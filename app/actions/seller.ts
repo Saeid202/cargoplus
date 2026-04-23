@@ -460,7 +460,7 @@ export async function getCategories() {
     const supabase = await createServerClient();
     const { data, error } = await supabase
       .from("categories")
-      .select("id, name, slug")
+      .select("id, name, slug, description, image_url, parent_id, created_at")
       .order("name");
     
     if (error) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Mail, Phone, MapPin, Edit, Save, Upload, Shield, CheckCircle, AlertCircle, Camera, Package, ShoppingCart, TrendingUp, Eye, Star } from "lucide-react";
+import { User, Users, Mail, Phone, MapPin, Edit, Save, Upload, Shield, CheckCircle, AlertCircle, Camera, Package, ShoppingCart, TrendingUp, Eye, Star } from "lucide-react";
 
 export default function ProfileSection() {
   const [isEditing, setIsEditing] = useState(false);
