@@ -63,15 +63,13 @@ export default function ProfilePage() {
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) return;
     
-    // Only update the fields that exist in the database schema
-    // @ts-ignore - TypeScript database typing issues, but runtime works correctly
     const { error } = await supabase
       .from("profiles")
       .update({
         full_name: profile.full_name,
         phone: profile.phone,
         updated_at: new Date().toISOString()
-      })
+      } as any)
       .eq("id", s.session.user.id);
     
     if (error) setError(error.message); else setSuccess(true);
