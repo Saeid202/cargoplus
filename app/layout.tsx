@@ -11,6 +11,8 @@ const inter = Inter({
   preload: true,
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: "CargoPlus - Construction Materials & Robots Marketplace",

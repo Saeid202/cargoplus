@@ -75,16 +75,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  // Get all products from database for static generation
-  const result = await getProducts({ limit: 100 });
-  
-  if (result.data && result.data.length > 0) {
-    return result.data.map((p) => ({ slug: p.slug }));
-  }
-  
-  // Fall back to mock data
-  return mockProducts.map((p) => ({ slug: p.slug }));
+  // Skip static generation — use dynamic rendering at request time
+  return [];
 }
+
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
