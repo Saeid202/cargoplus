@@ -96,7 +96,7 @@ export async function getAllOrdersForAgent(): Promise<{ data: AgentOrder[]; erro
     const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
 
     const data: AgentOrder[] = (orders ?? []).map((o: any) => {
-      const profile = profileMap.get(o.user_id);
+      const profile = profileMap.get(o.user_id) as any;
       return {
         ...o,
         items: (o.consolidation_order_items ?? []).sort((a: any, b: any) => a.position - b.position),
