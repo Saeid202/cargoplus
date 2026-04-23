@@ -1,0 +1,16 @@
+{
+  "name": "CargoPlus - Construction Materials & Robots Marketplace",
+  "short_name": "CargoPlus",
+  "description": "B2C e-commerce marketplace for construction materials and robots",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

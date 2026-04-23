@@ -1,0 +1,576 @@
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Plus, Trash2, Eye, Pencil, Download, MessageSquare, X,
+  Loader2, Package, ChevronDown, ChevronUp, Send, ExternalLink, ImagePlus,
+} from "lucide-react";
+import {
+  getMyOrders, createOrder, updateOrder, deleteOrder, updateOrderNotes,
+  uploadItemImages, getOrderImages, deleteItemImage,
+  type ConsolidationOrder, type OrderItem, type ItemImage,
+} from "@/app/actions/consolidation";
+import { CATEGORIES, UNITS } from "@/lib/consolidation-constants";
+
+// ── constants ─────────────────────────────────────────────────────────────────
+const PRIORITY_CONFIG = {
+  high:   { label: "High",   className: "bg-red-100 text-red-700 border border-red-200" },
+  medium: { label: "Medium", className: "bg-amber-100 text-amber-700 border border-amber-200" },
+  low:    { label: "Low",    className: "bg-green-100 text-green-700 border border-green-200" },
+};
+
+const inp = "w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-0 bg-white transition-colors placeholder-gray-300";
+const inpSm = "w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-0 bg-white transition-colors";
+
+function emptyItem(position: number): OrderItem {
+  return { product_name: "", category: CATEGORIES[0], specification: "", quantity: 1, unit: "pcs", target_price: null, reference_link: "", priority: "medium", position };
+}
+
+// ── PDF export ────────────────────────────────────────────────────────────────
+async function exportPDF(order: ConsolidationOrder) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF();
+  doc.setFontSize(16); doc.text(order.order_name, 14, 16);
+  doc.setFontSize(9); doc.text(`Submitted: ${new Date(order.created_at).toLocaleDateString()}`, 14, 23);
+  let y = 32;
+  order.items.forEach((item, i) => {
+    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(`${i + 1}. ${item.product_name}`, 14, y); y += 6;
+    doc.setFontSize(9); doc.setFont("helvetica", "normal");
+    doc.text(`Category: ${item.category}  |  Qty: ${item.quantity} ${item.unit}  |  Priority: ${item.priority}`, 14, y); y += 5;
+    if (item.target_price) { doc.text(`Target Price: $${item.target_price}`, 14, y); y += 5; }
+    if (item.specification) { doc.text(`Spec: ${item.specification}`, 14, y); y += 5; }
+    if (item.reference_link) { doc.text(`Ref: ${item.reference_link}`, 14, y); y += 5; }
+    y += 3;
+    if (y > 270) { doc.addPage(); y = 16; }
+  });
+  if (order.notes) { doc.setFont("helvetica", "italic"); doc.text(`Notes: ${order.notes}`, 14, y); }
+  doc.save(`order-${order.order_name.replace(/\s+/g, "-")}.pdf`);
+}
+
+// ── Order form ────────────────────────────────────────────────────────────────
+function OrderForm({ existing, onDone }: { existing?: ConsolidationOrder; onDone: () => void }) {
+  const [orderName, setOrderName] = useState(existing?.order_name ?? "");
+  const [notes, setNotes] = useState(existing?.notes ?? "");
+  const [items, setItems] = useState<OrderItem[]>(existing?.items.length ? existing.items : [emptyItem(0)]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // newFiles[i] = files staged for upload for item i
+  const [newFiles, setNewFiles] = useState<File[][]>(() => (existing?.items ?? [emptyItem(0)]).map(() => []));
+  // existingImages[i] = already-saved images for item i (edit mode)
+  const [existingImages, setExistingImages] = useState<ItemImage[][]>(() => (existing?.items ?? []).map(() => []));
+
+  // Load existing images when editing
+  useEffect(() => {
+    if (!existing) return;
+    getOrderImages(existing.id).then((imgs) => {
+      const grouped = existing.items.map((_, i) => imgs.filter((img) => img.item_index === i));
+      setExistingImages(grouped);
+    });
+  }, [existing]);
+
+  function setItem(i: number, field: keyof OrderItem, value: any) {
+    setItems((prev) => prev.map((item, idx) => idx === i ? { ...item, [field]: value } : item));
+  }
+
+  function addItem() {
+    setItems((prev) => [...prev, emptyItem(prev.length)]);
+    setNewFiles((prev) => [...prev, []]);
+    setExistingImages((prev) => [...prev, []]);
+  }
+
+  function removeItem(i: number) {
+    setItems((prev) => prev.filter((_, idx) => idx !== i));
+    setNewFiles((prev) => prev.filter((_, idx) => idx !== i));
+    setExistingImages((prev) => prev.filter((_, idx) => idx !== i));
+  }
+
+  function addFiles(i: number, files: FileList) {
+    setNewFiles((prev) => prev.map((arr, idx) => idx === i ? [...arr, ...Array.from(files)] : arr));
+  }
+
+  function removeNewFile(i: number, fi: number) {
+    setNewFiles((prev) => prev.map((arr, idx) => idx === i ? arr.filter((_, j) => j !== fi) : arr));
+  }
+
+  async function removeExistingImage(i: number, img: ItemImage) {
+    await deleteItemImage(img.id, img.storage_path);
+    setExistingImages((prev) => prev.map((arr, idx) => idx === i ? arr.filter((x) => x.id !== img.id) : arr));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (items.length === 0) { setError("Add at least one product line."); return; }
+    setSaving(true); setError(null);
+
+    const result = existing
+      ? await updateOrder(existing.id, orderName, notes || null, items)
+      : await createOrder(orderName, notes || null, items);
+
+    if ("error" in result && result.error) { setError(result.error); setSaving(false); return; }
+
+    const orderId = existing ? existing.id : (result as any).id;
+
+    // Upload new images per item
+    for (let i = 0; i < newFiles.length; i++) {
+      if (newFiles[i].length === 0) continue;
+      const attachments: { name: string; base64: string; type: string }[] = [];
+      for (const file of newFiles[i]) {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.readAsDataURL(file);
+        });
+        attachments.push({ name: file.name, base64, type: file.type });
+      }
+      await uploadItemImages(orderId, i, attachments);
+    }
+
+    setSaving(false);
+    onDone();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700 flex items-center gap-2">
+          <X className="h-4 w-4 shrink-0" />{error}
+        </div>
+      )}
+
+      {/* Order name */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5">
+        <label className="block text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">📦 Order Name *</label>
+        <input type="text" required value={orderName} onChange={(e) => setOrderName(e.target.value)}
+          placeholder="e.g. Spring 2026 Batch — Electronics"
+          className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 bg-white placeholder-blue-200 transition-colors" />
+      </div>
+
+      {/* Product lines */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-bold text-gray-800">Product Lines</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Add one or more products to this order</p>
+          </div>
+          <button type="button" onClick={addItem}
+            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20">
+            <Plus className="h-3.5 w-3.5" /> Add Product Line
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {items.map((item, i) => {
+            const accentGradient = item.priority === "high" ? "from-red-500 to-rose-600" : item.priority === "low" ? "from-emerald-500 to-teal-600" : "from-blue-400 to-indigo-500";
+            return (
+              <div key={i} className="relative rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-white">
+                <div className={`absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b ${accentGradient}`} />
+                <div className="pl-5 pr-4 pt-4 pb-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br ${accentGradient} text-white text-[10px] font-black`}>{i + 1}</span>
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Line {i + 1}</span>
+                    </div>
+                    {items.length > 1 && (
+                      <button type="button" onClick={() => removeItem(i)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-red-500 bg-red-50 hover:bg-red-100 transition-colors">
+                        <Trash2 className="h-3 w-3" /> Remove
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Row 1 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-6 gap-3 mb-3">
+                    <div className="sm:col-span-3 space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Product Name *</label>
+                      <input type="text" required value={item.product_name}
+                        onChange={(e) => setItem(i, "product_name", e.target.value)}
+                        placeholder="e.g. Galvanized Steel Pipe"
+                        className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 bg-white placeholder-gray-300 transition-colors font-medium" />
+                      {/* Sample images */}
+                      <div className="mt-2">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {/* Existing saved images */}
+                          {(existingImages[i] ?? []).map((img) => (
+                            <div key={img.id} className="relative group h-16 w-16 rounded-xl overflow-hidden border-2 border-blue-100 shadow-sm">
+                              <img src={img.url} alt={img.file_name} className="h-full w-full object-cover" />
+                              <button type="button" onClick={() => removeExistingImage(i, img)}
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <X className="h-4 w-4 text-white" />
+                              </button>
+                            </div>
+                          ))}
+                          {/* New staged images */}
+                          {(newFiles[i] ?? []).map((file, fi) => (
+                            <div key={fi} className="relative group h-16 w-16 rounded-xl overflow-hidden border-2 border-indigo-200 shadow-sm">
+                              <img src={URL.createObjectURL(file)} alt={file.name} className="h-full w-full object-cover" />
+                              <button type="button" onClick={() => removeNewFile(i, fi)}
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <X className="h-4 w-4 text-white" />
+                              </button>
+                            </div>
+                          ))}
+                          {/* Upload button */}
+                          <label className="flex flex-col items-center justify-center h-16 w-16 rounded-xl border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-colors">
+                            <ImagePlus className="h-5 w-5 text-gray-300 hover:text-blue-400" />
+                            <span className="text-[9px] text-gray-300 mt-0.5">Add</span>
+                            <input type="file" multiple accept="image/*" className="hidden"
+                              onChange={(e) => e.target.files && addFiles(i, e.target.files)} />
+                          </label>
+                        </div>
+                        {((existingImages[i]?.length ?? 0) + (newFiles[i]?.length ?? 0)) > 0 && (
+                          <p className="text-[10px] text-gray-400">{(existingImages[i]?.length ?? 0) + (newFiles[i]?.length ?? 0)} sample image{((existingImages[i]?.length ?? 0) + (newFiles[i]?.length ?? 0)) !== 1 ? "s" : ""} · hover to remove</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2 space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Category *</label>
+                      <select value={item.category} onChange={(e) => setItem(i, "category", e.target.value)}
+                        className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 bg-white transition-colors">
+                        {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div className="sm:col-span-1 space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Priority *</label>
+                      <select value={item.priority} onChange={(e) => setItem(i, "priority", e.target.value as any)}
+                        className={`w-full px-3 py-2.5 border-2 rounded-xl text-sm font-semibold focus:outline-none transition-colors ${
+                          item.priority === "high" ? "border-red-300 bg-red-50 text-red-700" :
+                          item.priority === "medium" ? "border-indigo-300 bg-indigo-50 text-indigo-700" :
+                          "border-green-300 bg-green-50 text-green-700"
+                        }`}>
+                        <option value="high">🔴 High</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="low">🟢 Low</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 2 */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Quantity *</label>
+                      <input type="number" required min={0} step="any" value={item.quantity}
+                        onChange={(e) => setItem(i, "quantity", parseFloat(e.target.value))}
+                        className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 bg-white transition-colors font-medium" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Unit *</label>
+                      <select value={item.unit} onChange={(e) => setItem(i, "unit", e.target.value)}
+                        className="w-full px-3 py-2.5 border-2 border-indigo-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400 bg-indigo-50 text-indigo-700 font-semibold transition-colors">
+                        {UNITS.map((u) => <option key={u}>{u}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Target Price ($/unit)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">$</span>
+                        <input type="number" min={0} step="any" value={item.target_price ?? ""}
+                          onChange={(e) => setItem(i, "target_price", e.target.value ? parseFloat(e.target.value) : null)}
+                          placeholder="0.00"
+                          className="w-full pl-7 pr-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400 bg-white placeholder-gray-300 transition-colors" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Reference Link</label>
+                      <input type="url" value={item.reference_link ?? ""}
+                        onChange={(e) => setItem(i, "reference_link", e.target.value || null)}
+                        placeholder="https://alibaba.com/..."
+                        className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-purple-400 bg-white placeholder-gray-300 transition-colors" />
+                    </div>
+                  </div>
+
+                  {/* Row 3 */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Specification</label>
+                    <input type="text" value={item.specification ?? ""}
+                      onChange={(e) => setItem(i, "specification", e.target.value || null)}
+                      placeholder="Size, color, material, grade, standard…"
+                      className="w-full px-3 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 bg-gray-50 placeholder-gray-300 transition-colors" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-100 rounded-2xl p-5">
+        <label className="block text-xs font-bold text-violet-700 uppercase tracking-widest mb-2">📝 Notes for Agent</label>
+        <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)}
+          placeholder="Any additional instructions, delivery requirements, or special requests…"
+          className="w-full px-4 py-3 border-2 border-violet-200 rounded-xl text-sm focus:outline-none focus:border-violet-400 bg-white placeholder-violet-200 resize-none transition-colors" />
+      </div>
+
+      <div className="flex gap-3 pt-2">
+        <button type="submit" disabled={saving}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-blue-500/25">
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          {existing ? "💾 Save Changes" : "🚀 Submit Order"}
+        </button>
+        <button type="button" onClick={onDone}
+          className="px-6 py-3 text-sm font-semibold border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors text-gray-600">
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// ── View modal ────────────────────────────────────────────────────────────────
+function ViewModal({ order, onClose }: { order: ConsolidationOrder; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="font-bold text-gray-900">{order.order_name}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="overflow-y-auto p-6 space-y-4">
+          {order.items.map((item, i) => (
+            <div key={i} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-semibold text-gray-900 text-sm">{item.product_name}</h3>
+                <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${PRIORITY_CONFIG[item.priority].className}`}>
+                  {PRIORITY_CONFIG[item.priority].label}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
+                <span><b>Category:</b> {item.category}</span>
+                <span><b>Qty:</b> {item.quantity} {item.unit}</span>
+                {item.target_price && <span><b>Target:</b> ${item.target_price}/unit</span>}
+                {item.specification && <span className="col-span-2"><b>Spec:</b> {item.specification}</span>}
+                {item.reference_link && (
+                  <span className="col-span-2">
+                    <b>Ref: </b>
+                    <a href={item.reference_link} target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline inline-flex items-center gap-0.5">
+                      {item.reference_link.replace(/^https?:\/\//, "").slice(0, 40)}…
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+          {order.notes && (
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800">
+              <b>Notes:</b> {order.notes}
+            </div>
+          )}
+        </div>
+        <div className="px-6 py-4 border-t border-gray-100 flex gap-2">
+          <button onClick={() => exportPDF(order)}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
+            <Download className="h-4 w-4" /> PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Note editor ───────────────────────────────────────────────────────────────
+function NoteEditor({ order, onClose, onSaved }: { order: ConsolidationOrder; onClose: () => void; onSaved: (notes: string) => void }) {
+  const [text, setText] = useState(order.notes ?? "");
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    await updateOrderNotes(order.id, text);
+    setSaving(false);
+    onSaved(text);
+  }
+
+  return (
+    <div>
+      <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)}
+        placeholder="Add notes for the agent…"
+        className="w-full px-3 py-2 border border-violet-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none" />
+      <div className="flex gap-2 mt-2">
+        <button onClick={handleSave} disabled={saving}
+          className="flex items-center gap-1.5 px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-lg hover:bg-violet-700 disabled:opacity-50 transition-colors">
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+          Save Note
+        </button>
+        <button onClick={onClose} className="px-4 py-2 text-sm border border-violet-200 rounded-lg hover:bg-violet-50">Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+export default function ConsolidationPage() {
+  const [orders, setOrders] = useState<ConsolidationOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"table" | "form" | "edit">("table");
+  const [editOrder, setEditOrder] = useState<ConsolidationOrder | null>(null);
+  const [viewOrder, setViewOrder] = useState<ConsolidationOrder | null>(null);
+  const [noteOrderId, setNoteOrderId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const result = await getMyOrders();
+    setOrders(result.data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this order? This cannot be undone.")) return;
+    setDeleting(id);
+    await deleteOrder(id);
+    setDeleting(null);
+    load();
+  }
+
+  function handleNotesSaved(orderId: string, notes: string) {
+    setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, notes } : o));
+    setNoteOrderId(null);
+  }
+
+  return (
+    <div className="space-y-6">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Consolidation / RFQ</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{orders.length} order{orders.length !== 1 ? "s" : ""} submitted</p>
+        </div>
+        {view === "table" && (
+          <button onClick={() => setView("form")}
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20">
+            <Plus className="h-4 w-4" /> New Order
+          </button>
+        )}
+      </div>
+
+      {/* Form */}
+      {(view === "form" || view === "edit") && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-5">{view === "edit" ? "Edit Order" : "New Order"}</h2>
+          <OrderForm
+            existing={view === "edit" ? editOrder ?? undefined : undefined}
+            onDone={() => { setView("table"); setEditOrder(null); load(); }}
+          />
+        </div>
+      )}
+
+      {/* Order cards */}
+      {view === "table" && (
+        <div>
+          {loading ? (
+            <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-blue-500" /></div>
+          ) : orders.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm text-center py-20">
+              <Package className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-400 mb-3">No orders yet.</p>
+              <button onClick={() => setView("form")} className="text-sm text-blue-600 hover:underline">Submit your first order</button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map((order) => {
+                const noteOpen = noteOrderId === order.id;
+                const highCount = order.items.filter((i) => i.priority === "high").length;
+                const medCount  = order.items.filter((i) => i.priority === "medium").length;
+                const lowCount  = order.items.filter((i) => i.priority === "low").length;
+                return (
+                  <div key={order.id}>
+                    <div className={`relative overflow-hidden rounded-2xl border shadow-sm transition-all ${noteOpen ? "border-violet-200 shadow-violet-100" : "border-gray-100 hover:shadow-md hover:border-blue-100"}`}>
+                      {/* Top gradient accent */}
+                      <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+
+                      <div className="bg-white px-6 py-5 flex items-center gap-6">
+                        {/* Order icon */}
+                        <div className="shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                          <Package className="h-6 w-6 text-white" />
+                        </div>
+
+                        {/* Order info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-gray-900 text-base truncate">{order.order_name}</h3>
+                            <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                              {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+
+                          {/* Product chips */}
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {order.items.slice(0, 4).map((item, i) => (
+                              <span key={i} className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-gray-100 text-gray-600">
+                                {item.product_name}
+                              </span>
+                            ))}
+                            {order.items.length > 4 && (
+                              <span className="px-2 py-0.5 rounded-lg text-[11px] font-medium bg-gray-100 text-gray-400">
+                                +{order.items.length - 4} more
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Priority breakdown + date */}
+                          <div className="flex items-center gap-3 text-xs text-gray-400">
+                            {highCount > 0 && <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />{highCount} high</span>}
+                            {medCount > 0  && <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-indigo-400" />{medCount} medium</span>}
+                            {lowCount > 0  && <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500" />{lowCount} low</span>}
+                            <span className="ml-auto">{new Date(order.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="shrink-0 flex items-center gap-2">
+                          <button onClick={() => setViewOrder(order)}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md shadow-blue-500/20 transition-all">
+                            <Eye className="h-3.5 w-3.5" /> View
+                          </button>
+                          <button onClick={() => { setEditOrder(order); setView("edit"); }}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all">
+                            <Pencil className="h-3.5 w-3.5" /> Edit
+                          </button>
+                          <button onClick={() => setNoteOrderId(noteOpen ? null : order.id)}
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${noteOpen ? "bg-violet-600 text-white border-violet-600 shadow-md shadow-violet-500/20" : "text-violet-700 bg-violet-50 hover:bg-violet-100 border-violet-200"}`}>
+                            <MessageSquare className="h-3.5 w-3.5" /> Note
+                          </button>
+                          <button onClick={() => exportPDF(order)}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-all">
+                            <Download className="h-3.5 w-3.5" /> PDF
+                          </button>
+                          <button onClick={() => handleDelete(order.id)} disabled={deleting === order.id}
+                            className="flex items-center justify-center h-8 w-8 rounded-xl text-red-400 bg-red-50 hover:bg-red-100 border border-red-100 transition-all disabled:opacity-50">
+                            {deleting === order.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Inline notes */}
+                    {noteOpen && (
+                      <div className="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 border-t-0 rounded-b-2xl px-6 py-4 -mt-2 pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4 text-violet-600" />
+                            <span className="text-sm font-semibold text-violet-900">Notes — {order.order_name}</span>
+                          </div>
+                          <button onClick={() => setNoteOrderId(null)} className="p-1 rounded-lg hover:bg-violet-100 text-violet-400 hover:text-violet-600">
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <NoteEditor order={order} onClose={() => setNoteOrderId(null)} onSaved={(notes) => handleNotesSaved(order.id, notes)} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {viewOrder && <ViewModal order={viewOrder} onClose={() => setViewOrder(null)} />}
+    </div>
+  );
+}

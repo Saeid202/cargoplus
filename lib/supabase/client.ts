@@ -1,0 +1,52 @@
+import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr'
+import type { Database } from '@/types/database'
+
+let client: ReturnType<typeof createSupabaseBrowserClient<Database>> | null = null
+
+export function createBrowserClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.'
+    )
+  }
+
+  if (!client) {
+    client = createSupabaseBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          // Read cookies from document.cookie
+          const cookies: { name: string; value: string }[] = []
+          if (typeof document !== 'undefined' && document.cookie) {
+            document.cookie.split(';').forEach((cookie) => {
+              const [name, ...rest] = cookie.trim().split('=')
+              if (name && rest.length > 0) {
+                cookies.push({ name, value: rest.join('=') })
+              }
+            })
+          }
+          return cookies
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              let cookie = `${name}=${value}`
+              if (options.maxAge) cookie += `; max-age=${options.maxAge}`
+              if (options.path) cookie += `; path=${options.path}`
+              if (options.domain) cookie += `; domain=${options.domain}`
+              if (options.sameSite) cookie += `; samesite=${options.sameSite}`
+              if (options.secure) cookie += '; secure'
+              document.cookie = cookie
+            })
+          } catch {
+            // Ignore cookie errors on client
+          }
+        },
+      },
+    })
+  }
+
+  return client
+}
