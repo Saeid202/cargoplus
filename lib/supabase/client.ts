@@ -1,7 +1,6 @@
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr'
-import type { Database } from '@/types/database'
 
-let client: ReturnType<typeof createSupabaseBrowserClient<Database>> | null = null
+let client: ReturnType<typeof createSupabaseBrowserClient> | null = null
 
 export function createBrowserClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -14,7 +13,7 @@ export function createBrowserClient() {
   }
 
   if (!client) {
-    client = createSupabaseBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
+    client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           // Read cookies from document.cookie
