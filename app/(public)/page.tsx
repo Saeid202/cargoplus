@@ -63,7 +63,7 @@ export default async function HomePage() {
     specifications: product.specifications as Record<string, string>,
     createdAt: product.created_at,
     updatedAt: product.updated_at,
-    images: product.product_images.map((img) => ({
+    images: product.product_images.map((img: any) => ({
       id: img.id,
       productId: img.product_id,
       url: img.url,
