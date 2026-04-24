@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
 
-const SVG = path.resolve('public/logo.svg');
+const SVG = path.resolve('public/logo-icon.svg');
 const OUT = path.resolve('public/icons');
 
 async function main() {
