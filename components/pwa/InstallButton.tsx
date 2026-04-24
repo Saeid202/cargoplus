@@ -39,15 +39,31 @@ export function InstallButton() {
     setIsIOS(detectIOS());
     if ('Notification' in window) setNotifPermission(Notification.permission);
 
+    // Check if previously installed (localStorage flag)
+    const wasInstalled = localStorage.getItem('pwa-installed') === 'true';
+
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
+      // beforeinstallprompt fires = app is NOT installed (or was uninstalled)
+      localStorage.removeItem('pwa-installed');
       setDeferredPrompt(e);
       setIsInstalled(false);
     };
     const handleAppInstalled = () => {
+      localStorage.setItem('pwa-installed', 'true');
       setIsInstalled(true);
       setDeferredPrompt(null);
     };
+
+    // If standalone mode, mark as installed
+    if (isStandaloneMode()) {
+      localStorage.setItem('pwa-installed', 'true');
+    }
+
+    // If was installed but not in standalone = was uninstalled, wait for prompt
+    if (wasInstalled && !isStandaloneMode()) {
+      setIsInstalled(false); // show button once prompt fires
+    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -72,8 +88,12 @@ export function InstallButton() {
   async function handleInstall() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
+    if (outcome === 'dismissed') {
+      // Keep button available if user dismissed
+      localStorage.removeItem('pwa-installed');
+    }
   }
 
   async function handleEnableNotifications() {
