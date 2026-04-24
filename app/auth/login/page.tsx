@@ -7,7 +7,13 @@ export const metadata: Metadata = {
   description: "Login to your CargoPlus account",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
+  const { redirect } = await searchParams;
+
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -17,12 +23,15 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white shadow-sm border border-gray-200 rounded-xl p-8">
-          <AuthForm mode="login" />
+          <AuthForm mode="login" redirectTo={redirect ?? "/account/dashboard"} />
         </div>
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/register" className="text-blue-600 font-medium hover:underline">
+          <Link
+            href={redirect ? `/auth/register?redirect=${encodeURIComponent(redirect)}` : "/auth/register"}
+            className="text-blue-600 font-medium hover:underline"
+          >
             Sign up
           </Link>
         </p>
