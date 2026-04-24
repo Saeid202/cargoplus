@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/actions/seller";
 import type { Category } from "@/types/database";
-import { X, Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
+import { Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
 import { LuxuryButton } from "@/components/seller/LuxuryButton";
 import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
+import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
 
 interface NewProductFormProps {
   categories: Category[];
