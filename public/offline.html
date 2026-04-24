@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — CargoPlus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #4B1D8F;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+    }
+    img { width: 120px; height: auto; margin-bottom: 2rem; }
+    h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+    p { font-size: 1rem; color: rgba(255,255,255,0.75); max-width: 320px; line-height: 1.6; }
+    button {
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 0.5rem;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: rgba(255,255,255,0.25); }
+  </style>
+</head>
+<body>
+  <img src="/icons/icon-192.png" alt="CargoPlus" />
+  <h1>You are offline</h1>
+  <p>Please check your internet connection and try again.</p>
+  <button onclick="window.location.reload()">Try again</button>
+</body>
+</html>

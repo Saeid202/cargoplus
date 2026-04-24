@@ -8,6 +8,7 @@ import { MobileMenu } from "./MobileMenu";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { SellerAuthModal } from "@/components/auth/SellerAuthModal";
 import { HeaderAuth } from "./HeaderAuth";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 interface HeaderProps {
   cmsNav?: React.ReactNode;
@@ -78,6 +79,7 @@ export function Header({ cmsNav }: HeaderProps) {
 
               {/* Auth — Desktop */}
               <div className="hidden lg:flex items-center gap-2">
+                <InstallButton />
                 <HeaderAuth />
               </div>
 

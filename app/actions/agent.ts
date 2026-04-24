@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { sendPushNotification } from "@/lib/push/sendPushNotification";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -157,6 +158,15 @@ export async function updateOrderStatus(orderId: string, status: string): Promis
     const { error } = await admin.from("consolidation_orders").update({ status }).eq("id", orderId);
     if (error) return { error: error.message };
     revalidatePath("/agent/orders");
+    // Fetch user_id for push notification
+    const { data: order } = await admin.from("consolidation_orders").select("user_id").eq("id", orderId).single();
+    if (order?.user_id) {
+      void sendPushNotification(order.user_id, {
+        title: "Order Update",
+        body: "Your order status has been updated. Tap to view.",
+        data: { url: "/account/consolidation" },
+      });
+    }
     return { error: null };
   } catch { return { error: "Failed to update status" }; }
 }
@@ -207,6 +217,9 @@ export async function submitAgentResponse(
       has_unread_response: true,
     }).eq("id", orderId);
 
+    // Fetch buyer user_id for push notification
+    const { data: orderRow } = await admin.from("consolidation_orders").select("user_id").eq("id", orderId).single();
+
     // Upload files
     for (const file of files) {
       const storagePath = `${user.id}/${orderId}/${Date.now()}-${file.name}`;
@@ -230,6 +243,14 @@ export async function submitAgentResponse(
     }
 
     revalidatePath("/agent/orders");
+    // Fire-and-forget push notification to buyer
+    if (orderRow?.user_id) {
+      void sendPushNotification(orderRow.user_id, {
+        title: "Quote Ready",
+        body: "Your consolidation order quote is ready. Tap to view.",
+        data: { url: "/account/consolidation" },
+      });
+    }
     return { error: null };
   } catch { return { error: "Failed to submit response" }; }
 }
@@ -274,6 +295,16 @@ export async function sendAgentMessage(
 
     // Mark unread for buyer
     await admin.from("consolidation_orders").update({ has_unread_response: true }).eq("id", orderId);
+
+    // Fetch buyer user_id for push notification
+    const { data: orderRow } = await admin.from("consolidation_orders").select("user_id").eq("id", orderId).single();
+    if (orderRow?.user_id) {
+      void sendPushNotification(orderRow.user_id, {
+        title: "New Message",
+        body: "Your agent has sent you a new message. Tap to view.",
+        data: { url: "/account/consolidation" },
+      });
+    }
 
     // Upload files
     for (const file of files) {

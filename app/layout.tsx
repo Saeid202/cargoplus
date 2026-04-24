@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ConditionalShell } from "@/components/layout/ConditionalShell";
 import { CmsNavigation } from "@/components/layout/CmsNavigation";
+import { ServiceWorkerRegistrar } from "@/components/pwa/ServiceWorkerRegistrar";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -73,9 +74,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: "/icons/icon-192.png",
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
 };
 
 export default async function RootLayout({
@@ -86,6 +87,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="flex min-h-screen flex-col">
+        <ServiceWorkerRegistrar />
         <ConditionalShell cmsNav={<CmsNavigation />}>{children}</ConditionalShell>
       </body>
     </html>
