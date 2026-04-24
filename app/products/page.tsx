@@ -33,6 +33,9 @@ function transformProduct(dbProduct: NonNullable<Awaited<ReturnType<typeof getPr
       url: img.url,
       altText: img.alt_text,
       position: img.position,
+      variantCode: (img as any).variant_code ?? null,
+      variantPrice: (img as any).variant_price ?? null,
+      isMaster: (img as any).is_master ?? false,
     })),
     category: dbProduct.categories ? {
       id: dbProduct.categories.id,

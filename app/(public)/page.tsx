@@ -69,6 +69,9 @@ export default async function HomePage() {
       url: img.url,
       altText: img.alt_text,
       position: img.position,
+      variantCode: (img as any).variant_code ?? null,
+      variantPrice: (img as any).variant_price ?? null,
+      isMaster: (img as any).is_master ?? false,
     })),
     category: product.categories ? {
       id: product.categories.id,
