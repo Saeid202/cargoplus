@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Home, Package2, BarChart3, Settings, Users, ShoppingCart, ChevronRight, Store } from "lucide-react";
+import { Menu, X, Home, Package2, Settings, Users, ShoppingCart, ChevronRight, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,7 +14,6 @@ const menuItems = [
   { id: "profile", label: "Profile", icon: Users, href: "/seller/profile" },
   { id: "products", label: "Products", icon: Package2, href: "/seller/products" },
   { id: "orders", label: "Orders", icon: ShoppingCart, href: "/seller/orders" },
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/seller/analytics" },
   { id: "settings", label: "Settings", icon: Settings, href: "/seller/settings" },
 ];
 

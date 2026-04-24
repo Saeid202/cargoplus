@@ -115,19 +115,24 @@ export function ProductDetailClient({ product }: Props) {
         {/* Main image */}
         <div className="flex-1">
           <div
-            className="relative aspect-square rounded-2xl overflow-hidden"
+            className="relative rounded-2xl overflow-hidden bg-white"
             style={{
               boxShadow: `0 0 0 1px ${PURPLE}, 0 0 0 4px ${GOLD}, 0 0 0 5px ${PURPLE}`,
+              minHeight: "420px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             {activeImage ? (
               <img
                 src={activeImage.url}
                 alt={activeImage.altText ?? product.name}
-                className="w-full h-full object-contain bg-white transition-all duration-300"
+                className="w-full h-auto block transition-all duration-300"
+                style={{ maxHeight: "520px", objectFit: "contain" }}
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-gray-400 bg-gray-50 min-h-[400px]">
+              <div className="flex items-center justify-center text-gray-400 bg-gray-50 min-h-[400px]">
                 No image available
               </div>
             )}
@@ -214,6 +219,48 @@ export function ProductDetailClient({ product }: Props) {
           </div>
         )}
 
+        {/* Specifications */}
+        {Object.entries(product.specifications as Record<string,string>)
+          .filter(([, v]) => v !== "" && v != null).length > 0 && (
+          <div className="mb-5">
+            <h2 className="font-bold text-gray-900 mb-3">Specifications</h2>
+            <div
+              className="flex w-full rounded-xl overflow-hidden border-2"
+              style={{ borderColor: `${PURPLE}33`, boxShadow: `0 2px 8px ${PURPLE}18` }}
+            >
+              {Object.entries(product.specifications as Record<string,string>)
+                .filter(([, v]) => v !== "" && v != null)
+                .map(([key, value], idx, arr) => (
+                  <div key={key} className="flex items-center flex-1">
+                    <div
+                      className="flex items-center gap-3 px-5 py-2 w-full"
+                      style={{ backgroundColor: idx % 2 === 0 ? "#F0EBF9" : "white" }}
+                    >
+                      <span
+                        className="text-xs font-extrabold uppercase tracking-widest whitespace-nowrap"
+                        style={{ color: PURPLE }}
+                      >
+                        {key.replace(/_/g, " ")}
+                      </span>
+                      <span
+                        className="text-base font-extrabold whitespace-nowrap"
+                        style={{ color: GOLD }}
+                      >
+                        {value}
+                      </span>
+                    </div>
+                    {idx < arr.length - 1 && (
+                      <span
+                        className="self-stretch w-0.5 flex-shrink-0"
+                        style={{ backgroundColor: `${PURPLE}33` }}
+                      />
+                    )}
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* Variant codes table */}
         {hasVariants && (
           <div className="mb-5">
@@ -273,21 +320,6 @@ export function ProductDetailClient({ product }: Props) {
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
-
-        {/* Specifications */}
-        {Object.keys(product.specifications).length > 0 && (
-          <div className="mb-5">
-            <h2 className="font-bold text-gray-900 mb-2">Specifications</h2>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {Object.entries(product.specifications).map(([key, value]) => (
-                <div key={key}>
-                  <dt className="text-gray-400 capitalize text-xs">{key.replace(/_/g, " ")}</dt>
-                  <dd className="font-semibold text-gray-900">{value}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
         )}
 

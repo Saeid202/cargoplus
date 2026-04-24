@@ -8,6 +8,7 @@ import type { Category } from "@/types/database";
 import { X, Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
 import { LuxuryButton } from "@/components/seller/LuxuryButton";
 import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
+import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
 
 interface EditProductFormProps {
   product: SellerProduct;
@@ -165,26 +166,7 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
       </div>
 
       <Section title="Specifications" />
-      <div className="space-y-3">
-        {specs.length > 0 && (
-          <div className="space-y-2">
-            {specs.map((spec, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <input type="text" placeholder="Key (e.g., Weight)" value={spec.key} onChange={(e) => updateSpec(i, "key", e.target.value)} className={`${inputClass} flex-1`} />
-                <input type="text" placeholder="Value (e.g., 30 kg)" value={spec.value} onChange={(e) => updateSpec(i, "value", e.target.value)} className={`${inputClass} flex-1`} />
-                <button type="button" onClick={() => removeSpec(i)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <button type="button" onClick={addSpec}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors hover:bg-[#EDE9F6]"
-          style={{ borderColor: GOLD, color: PURPLE }}>
-          + Add Specification
-        </button>
-      </div>
+      <SpecificationsEditor specs={specs} onChange={setSpecs} />
 
       <div className="flex gap-3 pt-4 border-t" style={{ borderColor: `${GOLD}44` }}>
         <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>
