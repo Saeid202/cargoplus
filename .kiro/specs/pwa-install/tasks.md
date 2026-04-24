@@ -139,7 +139,7 @@ Add a full PWA layer to the Next.js 16 / TypeScript / Tailwind / Supabase platfo
   - Import and render `<InstallButton />` in the right-side action area of the public header component, visible to all visitors
   - _Requirements: 5.1_
 
-- [ ] 15. Final checkpoint — Ensure all tests pass
+- [x] 15. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
