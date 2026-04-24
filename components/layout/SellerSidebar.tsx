@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Home, Package2, BarChart3, Settings, Users, ShoppingCart, ChevronRight } from "lucide-react";
+import { Menu, X, Home, Package2, BarChart3, Settings, Users, ShoppingCart, ChevronRight, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,133 +9,108 @@ interface SellerSidebarProps {
   children: React.ReactNode;
 }
 
+const menuItems = [
+  { id: "dashboard", label: "Dashboard", icon: Home, href: "/seller/dashboard" },
+  { id: "profile", label: "Profile", icon: Users, href: "/seller/profile" },
+  { id: "products", label: "Products", icon: Package2, href: "/seller/products" },
+  { id: "orders", label: "Orders", icon: ShoppingCart, href: "/seller/orders" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/seller/analytics" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/seller/settings" },
+];
+
 export default function SellerSidebar({ children }: SellerSidebarProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const menuItems = [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: Home,
-      href: "/seller/dashboard",
-    },
-    {
-      id: "profile",
-      label: "Profile",
-      icon: Users,
-      href: "/seller/profile",
-    },
-    {
-      id: "products",
-      label: "Products",
-      icon: Package2,
-      href: "/seller/products",
-    },
-    {
-      id: "orders",
-      label: "Orders",
-      icon: ShoppingCart,
-      href: "/seller/orders",
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      icon: BarChart3,
-      href: "/seller/analytics",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      href: "/seller/settings",
-    },
-  ];
-
-  const getActiveSection = () => {
-    const pathSegments = pathname.split('/');
-    const lastSegment = pathSegments[pathSegments.length - 1];
-    return lastSegment || 'dashboard';
-  };
-
-  const activeSection = getActiveSection();
+  const activeSection = (() => {
+    const segments = pathname.split("/");
+    return segments[2] || "dashboard";
+  })();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen flex bg-[#F5F4F7]">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
-          <Link href="/seller/dashboard" className="text-lg font-semibold text-gray-900">
-            CargoPlus
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 bg-[#4B1D8F] ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >        {/* Logo */}
+        <div className="flex h-16 items-center justify-between px-5 border-b border-white/10">
+          <Link href="/seller/dashboard" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: "#D4AF37" }}>
+              <Store className="h-4 w-4 text-white" />
+            </div>
+            <span className="text-white font-bold text-lg tracking-tight">Seller Centre</span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            className="lg:hidden p-1.5 rounded-lg text-purple-200 hover:bg-white/10"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </button>
         </div>
-        
-        <nav className="flex-1 px-4 py-6 space-y-2">
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
-            const isActive = activeSection === item.id || 
-                           (item.id === 'dashboard' && (pathname === '/seller' || pathname === '/seller/dashboard'));
-            
+            const isActive =
+              activeSection === item.id ||
+              (item.id === "dashboard" && (pathname === "/seller" || pathname === "/seller/dashboard"));
             return (
               <Link
                 key={item.id}
                 href={item.href}
-                className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-sm"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
                 onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? "text-white shadow-md"
+                    : "text-purple-200 hover:bg-white/10 hover:text-white"
+                }`}
+                style={isActive ? { backgroundColor: "#D4AF37", color: "#1a1a2e" } : {}}
               >
-                <item.icon className="h-5 w-5 mr-3" />
-                {item.label}
-                {isActive && (
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                )}
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span className="flex-1">{item.label}</span>
+                {isActive && <ChevronRight className="h-4 w-4" />}
               </Link>
             );
           })}
         </nav>
-      </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-white/10">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-xs text-purple-300 hover:text-white transition-colors"
+          >
+            ← Back to Store
+          </Link>
+        </div>
+      </aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}>
+          <div className="fixed inset-0 bg-black/50" />
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 lg:ml-64">
-        {/* Top Navigation */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-xl font-semibold text-gray-900">
-                {menuItems.find(item => item.id === activeSection)?.label || "Dashboard"}
-              </h1>
-              
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar */}
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <h1 className="text-base font-semibold text-gray-800 lg:text-lg">
+            {menuItems.find((i) => i.id === activeSection)?.label ?? "Dashboard"}
+          </h1>
+          <div id="seller-topbar-actions" />
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>

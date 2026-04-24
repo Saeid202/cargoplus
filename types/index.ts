@@ -74,6 +74,9 @@ export interface ProductImageData {
   url: string
   altText: string | null
   position: number
+  variantCode: string | null
+  variantPrice: number | null
+  isMaster: boolean
 }
 
 export interface CategoryData {

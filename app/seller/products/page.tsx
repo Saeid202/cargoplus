@@ -1,9 +1,12 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { getSellerProfile, getSellerProducts, deleteProduct } from "@/app/actions/seller";
-import { Package, Plus, Pencil, Trash2, MoreVertical } from "lucide-react";
+import { getSellerProfile, getSellerProducts } from "@/app/actions/seller";
+import { Package, Plus } from "lucide-react";
 import { ProductActions } from "./ProductActions";
+import { LuxuryLinkButton } from "@/components/seller/LuxuryButton";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "My Products",
@@ -24,104 +27,81 @@ export default async function SellerProductsPage() {
   const products = productsResult.data || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">My Products</h1>
-          <p className="text-muted-foreground">
-            {products.length} product{products.length !== 1 ? "s" : ""} listed
-          </p>
-        </div>
-        <Link
-          href="/seller/products/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90"
-        >
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-sm text-gray-500">
+          {products.length} product{products.length !== 1 ? "s" : ""} listed
+        </p>
+        <LuxuryLinkButton href="/seller/products/new" size="md">
           <Plus className="h-4 w-4" />
           Add Product
-        </Link>
+        </LuxuryLinkButton>
       </div>
 
       {products.length === 0 ? (
-        <div className="bg-card border rounded-xl p-12 text-center">
-          <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No products yet</h2>
-          <p className="text-muted-foreground mb-6">
-            Start adding products to sell on CargoPlus.
-          </p>
-          <Link
-            href="/seller/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90"
-          >
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4" style={{ backgroundColor: "#EDE9F6" }}>
+            <Package className="h-7 w-7" style={{ color: "#4B1D8F" }} />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-1">No products yet</h2>
+          <p className="text-sm text-gray-500 mb-5">Start adding products to sell on CargoPlus.</p>
+          <LuxuryLinkButton href="/seller/products/new" size="md">
             <Plus className="h-4 w-4" />
             Add Your First Product
-          </Link>
+          </LuxuryLinkButton>
         </div>
       ) : (
-        <div className="bg-card border rounded-xl overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b">
-                <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Product</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Category</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Price</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Stock</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ backgroundColor: "#F5F4F7" }}>
+                  {["Product", "Category", "Price", "Stock", "Status", "Actions"].map((h) => (
+                    <th key={h} className={`px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${h === "Actions" ? "text-right" : "text-left"}`}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-50">
                 {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-muted/30">
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden shrink-0">
+                        <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0" style={{ backgroundColor: "#EDE9F6" }}>
                           {product.product_images[0] ? (
-                            <img
-                              src={product.product_images[0].url}
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
+                            <img src={product.product_images[0].url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-5 w-5 text-muted-foreground" />
+                              <Package className="h-5 w-5" style={{ color: "#4B1D8F" }} />
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium truncate">{product.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{product.slug}</p>
+                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-xs text-gray-400 truncate">{product.slug}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm">
-                      {product.categories?.name || "Uncategorized"}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium">
-                      ${product.price.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={product.stock_quantity < 10 ? "text-red-600 font-medium" : ""}>
+                    <td className="px-4 py-3 text-gray-600">{product.categories?.name || "Uncategorized"}</td>
+                    <td className="px-4 py-3 font-semibold text-gray-900">${product.price.toFixed(2)}</td>
+                    <td className="px-4 py-3">
+                      <span className={product.stock_quantity < 10 ? "text-red-600 font-semibold" : "text-gray-600"}>
                         {product.stock_quantity}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          product.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : product.status === "pending"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : product.status === "rejected"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
+                      <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${
+                        product.status === "active" ? "bg-green-100 text-green-700"
+                        : product.status === "pending" ? "bg-yellow-100 text-yellow-700"
+                        : product.status === "rejected" ? "bg-red-100 text-red-700"
+                        : "bg-gray-100 text-gray-600"
+                      }`}>
                         {product.status}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <ProductActions productId={product.id} productName={product.name} />
+                      <ProductActions productId={product.id} productName={product.name} productSlug={product.slug} />
                     </td>
                   </tr>
                 ))}

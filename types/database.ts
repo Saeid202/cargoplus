@@ -177,6 +177,9 @@ export interface Database {
           url: string
           alt_text: string | null
           position: number
+          variant_code: string | null
+          variant_price: number | null
+          is_master: boolean
           created_at: string
         }
         Insert: {
@@ -185,6 +188,9 @@ export interface Database {
           url: string
           alt_text?: string | null
           position?: number
+          variant_code?: string | null
+          variant_price?: number | null
+          is_master?: boolean
           created_at?: string
         }
         Update: {
@@ -193,6 +199,9 @@ export interface Database {
           url?: string
           alt_text?: string | null
           position?: number
+          variant_code?: string | null
+          variant_price?: number | null
+          is_master?: boolean
           created_at?: string
         }
       }

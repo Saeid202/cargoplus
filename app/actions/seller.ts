@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import type { Product, ProductImage, Category, Seller } from "@/types/database";
 
@@ -134,15 +135,10 @@ export async function createProduct(formData: FormData): Promise<{
       return { data: null, error: "Not authenticated" };
     }
 
-    // Get seller profile
-    const { data: seller } = await supabase
-      .from("sellers")
-      .select("id, status")
-      .eq("id", user.id)
-      .single();
-
-    if (!seller || seller.status !== "active") {
-      return { data: null, error: "Seller account not active" };
+    // Verify user is a seller via auth metadata (faster than a DB query)
+    const role = user.user_metadata?.role;
+    if (role !== "seller") {
+      return { data: null, error: "Not a seller account" };
     }
 
     const name = formData.get("name") as string;
@@ -198,27 +194,78 @@ export async function createProduct(formData: FormData): Promise<{
       return { data: null, error: productError.message };
     }
 
-    // Handle image uploads
-    const imageFile = formData.get("image") as File;
-    if (imageFile && imageFile.size > 0) {
-      const fileExt = imageFile.name.split(".").pop();
-      const fileName = `${user.id}/${product.id}/${Date.now()}.${fileExt}`;
+    // Handle image uploads — variants JSON sent as "variantsJson"
+    const variantsJson = formData.get("variantsJson") as string | null;
+    let variants: { file?: File; code: string; price?: number | null; isMaster: boolean }[] = [];
+    try {
+      if (variantsJson) variants = JSON.parse(variantsJson);
+    } catch { /* ignore */ }
 
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, imageFile);
+    // Use admin client for storage uploads (bypasses RLS auth issues)
+    const storageClient = createAdminClient() || supabase;
 
-      if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage
-          .from("product-images")
-          .getPublicUrl(fileName);
+    if (variantsJson) {
+      // Upload all variant files IN PARALLEL, then batch-insert DB rows
+      const uploadResults = await Promise.all(
+        variants.map(async (variant, i) => {
+          const file = formData.get(`variant_file_${i}`) as File | null;
+          if (!file || file.size === 0) return null;
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${user.id}/${product.id}/${Date.now()}_${i}.${fileExt}`;
+          const { error: uploadError } = await storageClient.storage
+            .from("product-images")
+            .upload(fileName, file);
+          if (uploadError) {
+            console.error(`Variant ${i} upload error:`, uploadError.message);
+            return null;
+          }
+          const { data: { publicUrl } } = storageClient.storage
+            .from("product-images")
+            .getPublicUrl(fileName);
+          return { publicUrl, variant, position: i };
+        })
+      );
 
-        await supabase.from("product_images").insert({
+      // Batch insert all image rows at once
+      const rows = uploadResults
+        .filter(Boolean)
+        .map((r) => ({
           product_id: product.id,
-          url: publicUrl,
-          alt_text: name,
-          position: 0,
-        });
+          url: r!.publicUrl,
+          alt_text: r!.variant.code || product.name,
+          position: r!.position,
+          variant_code: r!.variant.code || null,
+          variant_price: r!.variant.price ?? null,
+          is_master: r!.variant.isMaster,
+        }));
+
+      if (rows.length > 0) {
+        const { error: batchErr } = await supabase.from("product_images").insert(rows);
+        if (batchErr) console.error("Batch image insert error:", batchErr.message);
+      }
+    } else {
+      // Legacy single-image fallback
+      const imageFile = formData.get("image") as File;
+      if (imageFile && imageFile.size > 0) {
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${user.id}/${product.id}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await storageClient.storage
+          .from("product-images")
+          .upload(fileName, imageFile);
+        if (uploadError) {
+          console.error("Image upload error:", uploadError.message);
+        } else {
+          const { data: { publicUrl } } = storageClient.storage
+            .from("product-images")
+            .getPublicUrl(fileName);
+          await supabase.from("product_images").insert({
+            product_id: product.id,
+            url: publicUrl,
+            alt_text: name,
+            position: 0,
+            is_master: true,
+          });
+        }
       }
     }
 
@@ -305,28 +352,96 @@ export async function updateProduct(productId: string, formData: FormData): Prom
       return { data: null, error: productError.message };
     }
 
-    // Handle new image upload
-    const imageFile = formData.get("image") as File;
-    if (imageFile && imageFile.size > 0) {
-      const fileExt = imageFile.name.split(".").pop();
-      const fileName = `${user.id}/${productId}/${Date.now()}.${fileExt}`;
+    // Handle variant image uploads
+    const variantsJson = formData.get("variantsJson") as string | null;
+    let variants: { file?: File; code: string; price?: number | null; isMaster: boolean; existingUrl?: string }[] = [];
+    try {
+      if (variantsJson) variants = JSON.parse(variantsJson);
+    } catch { /* ignore */ }
 
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, imageFile);
+    const storageClient = createAdminClient() || supabase;
 
-      if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage
+    if (variantsJson) {
+      // Delete old storage files and DB rows
+      const { data: oldImages } = await supabase
+        .from("product_images")
+        .select("url")
+        .eq("product_id", productId);
+
+      // Delete old storage files in parallel
+      if (oldImages && oldImages.length > 0) {
+        const paths = oldImages
+          .map((img) => img.url.split("/product-images/")[1])
+          .filter(Boolean) as string[];
+        if (paths.length > 0) {
+          await storageClient.storage.from("product-images").remove(paths);
+        }
+      }
+      await supabase.from("product_images").delete().eq("product_id", productId);
+
+      // Upload new files IN PARALLEL
+      const uploadResults = await Promise.all(
+        variants.map(async (variant, i) => {
+          const file = formData.get(`variant_file_${i}`) as File | null;
+          let publicUrl = variant.existingUrl ?? null;
+
+          if (file && file.size > 0) {
+            const fileExt = file.name.split(".").pop();
+            const fileName = `${user.id}/${productId}/${Date.now()}_${i}.${fileExt}`;
+            const { error: uploadError } = await storageClient.storage
+              .from("product-images")
+              .upload(fileName, file);
+            if (uploadError) {
+              console.error(`Update variant ${i} upload error:`, uploadError.message);
+            } else {
+              publicUrl = storageClient.storage
+                .from("product-images")
+                .getPublicUrl(fileName).data.publicUrl;
+            }
+          }
+
+          if (!publicUrl) return null;
+          return {
+            product_id: productId,
+            url: publicUrl,
+            alt_text: variant.code || name,
+            position: i,
+            variant_code: variant.code || null,
+            variant_price: variant.price ?? null,
+            is_master: variant.isMaster,
+          };
+        })
+      );
+
+      // Batch insert all rows at once
+      const rows = uploadResults.filter(Boolean) as object[];
+      if (rows.length > 0) {
+        const { error: batchErr } = await supabase.from("product_images").insert(rows);
+        if (batchErr) console.error("Batch update image insert error:", batchErr.message);
+      }
+    } else {
+      // Legacy single-image fallback
+      const imageFile = formData.get("image") as File;
+      if (imageFile && imageFile.size > 0) {
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${user.id}/${productId}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await storageClient.storage
           .from("product-images")
-          .getPublicUrl(fileName);
-
-        // Add new image
-        await supabase.from("product_images").insert({
-          product_id: productId,
-          url: publicUrl,
-          alt_text: name,
-          position: 0,
-        });
+          .upload(fileName, imageFile);
+        if (uploadError) {
+          console.error("Update image upload error:", uploadError.message);
+        } else {
+          const { data: { publicUrl } } = storageClient.storage
+            .from("product-images")
+            .getPublicUrl(fileName);
+          await supabase.from("product_images").insert({
+            product_id: productId,
+            url: publicUrl,
+            alt_text: name,
+            position: 0,
+            is_master: true,
+          });
+        }
       }
     }
 

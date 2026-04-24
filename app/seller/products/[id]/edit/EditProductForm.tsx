@@ -5,323 +5,192 @@ import { useRouter } from "next/navigation";
 import { updateProduct } from "@/app/actions/seller";
 import type { SellerProduct } from "@/app/actions/seller";
 import type { Category } from "@/types/database";
-import { Loader2, Upload, X } from "lucide-react";
+import { X, Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
+import { LuxuryButton } from "@/components/seller/LuxuryButton";
+import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
 
 interface EditProductFormProps {
   product: SellerProduct;
   categories: Category[];
 }
 
+const PURPLE = "#4B1D8F";
+const GOLD = "#D4AF37";
+
+function Field({ label, hint, required, icon: Icon, children }: {
+  label: string; hint?: string; required?: boolean; icon?: React.ElementType; children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2">
+        {Icon && (
+          <span className="flex h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: "#EDE9F6" }}>
+            <Icon className="h-3.5 w-3.5" style={{ color: PURPLE }} />
+          </span>
+        )}
+        <label className="text-sm font-semibold text-gray-700">
+          {label}{required && <span className="ml-1 font-bold" style={{ color: GOLD }}>*</span>}
+        </label>
+      </div>
+      {children}
+      {hint && <p className="text-xs text-gray-400 pl-8">{hint}</p>}
+    </div>
+  );
+}
+
+function Section({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-3 py-1">
+      <span className="h-px flex-1" style={{ background: `linear-gradient(to right, ${GOLD}55, transparent)` }} />
+      <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: GOLD }}>{title}</span>
+      <span className="h-px flex-1" style={{ background: `linear-gradient(to left, ${GOLD}55, transparent)` }} />
+    </div>
+  );
+}
+
+const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4B1D8F] focus:border-transparent transition-shadow";
+
 export function EditProductForm({ product, categories }: EditProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    product.product_images[0]?.url || null
-  );
+  const [variants, setVariants] = useState<VariantSlot[]>([]);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);
 
-  // Initialize specs from product
   useEffect(() => {
+    if (product.product_images.length > 0) {
+      const sorted = [...product.product_images].sort((a, b) => a.position - b.position);
+      const hasMaster = sorted.some((img) => (img as any).is_master === true);
+      setVariants(sorted.map((img, idx) => ({
+        id: img.id,
+        file: null,
+        preview: null,
+        existingUrl: img.url,
+        code: (img as any).variant_code ?? "",
+        price: (img as any).variant_price != null ? String((img as any).variant_price) : "",
+        isMaster: hasMaster ? (img as any).is_master === true : idx === 0,
+      })));
+    } else {
+      setVariants([newSlot(true)]);
+    }
     const specObj = product.specifications as Record<string, string>;
     if (specObj && Object.keys(specObj).length > 0) {
       setSpecs(Object.entries(specObj).map(([key, value]) => ({ key, value })));
     }
-  }, [product.specifications]);
+  }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const addSpec = () => {
-    setSpecs([...specs, { key: "", value: "" }]);
-  };
-
-  const removeSpec = (index: number) => {
-    setSpecs(specs.filter((_, i) => i !== index));
-  };
-
-  const updateSpec = (index: number, field: "key" | "value", value: string) => {
-    const updated = [...specs];
-    updated[index][field] = value;
-    setSpecs(updated);
+  const addSpec = () => setSpecs([...specs, { key: "", value: "" }]);
+  const removeSpec = (i: number) => setSpecs(specs.filter((_, idx) => idx !== i));
+  const updateSpec = (i: number, field: "key" | "value", val: string) => {
+    const updated = [...specs]; updated[i][field] = val; setSpecs(updated);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     const formData = new FormData(e.currentTarget);
-    
-    // Add specifications as JSON
     const specObj: Record<string, string> = {};
-    specs.forEach(({ key, value }) => {
-      if (key && value) {
-        specObj[key] = value;
-      }
-    });
+    specs.forEach(({ key, value }) => { if (key && value) specObj[key] = value; });
     formData.set("specifications", JSON.stringify(specObj));
-
+    const variantsMeta = variants.map((v) => ({
+      code: v.code,
+      price: v.price ? parseFloat(v.price) : null,
+      isMaster: v.isMaster,
+      existingUrl: v.file ? null : v.existingUrl,
+    }));
+    formData.set("variantsJson", JSON.stringify(variantsMeta));
+    variants.forEach((v, i) => { if (v.file) formData.set(`variant_file_${i}`, v.file); });
     const result = await updateProduct(product.id, formData);
-
-    if (result.error) {
-      setError(result.error);
-      setLoading(false);
-      return;
-    }
-
+    if (result.error) { setError(result.error); setLoading(false); return; }
     router.push("/seller/products");
+    router.refresh();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-7">
       {error && (
-        <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
+        <div className="flex items-start gap-3 p-4 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700">
+          <span className="mt-0.5 shrink-0">⚠</span> {error}
         </div>
       )}
 
-      {/* Product Image */}
-      <div>
-        <label className="block text-sm font-medium mb-1.5">Product Image</label>
-        <div className="border-2 border-dashed rounded-lg p-4">
-          {imagePreview ? (
-            <div className="relative w-32 h-32 mx-auto">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-full object-cover rounded-lg"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setImagePreview(null);
-                  const input = document.getElementById("image") as HTMLInputElement;
-                  if (input) input.value = "";
-                }}
-                className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ) : (
-            <label className="flex flex-col items-center justify-center py-8 cursor-pointer">
-              <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-              <span className="text-sm text-muted-foreground">Click to upload image</span>
-              <span className="text-xs text-muted-foreground mt-1">PNG, JPG up to 5MB</span>
-              <input
-                id="image"
-                name="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-          )}
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-gray-500">Current status:</span>
+        <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
+          product.status === "active" ? "bg-green-100 text-green-700"
+          : product.status === "pending" ? "bg-yellow-100 text-yellow-700"
+          : product.status === "rejected" ? "bg-red-100 text-red-700"
+          : "bg-gray-100 text-gray-600"
+        }`}>{product.status}</span>
       </div>
 
-      {/* Product Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1.5">
-          Product Name *
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          defaultValue={product.name}
-          className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-        />
+      <Section title="Product Images & Variants" />
+      <DraggableVariantGrid variants={variants} onChange={setVariants} />
+
+      <Section title="Product Details" />
+      <Field label="Product Name" required icon={Tag}>
+        <input id="name" name="name" type="text" required defaultValue={product.name} className={inputClass} />
+      </Field>
+      <Field label="Description" required icon={FileText}>
+        <textarea id="description" name="description" rows={4} required defaultValue={product.description ?? ""} className={`${inputClass} resize-none`} />
+      </Field>
+
+      <Section title="Pricing & Inventory" />
+      <div className="grid sm:grid-cols-2 gap-5">
+        <Field label="Category" required icon={Layers}>
+          <div className="relative">
+            <select id="categoryId" name="categoryId" required defaultValue={product.category_id} className={`${inputClass} appearance-none pr-9`}>
+              <option value="">Select a category</option>
+              {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+        </Field>
+        <Field label="Master Price (CAD)" required icon={DollarSign}>
+          <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">$</span>
+            <input id="price" name="price" type="number" step="0.01" min="0" required defaultValue={product.price} className={`${inputClass} pl-7`} />
+          </div>
+        </Field>
+        <Field label="Compare at Price (CAD)" icon={DollarSign} hint="Original price — used to show a discount badge">
+          <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">$</span>
+            <input id="compareAtPrice" name="compareAtPrice" type="number" step="0.01" min="0" defaultValue={product.compare_at_price ?? ""} className={`${inputClass} pl-7`} />
+          </div>
+        </Field>
+        <Field label="Stock Quantity" required icon={Hash}>
+          <input id="stockQuantity" name="stockQuantity" type="number" min="0" required defaultValue={product.stock_quantity} className={inputClass} />
+        </Field>
       </div>
 
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1.5">
-          Description *
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={4}
-          required
-          defaultValue={product.description || ""}
-          className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-        />
-      </div>
-
-      {/* Category and Price Row */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="categoryId" className="block text-sm font-medium mb-1.5">
-            Category *
-          </label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            required
-            defaultValue={product.category_id}
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium mb-1.5">
-            Price (CAD) *
-          </label>
-          <input
-            id="price"
-            name="price"
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            defaultValue={product.price}
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-      </div>
-
-      {/* Compare at Price and Stock Row */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="compareAtPrice" className="block text-sm font-medium mb-1.5">
-            Compare at Price (CAD)
-          </label>
-          <input
-            id="compareAtPrice"
-            name="compareAtPrice"
-            type="number"
-            step="0.01"
-            min="0"
-            defaultValue={product.compare_at_price || ""}
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <p className="text-xs text-muted-foreground mt-1">Original price for showing discount</p>
-        </div>
-
-        <div>
-          <label htmlFor="stockQuantity" className="block text-sm font-medium mb-1.5">
-            Stock Quantity *
-          </label>
-          <input
-            id="stockQuantity"
-            name="stockQuantity"
-            type="number"
-            min="0"
-            required
-            defaultValue={product.stock_quantity}
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-      </div>
-
-      {/* Specifications */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium">Specifications</label>
-          <button
-            type="button"
-            onClick={addSpec}
-            className="text-sm text-primary hover:underline"
-          >
-            + Add Specification
-          </button>
-        </div>
-        
+      <Section title="Specifications" />
+      <div className="space-y-3">
         {specs.length > 0 && (
-          <div className="space-y-2 mb-2">
-            {specs.map((spec, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Key (e.g., Weight)"
-                  value={spec.key}
-                  onChange={(e) => updateSpec(index, "key", e.target.value)}
-                  className="flex-1 px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Value (e.g., 30kg)"
-                  value={spec.value}
-                  onChange={(e) => updateSpec(index, "value", e.target.value)}
-                  className="flex-1 px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeSpec(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                >
+          <div className="space-y-2">
+            {specs.map((spec, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input type="text" placeholder="Key (e.g., Weight)" value={spec.key} onChange={(e) => updateSpec(i, "key", e.target.value)} className={`${inputClass} flex-1`} />
+                <input type="text" placeholder="Value (e.g., 30 kg)" value={spec.value} onChange={(e) => updateSpec(i, "value", e.target.value)} className={`${inputClass} flex-1`} />
+                <button type="button" onClick={() => removeSpec(i)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
               </div>
             ))}
           </div>
         )}
-        <p className="text-xs text-muted-foreground">
-          Add product specifications like dimensions, weight, material, etc.
-        </p>
+        <button type="button" onClick={addSpec}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors hover:bg-[#EDE9F6]"
+          style={{ borderColor: GOLD, color: PURPLE }}>
+          + Add Specification
+        </button>
       </div>
 
-      {/* Status Display */}
-      <div className="p-3 bg-muted rounded-lg">
-        <p className="text-sm">
-          <span className="font-medium">Status:</span>{" "}
-          <span
-            className={`font-medium ${
-              product.status === "active"
-                ? "text-green-600"
-                : product.status === "pending"
-                ? "text-yellow-600"
-                : product.status === "rejected"
-                ? "text-red-600"
-                : ""
-            }`}
-          >
-            {product.status}
-          </span>
-        </p>
-        {product.status === "pending" && (
-          <p className="text-xs text-muted-foreground mt-1">
-            This product is awaiting admin approval.
-          </p>
-        )}
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex gap-3 pt-4">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-4 py-2 border rounded-lg font-medium hover:bg-muted"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
+      <div className="flex gap-3 pt-4 border-t" style={{ borderColor: `${GOLD}44` }}>
+        <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>
+        <LuxuryButton type="submit" loading={loading} size="md" className="flex-1">
+          {loading ? "Saving Changes..." : "Save Changes"}
+        </LuxuryButton>
       </div>
     </form>
   );
