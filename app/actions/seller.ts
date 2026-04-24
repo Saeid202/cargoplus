@@ -569,6 +569,34 @@ export async function registerSeller(formData: FormData): Promise<{
   }
 }
 
+// Update seller profile
+export async function updateSellerProfile(data: {
+  business_name: string;
+  business_email: string;
+  business_phone: string;
+  business_address: string;
+  description: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+
+    const { error } = await supabase
+      .from("sellers")
+      .update({ ...data, updated_at: new Date().toISOString() })
+      .eq("id", user.id);
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath("/seller/profile");
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error updating seller profile:", err);
+    return { success: false, error: "Failed to update profile" };
+  }
+}
+
 // Get categories for product form
 export async function getCategories() {
   try {

@@ -232,11 +232,11 @@ function VariantCard({
         onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
       >
         {displayImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={displayImage}
-            alt="preview"
-            className="w-full h-40 object-contain bg-white"
-            draggable={false}
+            alt={slot.code || "variant"}
+            className="w-full h-40 object-contain bg-white pointer-events-none"
           />
         ) : (
           <div className="flex flex-col items-center justify-center h-40 gap-2 cursor-pointer">

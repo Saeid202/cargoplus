@@ -1,6 +1,6 @@
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { ServicesSection } from "@/components/home/ServicesSection";
-import { ProductShowcase } from "@/components/home/ProductShowcase";
+import { ProductShowcaseWrapper } from "@/components/home/ProductShowcaseWrapper";
 import { getHeroSlides } from "@/app/actions/hero-slides";
 import { getProducts } from "@/app/actions/products";
 import { mockHeroSlides, mockProducts } from "@/lib/mock-data";
@@ -94,7 +94,7 @@ export default async function HomePage() {
     <>
       <HeroSlider slides={heroSlides} />
       <ServicesSection />
-      <ProductShowcase products={products} title="Featured Products" />
+      <ProductShowcaseWrapper products={products} title="Featured Products" />
     </>
   );
 }

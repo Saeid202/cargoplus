@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { getProductBySlug } from "@/app/actions/products";
 import { mockProducts } from "@/lib/mock-data";
 import type { ProductWithRelations } from "@/types";
-import { ProductDetailClient } from "./ProductDetailClient";
+import { ProductDetailWrapper } from "./ProductDetailWrapper";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -91,7 +91,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <Link href="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
         <ArrowLeft className="h-4 w-4" /> Back to Products
       </Link>
-      <ProductDetailClient product={product} />
+      <ProductDetailWrapper product={product} />
     </div>
   );
 }

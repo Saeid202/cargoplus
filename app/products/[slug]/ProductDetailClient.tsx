@@ -12,9 +12,8 @@ interface Props {
 }
 
 export function ProductDetailClient({ product }: Props) {
-  // Separate master image from variants
   const masterImage = product.images.find((img) => img.isMaster) ?? product.images[0] ?? null;
-  const variantImages = product.images.filter((img) => img.variantCode);
+  const variantImages = product.images.filter((img) => !img.isMaster && img.id !== masterImage?.id);
 
   const hasVariants = variantImages.length > 0;
 
@@ -32,123 +31,158 @@ export function ProductDetailClient({ product }: Props) {
 
   return (
     <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
-      {/* ── LEFT: Image + variant thumbnails ── */}
-      <div className="space-y-4">
-        {/* Main image */}
-        <div
-          className="relative aspect-square rounded-2xl overflow-hidden"
-          style={{
-            boxShadow: `0 0 0 1px ${PURPLE}, 0 0 0 4px ${GOLD}, 0 0 0 5px ${PURPLE}`,
-          }}
-        >
-          {activeImage ? (
-            <img
-              src={activeImage.url}
-              alt={activeImage.altText ?? product.name}
-              className="w-full h-full object-contain bg-white transition-all duration-300"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-gray-400 bg-gray-50 min-h-[400px]">
-              No image available
-            </div>
-          )}
-          {hasDiscount && (
-            <span
-              className="absolute top-4 left-4 rounded-lg px-3 py-1 text-sm font-bold text-white"
-              style={{ backgroundColor: GOLD }}
-            >
-              Sale
-            </span>
-          )}
-          {activeCode && (
-            <span
-              className="absolute bottom-4 right-4 rounded-lg px-3 py-1 text-xs font-bold text-white tracking-widest"
-              style={{ backgroundColor: "rgba(75,29,143,0.85)" }}
-            >
-              {activeCode}
-            </span>
-          )}
-        </div>
-
-        {/* Variant thumbnail strip */}
+      {/* ── LEFT: Thumbnail column + main image ── */}
+      <div className="flex gap-3">
+        {/* Vertical thumbnail column */}
         {hasVariants && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD }}>
-              Available Variants
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {/* Master chip */}
-              {masterImage && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedVariant(masterImage)}
-                  className="group flex flex-col items-center gap-1.5 focus:outline-none"
+          <div
+            className="flex flex-col gap-2 overflow-y-auto max-h-[480px] p-2 rounded-2xl"
+            style={{
+              background: `linear-gradient(180deg, ${PURPLE}18 0%, ${PURPLE}08 100%)`,
+              border: `1.5px solid ${PURPLE}33`,
+              boxShadow: `inset 0 1px 4px ${PURPLE}18`,
+            }}
+          >
+            {/* Master thumbnail */}
+            {masterImage && (
+              <button
+                type="button"
+                onClick={() => setSelectedVariant(masterImage)}
+                className="group flex flex-col items-center gap-1 focus:outline-none flex-shrink-0"
+              >
+                <div
+                  className="relative h-16 w-16 rounded-xl overflow-hidden transition-all duration-200"
+                  style={{
+                    border: selectedVariant?.id === masterImage.id
+                      ? `2.5px solid ${GOLD}`
+                      : `2px solid ${PURPLE}44`,
+                    boxShadow: selectedVariant?.id === masterImage.id
+                      ? `0 0 0 2px ${PURPLE}, 0 4px 12px ${PURPLE}44`
+                      : `0 2px 6px ${PURPLE}22`,
+                    transform: selectedVariant?.id === masterImage.id ? "scale(1.06)" : "scale(1)",
+                  }}
                 >
-                  <div
-                    className="relative h-16 w-16 rounded-xl overflow-hidden border-2 transition-all"
-                    style={{
-                      borderColor:
-                        selectedVariant?.id === masterImage.id ? GOLD : "transparent",
-                      boxShadow:
-                        selectedVariant?.id === masterImage.id
-                          ? `0 0 0 1px ${PURPLE}`
-                          : "0 0 0 1px #e5e7eb",
-                    }}
-                  >
-                    <img src={masterImage.url} alt="Master" className="w-full h-full object-contain bg-white" />
-                  </div>
-                  <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: selectedVariant?.id === masterImage.id ? PURPLE : "#EDE9F6",
-                      color: selectedVariant?.id === masterImage.id ? "white" : PURPLE,
-                    }}
-                  >
-                    {masterImage.variantCode ?? "Master"}
-                  </span>
-                </button>
-              )}
+                  <img src={masterImage.url} alt="Master" className="w-full h-full object-contain bg-white" />
+                </div>
+                <span
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-center leading-tight max-w-[64px] truncate"
+                  style={{
+                    backgroundColor: selectedVariant?.id === masterImage.id ? PURPLE : "#EDE9F6",
+                    color: selectedVariant?.id === masterImage.id ? "white" : PURPLE,
+                  }}
+                >
+                  {masterImage.variantCode ?? "Master"}
+                </span>
+              </button>
+            )}
 
-              {/* Variant chips */}
-              {variantImages.map((img) => (
-                <button
-                  key={img.id}
-                  type="button"
-                  onClick={() => setSelectedVariant(img)}
-                  className="group flex flex-col items-center gap-1.5 focus:outline-none"
+            {/* Variant thumbnails */}
+            {variantImages.map((img) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setSelectedVariant(img)}
+                className="group flex flex-col items-center gap-1 focus:outline-none flex-shrink-0"
+              >
+                <div
+                  className="relative h-16 w-16 rounded-xl overflow-hidden transition-all duration-200"
+                  style={{
+                    border: selectedVariant?.id === img.id
+                      ? `2.5px solid ${GOLD}`
+                      : `2px solid ${PURPLE}44`,
+                    boxShadow: selectedVariant?.id === img.id
+                      ? `0 0 0 2px ${PURPLE}, 0 4px 12px ${PURPLE}44`
+                      : `0 2px 6px ${PURPLE}22`,
+                    transform: selectedVariant?.id === img.id ? "scale(1.06)" : "scale(1)",
+                  }}
                 >
-                  <div
-                    className="relative h-16 w-16 rounded-xl overflow-hidden border-2 transition-all"
-                    style={{
-                      borderColor: selectedVariant?.id === img.id ? GOLD : "transparent",
-                      boxShadow:
-                        selectedVariant?.id === img.id
-                          ? `0 0 0 1px ${PURPLE}`
-                          : "0 0 0 1px #e5e7eb",
-                    }}
-                  >
-                    <img src={img.url} alt={img.variantCode ?? ""} className="w-full h-full object-contain bg-white" />
-                  </div>
-                  <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors"
-                    style={{
-                      backgroundColor: selectedVariant?.id === img.id ? PURPLE : "#EDE9F6",
-                      color: selectedVariant?.id === img.id ? "white" : PURPLE,
-                    }}
-                  >
-                    {img.variantCode}
-                  </span>
-                </button>
-              ))}
-            </div>
+                  <img src={img.url} alt={img.variantCode ?? ""} className="w-full h-full object-contain bg-white" />
+                </div>
+                <span
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded-full transition-colors text-center leading-tight max-w-[64px] truncate"
+                  style={{
+                    backgroundColor: selectedVariant?.id === img.id ? PURPLE : "#EDE9F6",
+                    color: selectedVariant?.id === img.id ? "white" : PURPLE,
+                  }}
+                >
+                  {img.variantCode ?? `#${variantImages.indexOf(img) + 2}`}
+                </span>
+              </button>
+            ))}
           </div>
         )}
+
+        {/* Main image */}
+        <div className="flex-1">
+          <div
+            className="relative aspect-square rounded-2xl overflow-hidden"
+            style={{
+              boxShadow: `0 0 0 1px ${PURPLE}, 0 0 0 4px ${GOLD}, 0 0 0 5px ${PURPLE}`,
+            }}
+          >
+            {activeImage ? (
+              <img
+                src={activeImage.url}
+                alt={activeImage.altText ?? product.name}
+                className="w-full h-full object-contain bg-white transition-all duration-300"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-gray-400 bg-gray-50 min-h-[400px]">
+                No image available
+              </div>
+            )}
+            {hasDiscount && (
+              <span
+                className="absolute top-4 left-4 rounded-lg px-3 py-1 text-sm font-bold text-white"
+                style={{ backgroundColor: GOLD }}
+              >
+                Sale
+              </span>
+            )}
+            {activeCode && (
+              <span
+                className="absolute bottom-4 right-4 rounded-lg px-3 py-1 text-xs font-bold text-white tracking-widest"
+                style={{ backgroundColor: "rgba(75,29,143,0.85)" }}
+              >
+                {activeCode}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ── RIGHT: Details ── */}
       <div className="flex flex-col">
-        <p className="text-sm text-gray-400 mb-1">{product.category.name}</p>
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">{product.name}</h1>
+        {/* Name + Price on one line */}
+        <div className="flex items-baseline justify-between gap-4 mb-2 flex-wrap">
+          <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">{product.name}</h1>
+          <div className="flex items-baseline gap-2 flex-shrink-0">
+            <span className="text-2xl font-bold" style={{ color: PURPLE }}>
+              ${activePrice.toFixed(2)} CAD
+            </span>
+            {hasDiscount && selectedVariant?.variantPrice == null && (
+              <span className="text-base text-gray-400 line-through">
+                ${product.compareAtPrice!.toFixed(2)}
+              </span>
+            )}
+            {selectedVariant?.variantPrice != null && selectedVariant.variantPrice !== product.price && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#EDE9F6", color: PURPLE }}>
+                Variant price
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Category badge */}
+        <div className="flex items-center gap-1.5 mb-4">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Category</span>
+          <span
+            className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+            style={{ backgroundColor: `${PURPLE}18`, color: PURPLE, border: `1px solid ${PURPLE}33` }}
+          >
+            {product.category.name}
+          </span>
+        </div>
 
         {/* Selected variant indicator */}
         {hasVariants && activeCode && (
@@ -160,23 +194,6 @@ export function ProductDetailClient({ product }: Props) {
             Selected: <span style={{ color: GOLD }}>{activeCode}</span>
           </div>
         )}
-
-        {/* Price */}
-        <div className="flex items-baseline gap-3 mb-5">
-          <span className="text-3xl font-bold" style={{ color: PURPLE }}>
-            ${activePrice.toFixed(2)} CAD
-          </span>
-          {hasDiscount && selectedVariant?.variantPrice == null && (
-            <span className="text-lg text-gray-400 line-through">
-              ${product.compareAtPrice!.toFixed(2)}
-            </span>
-          )}
-          {selectedVariant?.variantPrice != null && selectedVariant.variantPrice !== product.price && (
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#EDE9F6", color: PURPLE }}>
-              Variant price
-            </span>
-          )}
-        </div>
 
         {/* Stock */}
         <div className="mb-5">
@@ -214,14 +231,16 @@ export function ProductDetailClient({ product }: Props) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {/* Master row */}
-                  {masterImage?.variantCode && (
+                  {/* Master row — always show */}
+                  {masterImage && (
                     <tr
                       className="cursor-pointer transition-colors"
                       style={{ backgroundColor: selectedVariant?.id === masterImage.id ? "#EDE9F6" : "white" }}
                       onClick={() => setSelectedVariant(masterImage)}
                     >
-                      <td className="px-4 py-2.5 font-bold" style={{ color: GOLD }}>{masterImage.variantCode}</td>
+                      <td className="px-4 py-2.5 font-bold" style={{ color: GOLD }}>
+                        {masterImage.variantCode ?? "Main"}
+                      </td>
                       <td className="px-4 py-2.5 font-semibold text-gray-900">${product.price.toFixed(2)}</td>
                       <td className="px-4 py-2.5">
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: GOLD }}>
@@ -237,7 +256,9 @@ export function ProductDetailClient({ product }: Props) {
                       style={{ backgroundColor: selectedVariant?.id === img.id ? "#EDE9F6" : "white" }}
                       onClick={() => setSelectedVariant(img)}
                     >
-                      <td className="px-4 py-2.5 font-semibold" style={{ color: PURPLE }}>{img.variantCode}</td>
+                      <td className="px-4 py-2.5 font-semibold" style={{ color: PURPLE }}>
+                        {img.variantCode ?? `Image ${variantImages.indexOf(img) + 2}`}
+                      </td>
                       <td className="px-4 py-2.5 text-gray-700">
                         ${(img.variantPrice ?? product.price).toFixed(2)}
                         {img.variantPrice == null && <span className="ml-1 text-xs text-gray-400">(same as master)</span>}
