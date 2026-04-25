@@ -67,7 +67,7 @@ export async function getMyConversations(): Promise<{ data: Conversation[]; erro
       .select("id, full_name, email")
       .in("id", uniqueIds);
 
-    const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p as { id: string; full_name?: string | null; email?: string | null }]));
+    const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
 
     // Batch fetch unread counts in one query
     const { data: unreadRows } = await supabase
@@ -85,7 +85,7 @@ export async function getMyConversations(): Promise<{ data: Conversation[]; erro
     const result: Conversation[] = data.map((conv: any) => {
       const otherId = conv.participant_a_id === user.id ? conv.participant_b_id : conv.participant_a_id;
       const otherRole: ParticipantRole = conv.participant_a_id === user.id ? conv.participant_b_role : conv.participant_a_role;
-      const profile = profileMap.get(otherId);
+      const profile = profileMap.get(otherId) as { id: string; full_name?: string | null; email?: string | null } | undefined;
       return {
         ...conv,
         other_user_id: otherId,
