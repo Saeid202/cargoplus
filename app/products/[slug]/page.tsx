@@ -65,9 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (result.data) {
     return { title: result.data.name, description: result.data.description ?? `${result.data.name} - ${result.data.price} CAD` };
   }
-  const product = mockProducts.find((p) => p.slug === slug);
-  if (!product) return { title: "Product Not Found" };
-  return { title: product.name, description: product.description ?? `${product.name} - ${product.price} CAD` };
+  return { title: "Product Not Found" };
 }
 
 export async function generateStaticParams() { return []; }
@@ -80,8 +78,6 @@ export default async function ProductDetailPage({ params }: Props) {
 
   if (result.data) {
     product = transformProduct(result.data);
-  } else {
-    product = mockProducts.find((p) => p.slug === slug) ?? null;
   }
 
   if (!product) notFound();

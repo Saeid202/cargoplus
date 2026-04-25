@@ -101,7 +101,7 @@ export default async function SellerProductsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <ProductActions productId={product.id} productName={product.name} productSlug={product.slug} />
+                      <ProductActions productId={product.id} productName={product.name} productSlug={product.slug} productStatus={product.status} />
                     </td>
                   </tr>
                 ))}

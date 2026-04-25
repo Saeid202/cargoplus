@@ -88,7 +88,7 @@ export default async function HomePage() {
       status: product.sellers.status,
     } : { id: "", businessName: "Unknown Seller", businessEmail: "", logoUrl: null, status: "active" as const },
   })) ?? [];
-  const products: ProductWithRelations[] = dbProducts.length > 0 ? dbProducts : mockProducts;
+  const products: ProductWithRelations[] = dbProducts;
 
   return (
     <>

@@ -3,20 +3,22 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { deleteProduct } from "@/app/actions/seller";
-import { Eye, FileDown, Pencil, Trash2, Loader2 } from "lucide-react";
+import { deleteProduct, toggleProductStatus } from "@/app/actions/seller";
+import { Eye, FileDown, Pencil, Trash2, Loader2, Globe, EyeOff } from "lucide-react";
 
 interface ProductActionsProps {
   productId: string;
   productName: string;
   productSlug: string;
+  productStatus: string;
 }
 
 const PURPLE = "#4B1D8F";
 
-export function ProductActions({ productId, productName, productSlug }: ProductActionsProps) {
+export function ProductActions({ productId, productName, productSlug, productStatus }: ProductActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isTogglingStatus, startStatusTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDelete = () => {
@@ -36,12 +38,43 @@ export function ProductActions({ productId, productName, productSlug }: ProductA
     });
   };
 
+  const handleToggleStatus = () => {
+    const newStatus = productStatus === "active" ? "pending" : "active";
+    startStatusTransition(async () => {
+      await toggleProductStatus(productId, newStatus);
+      router.refresh();
+    });
+  };
+
   const handleDownloadPdf = () => {
     window.open(`/products/${productSlug}?print=1`, "_blank");
   };
 
+  const isDraft = productStatus !== "active";
+
   return (
     <div className="flex items-center justify-end gap-1">
+      {/* Toggle draft/publish */}
+      <button
+        type="button"
+        title={isDraft ? "Publish product" : "Set to draft"}
+        onClick={handleToggleStatus}
+        disabled={isTogglingStatus}
+        className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-colors ${
+          isDraft
+            ? "bg-gray-100 text-gray-500 hover:bg-green-100 hover:text-green-700"
+            : "bg-green-100 text-green-700 hover:bg-gray-100 hover:text-gray-500"
+        }`}
+      >
+        {isTogglingStatus ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : isDraft ? (
+          <><EyeOff className="h-3 w-3" /> Draft</>
+        ) : (
+          <><Globe className="h-3 w-3" /> Live</>
+        )}
+      </button>
+
       <Link href={`/products/${productSlug}`} target="_blank" title="View listing"
         className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-[#EDE9F6]"
         style={{ color: PURPLE }}>

@@ -61,9 +61,9 @@ export default async function ProductsPage() {
     getCategories(),
   ]);
 
-  // Transform database results or use mock data as fallback
+  // Transform database results
   const dbProducts = productsResult.data?.map(transformProduct) ?? [];
-  const products: ProductWithRelations[] = dbProducts.length > 0 ? dbProducts : mockProducts;
+  const products: ProductWithRelations[] = dbProducts;
 
   const dbCategories = categoriesResult.data?.map((cat) => ({
     id: cat.id,
@@ -72,9 +72,7 @@ export default async function ProductsPage() {
     description: cat.description,
     imageUrl: cat.image_url,
   })) ?? [];
-  const categories: CategoryData[] = dbCategories.length > 0
-    ? dbCategories
-    : Array.from(new Map(mockProducts.map(p => [p.category.slug, p.category])).values());
+  const categories: CategoryData[] = dbCategories;
 
   return <ProductCatalog initialProducts={products} categories={categories} />;
 }

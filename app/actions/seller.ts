@@ -364,6 +364,29 @@ export async function updateProduct(productId: string, formData: FormData): Prom
   }
 }
 
+// Toggle product status between active and pending (draft)
+export async function toggleProductStatus(productId: string, newStatus: "active" | "pending"): Promise<{
+  error: string | null;
+}> {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", productId)
+      .eq("seller_id", user.id);
+
+    if (error) return { error: error.message };
+    revalidatePath("/seller/products");
+    return { error: null };
+  } catch {
+    return { error: "Failed to update status" };
+  }
+}
+
 // Delete a product
 export async function deleteProduct(productId: string): Promise<{
   success: boolean;
