@@ -52,6 +52,12 @@ export async function createPartner(
       return { data: null, error: partnerError.message };
     }
 
+    // Ensure the profiles row has role = 'partner'
+    await admin
+      .from("profiles")
+      .update({ role: "partner" })
+      .eq("id", authData.user.id);
+
     return { data: partner as Partner, error: null };
   } catch (err) {
     console.error("createPartner error:", err);

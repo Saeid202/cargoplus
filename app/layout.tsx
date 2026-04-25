@@ -12,8 +12,6 @@ const inter = Inter({
   preload: true,
 });
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: {
     default: "CargoPlus - Construction Materials & Robots Marketplace",
@@ -35,30 +33,21 @@ export const metadata: Metadata = {
   authors: [{ name: "CargoPlus" }],
   creator: "CargoPlus",
   publisher: "CargoPlus",
-  metadataBase: new URL("https://cargoplus.ca"),
+  metadataBase: new URL("https://cargoplus.site"),
   openGraph: {
     type: "website",
     locale: "en_CA",
-    url: "https://cargoplus.ca",
+    url: "https://cargoplus.site",
     siteName: "CargoPlus",
     title: "CargoPlus - Construction Materials & Robots Marketplace",
     description:
       "Shop quality construction materials and robots from trusted Chinese sellers. Secure payment in CAD, Canadian tax compliance, and fast shipping.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "CargoPlus - Construction Materials & Robots Marketplace",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "CargoPlus - Construction Materials & Robots Marketplace",
     description:
       "Shop quality construction materials and robots from trusted Chinese sellers.",
-    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -88,7 +77,9 @@ export default async function RootLayout({
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="flex min-h-screen flex-col">
         <ServiceWorkerRegistrar />
-        <ConditionalShell cmsNav={<CmsNavigation />}>{children}</ConditionalShell>
+        <ConditionalShell cmsNav={<CmsNavigation />}>
+          <main className="flex-1">{children}</main>
+        </ConditionalShell>
       </body>
     </html>
   );

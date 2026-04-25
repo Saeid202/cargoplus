@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Navigation } from "./Navigation";
 import { MobileMenu } from "./MobileMenu";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { SellerAuthModal } from "@/components/auth/SellerAuthModal";
 import { HeaderAuth } from "./HeaderAuth";
 import { InstallButton } from "@/components/pwa/InstallButton";
+import { CartBadge } from "./CartBadge";
 
 interface HeaderProps {
   cmsNav?: React.ReactNode;
@@ -69,13 +70,7 @@ export function Header({ cmsNav }: HeaderProps) {
             {/* Right side */}
             <div className="flex items-center gap-2 shrink-0">
               {/* Cart */}
-              <Link
-                href="/cart"
-                className="relative flex h-9 w-9 items-center justify-center rounded-xl text-purple-200 transition-all hover:bg-white/10 hover:text-white"
-                aria-label="Shopping cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </Link>
+              <CartBadge />
 
               {/* Auth — Desktop */}
               <div className="hidden lg:flex items-center gap-2">

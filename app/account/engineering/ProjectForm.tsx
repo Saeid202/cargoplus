@@ -4,12 +4,13 @@ import { useState } from "react";
 import { Upload, X, CheckCircle } from "lucide-react";
 import { submitEngineeringProject } from "@/app/actions/engineering";
 
-const inp = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white";
+const inp = "w-full px-3 py-2.5 border-2 border-[#4B1D8F]/60 rounded-xl text-sm font-bold focus:outline-none focus:border-[#4B1D8F] bg-white transition-colors placeholder-gray-300";
+const inputStyle = { color: "#1a0a3c", boxShadow: "0 0 0 3px rgba(75,29,143,0.08)" };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
-      <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{title}</h2>
+    <div className="bg-white rounded-xl border-2 border-[#4B1D8F]/30 p-6 space-y-4" style={{ boxShadow: "0 0 0 3px rgba(75,29,143,0.06)" }}>
+      <h2 className="text-xs font-extrabold text-gray-700 uppercase tracking-wider">{title}</h2>
       {children}
     </div>
   );
@@ -19,11 +20,11 @@ function Field({ label, required, hint, children }: {
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">
+    <div className="space-y-1.5">
+      <label className="block text-xs font-extrabold text-gray-700 uppercase tracking-wider">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
-        {hint && <span className="text-gray-400 font-normal ml-1">({hint})</span>}
+        {hint && <span className="text-gray-400 font-normal normal-case ml-1">({hint})</span>}
       </label>
       {children}
     </div>
@@ -91,14 +92,14 @@ export function ProjectForm({ onSubmitted }: { onSubmitted: () => void }) {
 
       <Section title="Project Basics">
         <Field label="Project Name" required>
-          <input name="project_name" type="text" required placeholder="e.g. Downtown Warehouse Build" className={inp} />
+          <input name="project_name" type="text" required placeholder="e.g. Downtown Warehouse Build" className={inp} style={inputStyle} />
         </Field>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="City" required><input name="project_location_city" type="text" required placeholder="Vancouver" className={inp} /></Field>
-          <Field label="Province" required><input name="project_location_province" type="text" required placeholder="BC" className={inp} /></Field>
+          <Field label="City" required><input name="project_location_city" type="text" required placeholder="Vancouver" className={inp} style={inputStyle} /></Field>
+          <Field label="Province" required><input name="project_location_province" type="text" required placeholder="BC" className={inp} style={inputStyle} /></Field>
         </div>
         <Field label="Project Type" required>
-          <select name="project_type" required className={inp}>
+          <select name="project_type" required className={inp} style={inputStyle}>
             <option value="">Select type</option>
             <option value="residential">Residential</option>
             <option value="commercial">Commercial</option>
@@ -109,17 +110,17 @@ export function ProjectForm({ onSubmitted }: { onSubmitted: () => void }) {
 
       <Section title="Building Specifications">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Total Area (sqft / m²)" required><input name="total_area" type="number" required min={0} step="any" placeholder="5000" className={inp} /></Field>
-          <Field label="Number of Floors" required><input name="number_of_floors" type="number" required min={1} placeholder="2" className={inp} /></Field>
-          <Field label="Building Length (m)" required><input name="building_length" type="number" required min={0} step="any" placeholder="30" className={inp} /></Field>
-          <Field label="Building Width (m)" required><input name="building_width" type="number" required min={0} step="any" placeholder="20" className={inp} /></Field>
-          <Field label="Building Height (m)" hint="optional"><input name="building_height" type="number" min={0} step="any" placeholder="6" className={inp} /></Field>
+          <Field label="Total Area (sqft / m²)" required><input name="total_area" type="number" required min={0} step="any" placeholder="5000" className={inp} style={inputStyle} /></Field>
+          <Field label="Number of Floors" required><input name="number_of_floors" type="number" required min={1} placeholder="2" className={inp} style={inputStyle} /></Field>
+          <Field label="Building Length (m)" required><input name="building_length" type="number" required min={0} step="any" placeholder="30" className={inp} style={inputStyle} /></Field>
+          <Field label="Building Width (m)" required><input name="building_width" type="number" required min={0} step="any" placeholder="20" className={inp} style={inputStyle} /></Field>
+          <Field label="Building Height (m)" hint="optional"><input name="building_height" type="number" min={0} step="any" placeholder="6" className={inp} style={inputStyle} /></Field>
         </div>
       </Section>
 
       <Section title="Structure">
         <Field label="Structure Type" required>
-          <select name="structure_type" required className={inp}>
+          <select name="structure_type" required className={inp} style={inputStyle}>
             <option value="light_steel_structure">Light Steel Structure</option>
           </select>
         </Field>
@@ -153,12 +154,12 @@ export function ProjectForm({ onSubmitted }: { onSubmitted: () => void }) {
       </Section>
 
       <Section title="Logistics">
-        <Field label="Delivery Location" required><input name="delivery_location" type="text" required placeholder="123 Site Ave, Calgary, AB" className={inp} /></Field>
+        <Field label="Delivery Location" required><input name="delivery_location" type="text" required placeholder="123 Site Ave, Calgary, AB" className={inp} style={inputStyle} /></Field>
       </Section>
 
       <Section title="Budget">
         <Field label="Budget Range" required>
-          <select name="budget_range" required className={inp}>
+          <select name="budget_range" required className={inp} style={inputStyle}>
             <option value="">Select range</option>
             <option value="under_100k">Under $100,000</option>
             <option value="100k_300k">$100,000 – $300,000</option>
@@ -169,21 +170,23 @@ export function ProjectForm({ onSubmitted }: { onSubmitted: () => void }) {
 
       <Section title="Contact Information">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Full Name" required><input name="full_name" type="text" required placeholder="John Smith" className={inp} /></Field>
-          <Field label="Company Name" required><input name="company_name" type="text" required placeholder="Acme Construction Ltd." className={inp} /></Field>
-          <Field label="Email" required><input name="email" type="email" required placeholder="john@acme.com" className={inp} /></Field>
-          <Field label="Phone" required><input name="phone" type="tel" required placeholder="+1 (604) 555-0100" className={inp} /></Field>
+          <Field label="Full Name" required><input name="full_name" type="text" required placeholder="John Smith" className={inp} style={inputStyle} /></Field>
+          <Field label="Company Name" required><input name="company_name" type="text" required placeholder="Acme Construction Ltd." className={inp} style={inputStyle} /></Field>
+          <Field label="Email" required><input name="email" type="email" required placeholder="john@acme.com" className={inp} style={inputStyle} /></Field>
+          <Field label="Phone" required><input name="phone" type="tel" required placeholder="+1 (604) 555-0100" className={inp} style={inputStyle} /></Field>
         </div>
       </Section>
 
       <Section title="Additional">
         <Field label="Project Description" hint="optional">
-          <textarea name="project_description" rows={4} placeholder="Any additional details..." className={inp + " resize-none"} />
+          <textarea name="project_description" rows={4} placeholder="Any additional details..." className={inp + " resize-none"} style={inputStyle} />
         </Field>
       </Section>
 
-      <button type="submit" disabled={submitting} className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
-        {submitting ? "Submitting..." : "Submit Project"}
+      <button type="submit" disabled={submitting}
+        className="w-full py-3 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50"
+        style={{ background: "linear-gradient(135deg, #4B1D8F, #3a1570)", border: "2px solid #D4AF37" }}>
+        {submitting ? "Submitting…" : "🚀 Submit Project"}
       </button>
     </form>
   );

@@ -59,7 +59,7 @@ export function AuthModal({ isOpen, initialMode = "login", onClose }: AuthModalP
     >
       <div
         ref={panelRef}
-        className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl"
+        className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl"
       >
         {/* Close button */}
         <button

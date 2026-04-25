@@ -5,6 +5,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import type { Product, ProductImage, Category, Seller } from "@/types/database";
 
+/** Generate a unique slug for a product, appending a random suffix on collision. */
+async function uniqueSlug(supabase: Awaited<ReturnType<typeof createServerClient>>, name: string, excludeId?: string): Promise<string> {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  let slug = base;
+  for (let i = 0; i < 5; i++) {
+    let q = supabase.from("products").select("id").eq("slug", slug);
+    if (excludeId) q = q.neq("id", excludeId);
+    const { data } = await q.maybeSingle();
+    if (!data) return slug;
+    slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+  }
+  return slug;
+}
+
 export interface SellerProduct extends Product {
   product_images: ProductImage[];
   categories: Category | null;
@@ -149,11 +163,8 @@ export async function createProduct(formData: FormData): Promise<{
     const categoryId = formData.get("categoryId") as string;
     const specificationsStr = formData.get("specifications") as string;
     
-    // Generate slug from name
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    // Generate unique slug
+    const slug = await uniqueSlug(supabase, name);
 
     // Parse specifications JSON
     let specifications = {};
@@ -256,11 +267,8 @@ export async function updateProduct(productId: string, formData: FormData): Prom
     const categoryId = formData.get("categoryId") as string;
     const specificationsStr = formData.get("specifications") as string;
     
-    // Generate slug from name
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    // Generate unique slug (exclude current product to allow same name on update)
+    const slug = await uniqueSlug(supabase, name, productId);
 
     // Parse specifications
     let specifications = {};

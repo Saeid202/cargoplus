@@ -7,24 +7,39 @@ import type { ProductWithRelations } from "@/types";
 
 interface ProductCardProps {
   product: ProductWithRelations;
-  onAddToCart?: (productId: string) => void;
 }
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const image = product.images.find((img) => img.isMaster) ?? product.images[0];
   const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
-  const [imgError, setImgError] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    // Lazy-import the store to avoid hydration mismatch
+    import("@/lib/stores/cartStore").then(({ useCartStore }) => {
+      useCartStore.getState().addItem({
+        productId: product.id,
+        variantCode: image?.variantCode ?? null,
+        variantImageUrl: image?.url ?? null,
+        productName: product.name,
+        productPrice: product.price,
+      }, 1);
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  }
 
   return (
     <div className="group flex flex-col rounded-xl border border-border bg-card overflow-hidden transition-shadow hover:shadow-md">
       {/* Image */}
       <Link href={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-muted">
-        {image?.url && !imgError ? (
+        {image?.url ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image.url}
             alt={image.altText ?? product.name}
             className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-            onError={() => setImgError(true)}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
@@ -63,12 +78,13 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         {/* Buttons */}
         <div className="mt-2 flex gap-1.5">
           <button
-            onClick={() => onAddToCart?.(product.id)}
+            onClick={handleAddToCart}
             aria-label={`Add ${product.name} to cart`}
-            className="flex flex-1 min-h-[36px] items-center justify-center gap-1.5 rounded-lg bg-primary px-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            className="flex flex-1 min-h-[36px] items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium text-white transition-colors"
+            style={{ backgroundColor: added ? "#16a34a" : "#4B1D8F" }}
           >
             <ShoppingCart className="h-3.5 w-3.5" />
-            Add to Cart
+            {added ? "Added!" : "Add to Cart"}
           </button>
           <Link
             href={`/products/${product.slug}`}

@@ -5,6 +5,7 @@ import { Menu, X, LayoutDashboard, ClipboardList, User, ChevronRight, LogOut, Br
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase/client";
+import { FloatingMessenger } from "@/components/messenger/FloatingMessenger";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/agent/dashboard", color: "from-blue-500 to-indigo-600" },
@@ -100,6 +101,7 @@ export default function AgentSidebar({ children }: { children: React.ReactNode }
         </header>
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>
+      <FloatingMessenger />
     </div>
   );
 }

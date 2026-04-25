@@ -5,6 +5,8 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { WhatsAppButton } from "./WhatsAppButton";
 
+const DASHBOARD_PREFIXES = ["/partner", "/admin", "/seller", "/account"];
+
 interface ConditionalShellProps {
   children: React.ReactNode;
   cmsNav?: React.ReactNode;
@@ -17,11 +19,9 @@ export function ConditionalShell({ children, cmsNav }: ConditionalShellProps) {
   return (
     <>
       {!isDashboard && <Header cmsNav={cmsNav} />}
-      <main className="flex-1">{children}</main>
+      {children}
       {!isDashboard && <Footer />}
       {!isDashboard && <WhatsAppButton />}
     </>
   );
 }
-
-const DASHBOARD_PREFIXES = ["/partner", "/admin", "/seller", "/account"];

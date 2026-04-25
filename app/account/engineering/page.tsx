@@ -333,16 +333,46 @@ export default function EngineeringPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Engineering Projects</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{projects.length} project{projects.length !== 1 ? "s" : ""} submitted</p>
+          <p className="text-sm text-gray-500">{projects.length} project{projects.length !== 1 ? "s" : ""} submitted</p>
         </div>
         <button
           onClick={() => setView(view === "form" ? "table" : "form")}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors shadow-md"
+          style={{ background: "linear-gradient(135deg, #4B1D8F, #3a1570)", border: "1px solid #D4AF37" }}
         >
           {view === "form" ? <><X className="h-4 w-4" /> Cancel</> : <><Plus className="h-4 w-4" /> New Project</>}
         </button>
       </div>
+
+      {/* Guidance banner */}
+      {view === "table" && (
+        <div className="rounded-2xl overflow-hidden border border-[#4B1D8F]/20" style={{ background: "linear-gradient(135deg, #f9f7ff 0%, #fdf8ec 100%)", boxShadow: "0 2px 12px rgba(75,29,143,0.08)" }}>
+          <div className="px-6 py-4 flex items-center gap-3 border-b border-[#4B1D8F]/10" style={{ background: "linear-gradient(135deg, #4B1D8F, #3a1570)" }}>
+            <span className="text-yellow-300 text-lg">✦</span>
+            <p className="text-sm font-bold uppercase tracking-widest text-white">How It Works</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#4B1D8F]/10">
+            <div className="bg-white/90 p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full text-white text-base font-black shrink-0" style={{ background: "linear-gradient(135deg, #4B1D8F, #D4AF37)" }}>1</span>
+                <p className="text-base font-bold text-gray-900">Submit Your Project</p>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 leading-relaxed">
+                Fill in your project details — dimensions, structure type, location, and budget. Our engineering team will review your submission and get back to you promptly with a tailored quote and next steps.
+              </p>
+            </div>
+            <div className="bg-white/90 p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full text-white text-base font-black shrink-0" style={{ background: "linear-gradient(135deg, #4B1D8F, #D4AF37)" }}>2</span>
+                <p className="text-base font-bold text-gray-900">We Handle the Rest</p>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 leading-relaxed">
+                Already have drawings or a preferred supplier? Attach your files and reference links directly to your project. We'll coordinate procurement, fabrication, and delivery — consolidating everything into one seamless process.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form view */}
       {view === "form" && (

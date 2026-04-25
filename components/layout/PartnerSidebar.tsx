@@ -5,6 +5,7 @@ import { Menu, X, LayoutDashboard, FolderOpen, User, ChevronRight, LogOut, Zap }
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase/client";
+import { FloatingMessenger } from "@/components/messenger/FloatingMessenger";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/partner/dashboard" },
@@ -126,6 +127,7 @@ export default function PartnerSidebar({ children }: { children: React.ReactNode
           {children}
         </main>
       </div>
+      <FloatingMessenger />
     </div>
   );
 }

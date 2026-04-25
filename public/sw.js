@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = `cargoplus-static-${CACHE_VERSION}`;
 const HTML_CACHE = `cargoplus-html-${CACHE_VERSION}`;
 const KNOWN_CACHES = [STATIC_CACHE, HTML_CACHE];
@@ -59,16 +59,16 @@ self.addEventListener('fetch', (event) => {
         )
     );
   } else if (isStatic) {
-    // Cache-first for static assets
+    // Network-first for JS/CSS so code changes are always picked up
+    // Falls back to cache only when offline
     event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached) return cached;
-        return fetch(request).then((res) => {
+      fetch(request)
+        .then((res) => {
           const clone = res.clone();
           caches.open(STATIC_CACHE).then((c) => c.put(request, clone));
           return res;
-        });
-      })
+        })
+        .catch(() => caches.match(request))
     );
   }
 });
