@@ -42,12 +42,21 @@ export const metadata: Metadata = {
     title: "CargoPlus - Construction Materials & Robots Marketplace",
     description:
       "Shop quality construction materials and robots from trusted Chinese sellers. Secure payment in CAD, Canadian tax compliance, and fast shipping.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Shanghai CargoPlus - Your Trusted Partner for Construction Success",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "CargoPlus - Construction Materials & Robots Marketplace",
     description:
       "Shop quality construction materials and robots from trusted Chinese sellers.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
