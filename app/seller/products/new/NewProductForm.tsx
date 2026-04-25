@@ -149,6 +149,28 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
       <Section title="Specifications" />
       <SpecificationsEditor specs={specs} onChange={setSpecs} />
 
+      {/* Publish status */}
+      <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: `${GOLD}44`, background: "#fdfbf7" }}>
+        <div>
+          <p className="text-sm font-semibold text-gray-800">Publish Status</p>
+          <p className="text-xs text-gray-400 mt-0.5">Draft saves the product without making it visible to buyers</p>
+        </div>
+        <div className="flex rounded-lg overflow-hidden border border-gray-200 shrink-0">
+          <label className="cursor-pointer">
+            <input type="radio" name="publishStatus" value="active" defaultChecked className="sr-only peer" />
+            <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-green-500 peer-checked:text-white text-gray-500 hover:bg-gray-50">
+              ● Publish
+            </span>
+          </label>
+          <label className="cursor-pointer border-l border-gray-200">
+            <input type="radio" name="publishStatus" value="draft" className="sr-only peer" />
+            <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors peer-checked:bg-gray-500 peer-checked:text-white text-gray-500 hover:bg-gray-50">
+              ○ Draft
+            </span>
+          </label>
+        </div>
+      </div>
+
       <div className="flex gap-3 border-t pt-4" style={{ borderColor: `${GOLD}44` }}>
         <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>
         <LuxuryButton type="submit" loading={loading} size="md" className="flex-1">

@@ -196,7 +196,7 @@ export async function createProduct(formData: FormData): Promise<{
         category_id: categoryId,
         seller_id: user.id,
         specifications,
-        status: "active", // Auto-approved
+        status: formData.get("publishStatus") === "draft" ? "pending" : "active",
       })
       .select()
       .single();
@@ -377,10 +377,10 @@ export async function deleteProduct(productId: string): Promise<{
       return { success: false, error: "Not authenticated" };
     }
 
-    // Verify ownership
+    // Verify ownership + fetch images in one query
     const { data: product } = await supabase
       .from("products")
-      .select("seller_id")
+      .select("seller_id, product_images(url)")
       .eq("id", productId)
       .single();
 
@@ -388,22 +388,16 @@ export async function deleteProduct(productId: string): Promise<{
       return { success: false, error: "Product not found or access denied" };
     }
 
-    // Delete product images from storage
-    const { data: images } = await supabase
-      .from("product_images")
-      .select("url")
-      .eq("product_id", productId);
+    // Delete all storage images in parallel (one batch call)
+    const paths = (product.product_images ?? [])
+      .map((img: any) => img.url.split("/product-images/")[1])
+      .filter(Boolean);
 
-    if (images) {
-      for (const img of images) {
-        const path = img.url.split("/product-images/")[1];
-        if (path) {
-          await supabase.storage.from("product-images").remove([path]);
-        }
-      }
+    if (paths.length > 0) {
+      await supabase.storage.from("product-images").remove(paths);
     }
 
-    // Delete product (cascade will delete images)
+    // Delete product (cascade will delete images rows)
     const { error } = await supabase
       .from("products")
       .delete()
