@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { updateProduct } from "@/app/actions/seller";
+import { uploadProductImage } from "@/lib/uploadProductImage";
+import { createBrowserClient } from "@/lib/supabase/client";
 import type { SellerProduct } from "@/app/actions/seller";
 import type { Category } from "@/types/database";
-import { X, Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
-import { LuxuryButton } from "@/components/seller/LuxuryButton";
+import { X, Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";import { LuxuryButton } from "@/components/seller/LuxuryButton";
 import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
 import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
 
@@ -54,6 +55,7 @@ const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-whit
 export function EditProductForm({ product, categories }: EditProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState("Saving Changes...");
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<VariantSlot[]>([]);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);
@@ -90,22 +92,40 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const formData = new FormData(e.currentTarget);
-    const specObj: Record<string, string> = {};
-    specs.forEach(({ key, value }) => { if (key && value) specObj[key] = value; });
-    formData.set("specifications", JSON.stringify(specObj));
-    const variantsMeta = variants.map((v) => ({
-      code: v.code,
-      price: v.price ? parseFloat(v.price) : null,
-      isMaster: v.isMaster,
-      existingUrl: v.file ? null : v.existingUrl,
-    }));
-    formData.set("variantsJson", JSON.stringify(variantsMeta));
-    variants.forEach((v, i) => { if (v.file) formData.set(`variant_file_${i}`, v.file); });
-    const result = await updateProduct(product.id, formData);
-    if (result.error) { setError(result.error); setLoading(false); return; }
-    router.push("/seller/products");
-    router.refresh();
+
+    // Capture form element immediately — before any await
+    const formEl = e.currentTarget;
+
+    try {
+      const supabase = createBrowserClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setError("Not authenticated"); setLoading(false); return; }
+
+      const hasNewFiles = variants.some((v) => v.file);
+      if (hasNewFiles) setLoadingMsg("Uploading images...");
+      const uploadedVariants = await Promise.all(
+        variants.map(async (v, i) => {
+          let url = v.existingUrl ?? null;
+          if (v.file) url = await uploadProductImage(v.file, user.id, i);
+          return { url, code: v.code, price: v.price ? parseFloat(v.price) : null, isMaster: v.isMaster };
+        })
+      );
+
+      const formData = new FormData(formEl);
+      const specObj: Record<string, string> = {};
+      specs.forEach(({ key, value }) => { if (key && value) specObj[key] = value; });
+      formData.set("specifications", JSON.stringify(specObj));
+      formData.set("variantsJson", JSON.stringify(uploadedVariants));
+
+      setLoadingMsg("Saving changes...");
+      const result = await updateProduct(product.id, formData);
+      if (result.error) { setError(result.error); setLoading(false); return; }
+      router.push("/seller/products");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message ?? "Upload failed");
+      setLoading(false);
+    }
   };
 
   return (
@@ -171,7 +191,7 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
       <div className="flex gap-3 pt-4 border-t" style={{ borderColor: `${GOLD}44` }}>
         <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>
         <LuxuryButton type="submit" loading={loading} size="md" className="flex-1">
-          {loading ? "Saving Changes..." : "Save Changes"}
+          {loading ? loadingMsg : "Save Changes"}
         </LuxuryButton>
       </div>
     </form>

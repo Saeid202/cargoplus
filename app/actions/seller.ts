@@ -194,79 +194,26 @@ export async function createProduct(formData: FormData): Promise<{
       return { data: null, error: productError.message };
     }
 
-    // Handle image uploads — variants JSON sent as "variantsJson"
+    // Images are uploaded client-side before this action is called.
+    // variantsJson contains { url, code, price, isMaster } for each variant.
     const variantsJson = formData.get("variantsJson") as string | null;
-    let variants: { file?: File; code: string; price?: number | null; isMaster: boolean }[] = [];
+    let variants: { url: string; code: string; price?: number | null; isMaster: boolean }[] = [];
     try {
       if (variantsJson) variants = JSON.parse(variantsJson);
     } catch { /* ignore */ }
 
-    // Use admin client for storage uploads (bypasses RLS auth issues)
-    const storageClient = createAdminClient() || supabase;
-
-    if (variantsJson) {
-      // Upload all variant files IN PARALLEL, then batch-insert DB rows
-      const uploadResults = await Promise.all(
-        variants.map(async (variant, i) => {
-          const file = formData.get(`variant_file_${i}`) as File | null;
-          if (!file || file.size === 0) return null;
-          const fileExt = file.name.split(".").pop();
-          const fileName = `${user.id}/${product.id}/${Date.now()}_${i}.${fileExt}`;
-          const { error: uploadError } = await storageClient.storage
-            .from("product-images")
-            .upload(fileName, file);
-          if (uploadError) {
-            console.error(`Variant ${i} upload error:`, uploadError.message);
-            return null;
-          }
-          const { data: { publicUrl } } = storageClient.storage
-            .from("product-images")
-            .getPublicUrl(fileName);
-          return { publicUrl, variant, position: i };
-        })
-      );
-
-      // Batch insert all image rows at once
-      const rows = uploadResults
-        .filter(Boolean)
-        .map((r) => ({
-          product_id: product.id,
-          url: r!.publicUrl,
-          alt_text: r!.variant.code || product.name,
-          position: r!.position,
-          variant_code: r!.variant.code || null,
-          variant_price: r!.variant.price ?? null,
-          is_master: r!.variant.isMaster,
-        }));
-
-      if (rows.length > 0) {
-        const { error: batchErr } = await supabase.from("product_images").insert(rows);
-        if (batchErr) console.error("Batch image insert error:", batchErr.message);
-      }
-    } else {
-      // Legacy single-image fallback
-      const imageFile = formData.get("image") as File;
-      if (imageFile && imageFile.size > 0) {
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${user.id}/${product.id}/${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await storageClient.storage
-          .from("product-images")
-          .upload(fileName, imageFile);
-        if (uploadError) {
-          console.error("Image upload error:", uploadError.message);
-        } else {
-          const { data: { publicUrl } } = storageClient.storage
-            .from("product-images")
-            .getPublicUrl(fileName);
-          await supabase.from("product_images").insert({
-            product_id: product.id,
-            url: publicUrl,
-            alt_text: name,
-            position: 0,
-            is_master: true,
-          });
-        }
-      }
+    if (variants.length > 0) {
+      const rows = variants.map((v, i) => ({
+        product_id: product.id,
+        url: v.url,
+        alt_text: v.code || product.name,
+        position: i,
+        variant_code: v.code || null,
+        variant_price: v.price ?? null,
+        is_master: v.isMaster,
+      }));
+      const { error: batchErr } = await supabase.from("product_images").insert(rows);
+      if (batchErr) console.error("Batch image insert error:", batchErr.message);
     }
 
     revalidatePath("/seller/products");
@@ -352,9 +299,10 @@ export async function updateProduct(productId: string, formData: FormData): Prom
       return { data: null, error: productError.message };
     }
 
-    // Handle variant image uploads
+    // Images are uploaded client-side before this action is called.
+    // variantsJson contains { url, code, price, isMaster, existingUrl } for each variant.
     const variantsJson = formData.get("variantsJson") as string | null;
-    let variants: { file?: File; code: string; price?: number | null; isMaster: boolean; existingUrl?: string }[] = [];
+    let variants: { url?: string; code: string; price?: number | null; isMaster: boolean; existingUrl?: string }[] = [];
     try {
       if (variantsJson) variants = JSON.parse(variantsJson);
     } catch { /* ignore */ }
@@ -368,7 +316,6 @@ export async function updateProduct(productId: string, formData: FormData): Prom
         .select("url")
         .eq("product_id", productId);
 
-      // Delete old storage files in parallel
       if (oldImages && oldImages.length > 0) {
         const paths = oldImages
           .map((img) => img.url.split("/product-images/")[1])
@@ -379,69 +326,25 @@ export async function updateProduct(productId: string, formData: FormData): Prom
       }
       await supabase.from("product_images").delete().eq("product_id", productId);
 
-      // Upload new files IN PARALLEL
-      const uploadResults = await Promise.all(
-        variants.map(async (variant, i) => {
-          const file = formData.get(`variant_file_${i}`) as File | null;
-          let publicUrl = variant.existingUrl ?? null;
-
-          if (file && file.size > 0) {
-            const fileExt = file.name.split(".").pop();
-            const fileName = `${user.id}/${productId}/${Date.now()}_${i}.${fileExt}`;
-            const { error: uploadError } = await storageClient.storage
-              .from("product-images")
-              .upload(fileName, file);
-            if (uploadError) {
-              console.error(`Update variant ${i} upload error:`, uploadError.message);
-            } else {
-              publicUrl = storageClient.storage
-                .from("product-images")
-                .getPublicUrl(fileName).data.publicUrl;
-            }
-          }
-
-          if (!publicUrl) return null;
+      const rows = variants
+        .map((v, i) => {
+          const resolvedUrl = v.url ?? v.existingUrl ?? null;
+          if (!resolvedUrl) return null;
           return {
             product_id: productId,
-            url: publicUrl,
-            alt_text: variant.code || name,
+            url: resolvedUrl,
+            alt_text: v.code || name,
             position: i,
-            variant_code: variant.code || null,
-            variant_price: variant.price ?? null,
-            is_master: variant.isMaster,
+            variant_code: v.code || null,
+            variant_price: v.price ?? null,
+            is_master: v.isMaster,
           };
         })
-      );
+        .filter(Boolean) as object[];
 
-      // Batch insert all rows at once
-      const rows = uploadResults.filter(Boolean) as object[];
       if (rows.length > 0) {
         const { error: batchErr } = await supabase.from("product_images").insert(rows);
         if (batchErr) console.error("Batch update image insert error:", batchErr.message);
-      }
-    } else {
-      // Legacy single-image fallback
-      const imageFile = formData.get("image") as File;
-      if (imageFile && imageFile.size > 0) {
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${user.id}/${productId}/${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await storageClient.storage
-          .from("product-images")
-          .upload(fileName, imageFile);
-        if (uploadError) {
-          console.error("Update image upload error:", uploadError.message);
-        } else {
-          const { data: { publicUrl } } = storageClient.storage
-            .from("product-images")
-            .getPublicUrl(fileName);
-          await supabase.from("product_images").insert({
-            product_id: productId,
-            url: publicUrl,
-            alt_text: name,
-            position: 0,
-            is_master: true,
-          });
-        }
       }
     }
 

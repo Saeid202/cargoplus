@@ -70,7 +70,7 @@ export default async function SellerProductsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0" style={{ backgroundColor: "#EDE9F6" }}>
                           {product.product_images[0] ? (
-                            <img src={product.product_images[0].url} alt={product.name} className="w-full h-full object-cover" />
+                            <img src={product.product_images[0].url} alt={product.name} className="w-full h-full object-contain" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <Package className="h-5 w-5" style={{ color: "#4B1D8F" }} />

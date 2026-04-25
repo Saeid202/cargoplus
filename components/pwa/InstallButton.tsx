@@ -43,8 +43,10 @@ export function InstallButton() {
     const wasInstalled = localStorage.getItem('pwa-installed') === 'true';
 
     const handleBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      // beforeinstallprompt fires = app is NOT installed (or was uninstalled)
+      // Do NOT call e.preventDefault() — that suppresses Chrome's native mini-infobar
+      // and causes the "Banner not shown" console warning. We store the event so our
+      // custom button can still call .prompt() when clicked, while Chrome's own UI
+      // (address-bar install icon / mini-infobar) continues to work normally.
       localStorage.removeItem('pwa-installed');
       setDeferredPrompt(e);
       setIsInstalled(false);
@@ -87,11 +89,16 @@ export function InstallButton() {
 
   async function handleInstall() {
     if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
+    const prompt = deferredPrompt;
     setDeferredPrompt(null);
-    if (outcome === 'dismissed') {
-      // Keep button available if user dismissed
+    try {
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === 'dismissed') {
+        localStorage.removeItem('pwa-installed');
+      }
+    } catch {
+      // Prompt was already consumed (e.g. user used Chrome's address-bar install)
       localStorage.removeItem('pwa-installed');
     }
   }

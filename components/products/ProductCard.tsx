@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import type { ProductWithRelations } from "@/types";
@@ -12,16 +13,18 @@ interface ProductCardProps {
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const image = product.images.find((img) => img.isMaster) ?? product.images[0];
   const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className="group flex flex-col rounded-xl border border-border bg-card overflow-hidden transition-shadow hover:shadow-md">
       {/* Image */}
       <Link href={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-muted">
-        {image?.url ? (
+        {image?.url && !imgError ? (
           <img
             src={image.url}
             alt={image.altText ?? product.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+            onError={() => setImgError(true)}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground text-sm">

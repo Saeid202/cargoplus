@@ -3,18 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/actions/seller";
+import { uploadProductImage } from "@/lib/uploadProductImage";
+import { createBrowserClient } from "@/lib/supabase/client";
 import type { Category } from "@/types/database";
 import { Tag, DollarSign, Layers, Hash, FileText, ChevronDown } from "lucide-react";
 import { LuxuryButton } from "@/components/seller/LuxuryButton";
 import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
 import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
 
-interface NewProductFormProps {
-  categories: Category[];
-}
-
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
+const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4B1D8F] focus:border-transparent transition-shadow";
 
 function Field({ label, hint, required, icon: Icon, children }: {
   label: string; hint?: string; required?: boolean; icon?: React.ElementType; children: React.ReactNode;
@@ -47,11 +46,10 @@ function Section({ title }: { title: string }) {
   );
 }
 
-const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4B1D8F] focus:border-transparent transition-shadow";
-
-export function NewProductForm({ categories }: NewProductFormProps) {
+export function NewProductForm({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [variants, setVariants] = useState<VariantSlot[]>([newSlot(true)]);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);
@@ -60,24 +58,51 @@ export function NewProductForm({ categories }: NewProductFormProps) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const formData = new FormData(e.currentTarget);
-    const specObj: Record<string, string> = {};
-    specs.forEach(({ key, value }) => { if (key && value) specObj[key] = value; });
-    formData.set("specifications", JSON.stringify(specObj));
-    const variantsMeta = variants.map((v) => ({
-      code: v.code, price: v.price ? parseFloat(v.price) : null, isMaster: v.isMaster,
-    }));
-    formData.set("variantsJson", JSON.stringify(variantsMeta));
-    variants.forEach((v, i) => { if (v.file) formData.set(`variant_file_${i}`, v.file); });
-    const result = await createProduct(formData);
-    if (result.error) { setError(result.error); setLoading(false); return; }
-    router.push("/seller/products");
+
+    // Capture form element immediately — before any await (React nullifies the event after)
+    const formEl = e.currentTarget;
+
+    try {
+      const supabase = createBrowserClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // 1. Upload images directly browser → Supabase (no Next.js in the middle)
+      const slotsWithImages = variants.filter((v) => v.file || v.existingUrl);
+      if (slotsWithImages.length > 0) setStatus("Uploading images…");
+
+      const uploadedVariants = await Promise.all(
+        variants.map(async (v, i) => {
+          const url = v.file
+            ? await uploadProductImage(v.file, user.id, i)
+            : (v.existingUrl ?? null);
+          return { url, code: v.code, price: v.price ? parseFloat(v.price) : null, isMaster: v.isMaster };
+        })
+      );
+
+      // 2. Call server action with URLs only (no file bytes)
+      setStatus("Saving product…");
+      const formData = new FormData(formEl);
+      const specObj: Record<string, string> = {};
+      specs.forEach(({ key, value }) => { if (key && value) specObj[key] = value; });
+      formData.set("specifications", JSON.stringify(specObj));
+      formData.set("variantsJson", JSON.stringify(uploadedVariants));
+
+      const result = await createProduct(formData);
+      if (result.error) throw new Error(result.error);
+
+      router.push("/seller/products");
+    } catch (err: any) {
+      setError(err.message ?? "Something went wrong");
+      setLoading(false);
+      setStatus("");
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-7">
       {error && (
-        <div className="flex items-start gap-3 p-4 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700">
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           <span className="mt-0.5 shrink-0">⚠</span> {error}
         </div>
       )}
@@ -87,20 +112,19 @@ export function NewProductForm({ categories }: NewProductFormProps) {
 
       <Section title="Product Details" />
       <Field label="Product Name" required icon={Tag}>
-        <input id="name" name="name" type="text" required className={inputClass} placeholder="e.g., Premium Flooring Collection" />
+        <input name="name" type="text" required className={inputClass} placeholder="e.g., Premium Flooring Collection" />
       </Field>
       <Field label="Description" required icon={FileText}>
-        <textarea id="description" name="description" rows={4} required className={`${inputClass} resize-none`}
-          placeholder="Describe your product — materials, dimensions, use cases..." />
+        <textarea name="description" rows={4} required className={`${inputClass} resize-none`} placeholder="Describe your product — materials, dimensions, use cases…" />
       </Field>
 
       <Section title="Pricing & Inventory" />
       <div className="grid sm:grid-cols-2 gap-5">
         <Field label="Category" required icon={Layers}>
           <div className="relative">
-            <select id="categoryId" name="categoryId" required className={`${inputClass} appearance-none pr-9`}>
+            <select name="categoryId" required className={`${inputClass} appearance-none pr-9`}>
               <option value="">Select a category</option>
-              {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
@@ -108,27 +132,27 @@ export function NewProductForm({ categories }: NewProductFormProps) {
         <Field label="Master Price (CAD)" required icon={DollarSign}>
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">$</span>
-            <input id="price" name="price" type="number" step="0.01" min="0" required className={`${inputClass} pl-7`} placeholder="299.99" />
+            <input name="price" type="number" step="0.01" min="0" required className={`${inputClass} pl-7`} placeholder="299.99" />
           </div>
         </Field>
-        <Field label="Compare at Price (CAD)" icon={DollarSign} hint="Original price — used to show a discount badge">
+        <Field label="Compare at Price (CAD)" icon={DollarSign} hint="Original price — shows a discount badge">
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">$</span>
-            <input id="compareAtPrice" name="compareAtPrice" type="number" step="0.01" min="0" className={`${inputClass} pl-7`} placeholder="349.99" />
+            <input name="compareAtPrice" type="number" step="0.01" min="0" className={`${inputClass} pl-7`} placeholder="349.99" />
           </div>
         </Field>
         <Field label="Stock Quantity" required icon={Hash}>
-          <input id="stockQuantity" name="stockQuantity" type="number" min="0" required className={inputClass} placeholder="100" />
+          <input name="stockQuantity" type="number" min="0" required className={inputClass} placeholder="100" />
         </Field>
       </div>
 
       <Section title="Specifications" />
       <SpecificationsEditor specs={specs} onChange={setSpecs} />
 
-      <div className="flex gap-3 pt-4 border-t" style={{ borderColor: `${GOLD}44` }}>
+      <div className="flex gap-3 border-t pt-4" style={{ borderColor: `${GOLD}44` }}>
         <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>
         <LuxuryButton type="submit" loading={loading} size="md" className="flex-1">
-          {loading ? "Creating Product..." : "Create Product"}
+          {loading ? status || "Working…" : "Create Product"}
         </LuxuryButton>
       </div>
     </form>
