@@ -199,6 +199,7 @@ export interface HeroSlideData {
   title: string
   subtitle: string | null
   imageUrl: string
+  ctaEnabled: boolean
   ctaText: string | null
   ctaLink: string | null
   position: number

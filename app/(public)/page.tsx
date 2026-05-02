@@ -42,6 +42,7 @@ export default async function HomePage() {
     title: slide.title,
     subtitle: slide.subtitle,
     imageUrl: slide.image_url,
+    ctaEnabled: (slide as any).cta_enabled ?? false,
     ctaText: slide.cta_text,
     ctaLink: slide.cta_link,
     position: slide.position,

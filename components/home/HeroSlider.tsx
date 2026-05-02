@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import type { HeroSlideData } from "@/types";
 
 interface HeroSliderProps {
@@ -36,10 +37,10 @@ export function HeroSlider({ slides }: HeroSliderProps) {
   const slide = slides[current];
 
   return (
-    <section data-testid="hero-slider" className="container mx-auto px-4 pt-6 pb-0">
+    <section data-testid="hero-slider" className="w-full">
       <div
-        className="relative w-full overflow-hidden rounded-2xl bg-gray-900"
-        style={{ height: "clamp(280px, 45vw, 540px)" }}
+        className="relative w-full overflow-hidden bg-gray-900"
+        style={{ height: "calc(100vh - 64px)" }}
       >
         {/* Slide image */}
         {!imgError ? (
@@ -77,6 +78,22 @@ export function HeroSlider({ slides }: HeroSliderProps) {
               <ChevronRight className="h-5 w-5" />
             </button>
           </>
+        )}
+
+        {/* CTA button overlay */}
+        {slide.ctaEnabled && slide.ctaText && slide.ctaLink && (
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 sm:left-12 sm:translate-x-0">
+            <Link
+              href={slide.ctaLink}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-bold text-white shadow-2xl transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #4B1D8F 0%, #3a1570 100%)",
+                boxShadow: "0 0 0 2px #D4AF37, 0 8px 32px rgba(75,29,143,0.5)",
+              }}
+            >
+              {slide.ctaText}
+            </Link>
+          </div>
         )}
 
         {/* Dot indicators */}

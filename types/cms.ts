@@ -7,6 +7,7 @@ export interface HeroSlideRow {
   image_url: string
   cta_text: string | null
   cta_link: string | null
+  cta_enabled: boolean
   position: number
   is_active: boolean
   created_at: string
@@ -48,6 +49,7 @@ export interface SlideFormData {
   title: string
   subtitle: string
   image_url: string
+  cta_enabled: boolean
   cta_text: string
   cta_link: string
   position: number

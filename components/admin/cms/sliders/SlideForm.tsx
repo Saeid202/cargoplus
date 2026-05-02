@@ -29,6 +29,7 @@ export function SlideForm({ slide, nextPosition, onClose, onSaved }: SlideFormPr
     title: slide?.title ?? "",
     subtitle: slide?.subtitle ?? "",
     image_url: slide?.image_url ?? "",
+    cta_enabled: slide?.cta_enabled ?? false,
     cta_text: slide?.cta_text ?? "",
     cta_link: slide?.cta_link ?? "",
     position: slide?.position ?? nextPosition,
@@ -139,18 +140,25 @@ export function SlideForm({ slide, nextPosition, onClose, onSaved }: SlideFormPr
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">CTA Text</label>
-              <input value={form.cta_text} onChange={(e) => set("cta_text", e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">CTA Link</label>
-              <input value={form.cta_link} onChange={(e) => set("cta_link", e.target.value)}
-                placeholder="/products"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
+          {/* CTA toggle + conditional fields */}
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-3">
+            <Toggle checked={form.cta_enabled} onChange={(v) => set("cta_enabled", v)} label="Enable Call-to-Action button" />
+            {form.cta_enabled && (
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Label <span className="text-red-500">*</span></label>
+                  <input value={form.cta_text} onChange={(e) => set("cta_text", e.target.value)}
+                    placeholder="e.g. Contact Us"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Button Link <span className="text-red-500">*</span></label>
+                  <input value={form.cta_link} onChange={(e) => set("cta_link", e.target.value)}
+                    placeholder="/contact or /auth/register"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3 items-center">

@@ -6,6 +6,7 @@ export const mockHeroSlides: HeroSlideData[] = [
     title: 'Professional in\nConstruction material',
     subtitle: 'Multi-Seller Consolidation|Combine multiple suppliers, optimize logistics, save time and cost.|Light Steel Structure Engineering sourcing|High-quality steel structure materials, one-stop sourcing for your projects.',
     imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&h=600&q=75&fit=crop',
+    ctaEnabled: true,
     ctaText: 'Shanghai cargo Plus',
     ctaLink: '/products',
     position: 0,
