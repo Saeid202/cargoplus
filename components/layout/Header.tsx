@@ -49,7 +49,7 @@ export function Header({ cmsNav }: HeaderProps) {
 
   return (
     <>
-      <header className="w-full sticky top-0 z-30 border-b border-purple-900/50 shadow-lg" style={{ backgroundColor: '#4B1D8F' }}>
+      <header className="w-full sticky top-0 z-30 border-b border-purple-900/50" style={{ backgroundColor: '#4B1D8F' }}>
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center gap-8">
 
