@@ -51,6 +51,9 @@ function transformProduct(dbProduct: NonNullable<Awaited<ReturnType<typeof getPr
       logoUrl: dbProduct.sellers.logo_url,
       status: dbProduct.sellers.status,
     } : { id: "", businessName: "Unknown Seller", businessEmail: "", logoUrl: null, status: "active" as const },
+    requireOrderRequest: (dbProduct as any).require_order_request ?? false,
+    showStock: (dbProduct as any).show_stock ?? true,
+    documents: [],
   };
 }
 
