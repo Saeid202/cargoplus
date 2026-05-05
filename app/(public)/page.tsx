@@ -88,6 +88,9 @@ export default async function HomePage() {
       logoUrl: product.sellers.logo_url,
       status: product.sellers.status,
     } : { id: "", businessName: "Unknown Seller", businessEmail: "", logoUrl: null, status: "active" as const },
+    requireOrderRequest: (product as any).require_order_request ?? false,
+    showStock: (product as any).show_stock ?? true,
+    documents: [],
   })) ?? [];
   const products: ProductWithRelations[] = dbProducts;
 
