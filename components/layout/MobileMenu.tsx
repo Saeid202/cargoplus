@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { X, ShoppingCart, User, ChevronDown, Wrench } from "lucide-react";
+import { X, ShoppingCart, User, ChevronDown, Wrench, ShieldCheck } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -121,6 +121,16 @@ export function MobileMenu({
                       >
                         <Wrench className="h-4 w-4 text-[#4B1D8F]" />
                         Construction Solutions
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/services/csa-certification"
+                        onClick={onClose}
+                        className="flex min-h-[40px] items-center gap-2 rounded-lg px-3 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        <ShieldCheck className="h-4 w-4 text-[#4B1D8F]" />
+                        CSA Certification Guide
                       </Link>
                     </li>
                   </ul>

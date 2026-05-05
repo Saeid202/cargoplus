@@ -6,27 +6,32 @@ import {
   Globe, DollarSign, Clock, ShieldCheck, Award,
   ClipboardList, Cog, Truck, HardHat, CheckCircle,
 } from "lucide-react";
+import { PrefabEPCFAQSection, ProjectEstimateForm } from "./ConstructionPageClient";
 
 /* ─── SEO ─────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "Construction Solutions — EPC, Prefab & China–Canada Supply Chain | CargoPlus",
+  title: "Prefab Construction Cost in Canada (2026 Guide) | CargoPlus",
   description:
-    "CargoPlus delivers end-to-end construction solutions from China to Canada: EPC project management, prefabricated buildings, cross-border supply chain, and CSA compliance support. Get a project quote today.",
+    "Full cost breakdown of prefab and steel structure projects from China to Canada. EPC delivery, CSA compliance, and modular building solutions. Get a free project estimate.",
   keywords: [
-    "EPC construction Canada",
+    "prefab construction cost Canada",
     "prefabricated buildings China Canada",
-    "construction solutions China to Canada",
+    "EPC construction Canada",
     "modular buildings Canada",
-    "CSA compliance construction",
-    "China Canada supply chain construction",
-    "industrial construction Canada",
-    "steel frame structures Canada",
+    "CSA compliance prefab",
+    "steel structure construction Canada",
+    "China Canada construction supply chain",
+    "industrial prefab buildings Canada",
   ],
+  alternates: {
+    canonical: "https://cargoplus.site/services/construction-solutions",
+  },
   openGraph: {
-    title: "End-to-End Construction Solutions from China to Canada | CargoPlus",
+    title: "Prefab Construction Cost in Canada (2026 Guide) | CargoPlus",
     description:
-      "Integrated EPC, prefabricated structures, and industrial construction solutions combining Chinese manufacturing efficiency with Canadian compliance standards.",
-    type: "website",
+      "Full cost breakdown of prefab and steel structure projects from China to Canada. EPC delivery, CSA compliance, and modular building solutions.",
+    type: "article",
+    url: "https://cargoplus.site/services/construction-solutions",
   },
 };
 
@@ -75,27 +80,108 @@ function CTAButton({
 export default function ConstructionSolutionsPage() {
   return (
     <>
-      {/* ── JSON-LD structured data for AI/SEO ── */}
+      {/* ── JSON-LD: Article schema ── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Service",
-            name: "Construction Solutions",
-            provider: {
+            "@type": "Article",
+            headline: "Prefab Construction Cost in Canada (2026 Guide)",
+            description:
+              "Full cost breakdown of prefab and steel structure projects from China to Canada. EPC delivery, CSA compliance, and modular building solutions.",
+            author: {
               "@type": "Organization",
               name: "CargoPlus",
               url: "https://cargoplus.site",
             },
-            description:
-              "End-to-end EPC construction solutions, prefabricated buildings, and China–Canada supply chain management for industrial and residential projects.",
-            areaServed: ["Canada", "China"],
-            serviceType: [
-              "EPC Construction",
-              "Prefabricated Buildings",
-              "Supply Chain Management",
-              "CSA Compliance Support",
+            publisher: {
+              "@type": "Organization",
+              name: "CargoPlus",
+              url: "https://cargoplus.site",
+            },
+            datePublished: "2026-01-01",
+            dateModified: "2026-05-01",
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://cargoplus.site/services/construction-solutions",
+            },
+          }),
+        }}
+      />
+
+      {/* ── JSON-LD: FAQ schema ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "How much does prefab construction cost in Canada?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Prefab construction in Canada typically ranges from $120 to $400+ per square foot, depending on design complexity, materials, and compliance requirements. Projects that integrate overseas manufacturing can reduce overall costs when properly managed.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Is importing prefabricated buildings from China cost-effective?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes. Importing prefab structures from China can reduce total project costs by 20% to 40%, primarily due to lower manufacturing costs and scalable production.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Can prefab buildings manufactured in China meet Canadian building codes?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes, but they must be adapted and engineered to comply with Canadian building codes and provincial regulations. This often involves structural modifications, documentation, and coordination with local engineers.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Is CSA certification required for prefab or modular buildings in Canada?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "In many cases, CSA certification or equivalent compliance validation is required, particularly for electrical systems and certain building components. Requirements vary based on project type and jurisdiction.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What is included in an EPC construction model?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "EPC (Engineering, Procurement, and Construction) includes project design, material sourcing, manufacturing, logistics, and on-site execution. It provides a fully integrated delivery approach with a single coordination structure.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How long does it take to complete a prefab construction project from China to Canada?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Typical timelines range from 8 to 20 weeks, depending on project scale. This includes design finalization, manufacturing, shipping, customs clearance, and installation preparation.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Is steel structure construction more cost-effective than traditional methods?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "For many industrial and commercial projects, steel structures are more cost-efficient and faster to deploy, especially when combined with prefabrication and modular construction methods.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How can I estimate the cost of my specific construction project?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Accurate cost estimation requires project-specific details, including size, location, design requirements, and compliance scope. A tailored evaluation is recommended for reliable budgeting.",
+                },
+              },
             ],
           }),
         }}
@@ -500,7 +586,248 @@ export default function ConstructionSolutionsPage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            SECTION 6 — CTA
+            SECTION 6 — COST SIGNAL
+        ══════════════════════════════════════════════════════════════════ */}
+        <section
+          aria-labelledby="cost-guide"
+          className="py-20 px-4 bg-white"
+        >
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GOLD }}>
+                Cost Reference
+              </p>
+              <h2
+                id="cost-guide"
+                className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight"
+              >
+                Prefab Construction Cost in Canada
+              </h2>
+              <p className="mt-3 text-gray-500 text-base max-w-2xl mx-auto leading-relaxed">
+                Reference ranges for 2026. Actual costs depend on project size, location, design
+                complexity, and compliance scope. Use these as a starting point — not a final budget.{" "}
+                <Link
+                  href="/services/csa-certification"
+                  className="font-bold underline hover:opacity-80"
+                  style={{ color: PURPLE }}
+                >
+                  CSA compliance affects your total cost — see the full breakdown →
+                </Link>
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+              {[
+                {
+                  label: "Basic Prefab / Modular",
+                  range: "$120 – $200",
+                  unit: "per sq ft",
+                  note: "Simple steel-frame or modular units, standard finishes",
+                  color: "#EDE9F6",
+                },
+                {
+                  label: "Mid-Range Prefab",
+                  range: "$200 – $300",
+                  unit: "per sq ft",
+                  note: "Custom design, upgraded materials, CSA compliance work",
+                  color: "#FDF8EC",
+                },
+                {
+                  label: "Complex / High-Spec",
+                  range: "$300 – $400+",
+                  unit: "per sq ft",
+                  note: "Industrial, multi-story, or high-compliance projects",
+                  color: "#EDE9F6",
+                },
+                {
+                  label: "Structural Steel",
+                  range: "$3,500 – $6,000",
+                  unit: "per tonne (delivered CA)",
+                  note: "Varies by grade, quantity, and shipping route",
+                  color: "#FDF8EC",
+                },
+                {
+                  label: "China-Sourced Savings",
+                  range: "20% – 40%",
+                  unit: "vs. Canadian market",
+                  note: "On materials and prefab components when properly coordinated",
+                  color: "#EDE9F6",
+                },
+                {
+                  label: "Typical Project Timeline",
+                  range: "8 – 20 weeks",
+                  unit: "design to delivery",
+                  note: "Includes manufacturing, shipping, customs, and site prep",
+                  color: "#FDF8EC",
+                },
+              ].map(({ label, range, unit, note, color }) => (
+                <div
+                  key={label}
+                  className="rounded-2xl p-6"
+                  style={{ backgroundColor: color, border: `1.5px solid ${GOLD}33` }}
+                >
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">{label}</p>
+                  <p className="text-2xl font-extrabold mb-0.5" style={{ color: PURPLE }}>{range}</p>
+                  <p className="text-xs font-semibold text-gray-500 mb-3">{unit}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{note}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-center text-xs text-gray-400 mb-8">
+              * All figures are estimates for planning purposes. Request a project-specific assessment for accurate budgeting.
+            </p>
+
+            {/* Mid-page CTA */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/contact?subject=Estimate My Project Cost"
+                className="inline-flex items-center gap-2 rounded-xl px-7 py-4 text-base font-bold transition-all hover:opacity-90"
+                style={{ backgroundColor: PURPLE, color: "#fff", border: `2px solid ${GOLD}` }}
+              >
+                Estimate My Project Cost
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/contact?subject=Request Cost Breakdown"
+                className="inline-flex items-center gap-2 rounded-xl border-2 px-7 py-4 text-base font-bold transition-all hover:opacity-80"
+                style={{ borderColor: PURPLE, color: PURPLE }}
+              >
+                Request a Cost Breakdown
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            SECTION 7 — INTERNAL LINKS (topic cluster)
+        ══════════════════════════════════════════════════════════════════ */}
+        <section
+          aria-labelledby="related-topics"
+          className="py-16 px-4"
+          style={{ backgroundColor: "#F8F6FC" }}
+        >
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: GOLD }}>
+                Related Topics
+              </p>
+              <h2
+                id="related-topics"
+                className="text-2xl font-extrabold text-gray-900"
+              >
+                Explore More Construction Resources
+              </h2>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-5">
+              <Link
+                href="/services/csa-certification"
+                className="group rounded-2xl bg-white p-6 transition-shadow hover:shadow-md"
+                style={{ border: `1.5px solid ${PURPLE}18` }}
+              >
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl mb-4"
+                  style={{ backgroundColor: "#EDE9F6" }}
+                >
+                  <ShieldCheck className="h-5 w-5" style={{ color: PURPLE }} />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-900 mb-1.5 group-hover:underline">
+                  CSA Certification for Prefab Buildings in Canada
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  What CSA certification means for imported prefab structures, when it&apos;s required,
+                  and how to navigate the process.
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold" style={{ color: PURPLE }}>
+                  Read guide <ChevronRight className="h-3 w-3" />
+                </span>
+              </Link>
+
+              <Link
+                href="/contact?subject=EPC Project Inquiry"
+                className="group rounded-2xl bg-white p-6 transition-shadow hover:shadow-md"
+                style={{ border: `1.5px solid ${PURPLE}18` }}
+              >
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl mb-4"
+                  style={{ backgroundColor: "#EDE9F6" }}
+                >
+                  <Wrench className="h-5 w-5" style={{ color: PURPLE }} />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-900 mb-1.5 group-hover:underline">
+                  EPC Project Delivery Model
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  How the Engineering, Procurement, and Construction model works for China-to-Canada
+                  industrial projects.
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold" style={{ color: PURPLE }}>
+                  Get in touch <ChevronRight className="h-3 w-3" />
+                </span>
+              </Link>
+
+              <Link
+                href="/shipping"
+                className="group rounded-2xl bg-white p-6 transition-shadow hover:shadow-md"
+                style={{ border: `1.5px solid ${PURPLE}18` }}
+              >
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl mb-4"
+                  style={{ backgroundColor: "#EDE9F6" }}
+                >
+                  <Truck className="h-5 w-5" style={{ color: PURPLE }} />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-900 mb-1.5 group-hover:underline">
+                  China–Canada Freight & Logistics
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Shipping timelines, customs clearance, and last-mile delivery for construction
+                  materials and prefab components.
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold" style={{ color: PURPLE }}>
+                  Learn more <ChevronRight className="h-3 w-3" />
+                </span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            SECTION 8 — ESTIMATE FORM
+        ══════════════════════════════════════════════════════════════════ */}
+        <section
+          aria-labelledby="estimate-form-heading"
+          className="py-20 px-4 bg-white"
+        >
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: GOLD }}>
+                Free Estimate
+              </p>
+              <h2
+                id="estimate-form-heading"
+                className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight"
+              >
+                Get a Project Cost Estimate
+              </h2>
+              <p className="mt-3 text-gray-500 text-base max-w-xl mx-auto leading-relaxed">
+                Tell us about your project and we&apos;ll provide a detailed cost estimate including
+                manufacturing, logistics, and compliance costs.
+              </p>
+            </div>
+            <ProjectEstimateForm />
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            SECTION 9 — PREFAB & EPC FAQ
+        ══════════════════════════════════════════════════════════════════ */}
+        <PrefabEPCFAQSection />
+
+        {/* ══════════════════════════════════════════════════════════════════
+            SECTION 9 — CTA
         ══════════════════════════════════════════════════════════════════ */}
         <section
           aria-labelledby="cta"
@@ -551,9 +878,17 @@ export default function ConstructionSolutionsPage() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/contact?subject=Speak With Our Team"
+                href="/contact?subject=Submit Project Details"
                 className="inline-flex items-center gap-2 rounded-xl px-7 py-4 text-base font-bold transition-all hover:bg-white/10"
                 style={{ border: "2px solid rgba(255,255,255,0.5)", color: "#fff" }}
+              >
+                Submit Project Details
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/contact?subject=Speak With Our Team"
+                className="inline-flex items-center gap-2 rounded-xl px-7 py-4 text-base font-bold transition-all hover:bg-white/10"
+                style={{ border: "2px solid rgba(255,255,255,0.3)", color: "rgba(255,255,255,0.8)" }}
               >
                 Speak With Our Team
                 <ChevronRight className="h-4 w-4" />

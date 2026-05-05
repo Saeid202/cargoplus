@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ChevronRight, MessageCircle, ChevronDown, ChevronUp,
-  X, Send, CheckCircle,
+  X, Send, CheckCircle, AlertCircle,
 } from "lucide-react";
+import { submitProjectEstimate } from "@/app/actions/inquiries";
 
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
@@ -362,6 +363,191 @@ export function FAQSection() {
   );
 }
 
+/* ─── Prefab & EPC Canada FAQ ────────────────────────────────────────────── */
+const PREFAB_EPC_FAQS = [
+  {
+    q: "How much does prefab construction cost in Canada?",
+    a: "Prefab construction in Canada typically ranges from $120 to $400+ per square foot, depending on design complexity, materials, and compliance requirements. Projects that integrate overseas manufacturing can reduce overall costs when properly managed.",
+  },
+  {
+    q: "Is importing prefabricated buildings from China cost-effective?",
+    a: "Yes. Importing prefab structures from China can reduce total project costs by 20% to 40%, primarily due to lower manufacturing costs and scalable production. However, savings depend on logistics planning, compliance adjustments, and project coordination.",
+  },
+  {
+    q: "Can prefab buildings manufactured in China meet Canadian building codes?",
+    a: "Yes, but they must be adapted and engineered to comply with Canadian building codes and provincial regulations. This often involves structural modifications, documentation, and coordination with local engineers.",
+  },
+  {
+    q: "Is CSA certification required for prefab or modular buildings in Canada?",
+    a: "In many cases, CSA certification or equivalent compliance validation is required, particularly for electrical systems and certain building components. Requirements vary based on project type and jurisdiction.",
+  },
+  {
+    q: "What is included in an EPC construction model?",
+    a: "EPC (Engineering, Procurement, and Construction) includes project design, material sourcing, manufacturing, logistics, and on-site execution. It provides a fully integrated delivery approach with a single coordination structure.",
+  },
+  {
+    q: "How long does it take to complete a prefab construction project from China to Canada?",
+    a: "Typical timelines range from 8 to 20 weeks, depending on project scale. This includes design finalization, manufacturing, shipping, customs clearance, and installation preparation.",
+  },
+  {
+    q: "What are the main risks when importing prefab construction systems?",
+    a: "Key risks include non-compliance with Canadian standards, incorrect specifications, shipping delays, and incomplete documentation. These risks can be mitigated through proper engineering coordination and supplier verification.",
+  },
+  {
+    q: "What factors affect the total cost of prefab construction projects?",
+    a: "Major cost factors include project size, design complexity, materials, shipping distance, compliance requirements, and local installation costs. Early-stage planning significantly impacts overall cost efficiency.",
+  },
+  {
+    q: "Is steel structure construction more cost-effective than traditional methods?",
+    a: "For many industrial and commercial projects, steel structures are more cost-efficient and faster to deploy, especially when combined with prefabrication and modular construction methods.",
+  },
+  {
+    q: "Who handles installation and construction in Canada?",
+    a: "Installation is typically carried out by local Canadian contractors, supported by engineering documentation and coordination from the project team to ensure compliance and accuracy.",
+  },
+  {
+    q: "What documentation is required to import prefab buildings into Canada?",
+    a: "Projects typically require engineering drawings, compliance documentation, shipping and customs paperwork, and certification records. Missing or incorrect documents can delay approvals.",
+  },
+  {
+    q: "Can one company manage the entire China-to-Canada construction process?",
+    a: "Yes. A coordinated provider can manage factory sourcing, engineering alignment, logistics, compliance, and construction support, ensuring a streamlined and accountable delivery process.",
+  },
+  {
+    q: "What types of projects are best suited for prefab construction?",
+    a: "Prefab solutions are ideal for warehouses, industrial facilities, modular housing, commercial buildings, and large-scale developments where speed and cost efficiency are priorities.",
+  },
+  {
+    q: "How does logistics impact prefab construction projects?",
+    a: "Logistics plays a critical role in cost, timeline, and risk management. Efficient shipping, customs handling, and delivery coordination are essential to avoid delays and unexpected costs.",
+  },
+  {
+    q: "How can I estimate the cost of my specific construction project?",
+    a: "Accurate cost estimation requires project-specific details, including size, location, design requirements, and compliance scope. A tailored evaluation is recommended for reliable budgeting.",
+  },
+];
+
+export function PrefabEPCFAQSection() {
+  const [open, setOpen] = useState<number | null>(null);
+
+  return (
+    <section
+      aria-labelledby="prefab-epc-faq-heading"
+      className="py-20 px-4"
+      style={{ backgroundColor: "#F8F6FC", fontFamily: "'Inter', sans-serif" }}
+    >
+      <div className="max-w-3xl mx-auto">
+        {/* Heading */}
+        <div className="text-center mb-12">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.2em] mb-3"
+            style={{ color: GOLD }}
+          >
+            Frequently Asked Questions
+          </p>
+          <h2
+            id="prefab-epc-faq-heading"
+            className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight"
+          >
+            Prefab &amp; EPC – Canada
+          </h2>
+          <p className="mt-3 text-gray-500 text-base max-w-xl mx-auto leading-relaxed">
+            Common questions about prefab construction costs, importing from China, compliance,
+            and project delivery in Canada.
+          </p>
+        </div>
+
+        {/* Accordion items */}
+        <div className="space-y-4">
+          {PREFAB_EPC_FAQS.map((faq, i) => {
+            const isOpen = open === i;
+            return (
+              <div
+                key={i}
+                className="rounded-2xl overflow-hidden transition-all duration-200"
+                style={{
+                  border: `1.5px solid ${isOpen ? GOLD : `${PURPLE}20`}`,
+                  boxShadow: isOpen
+                    ? `0 4px 20px rgba(75,29,143,0.10)`
+                    : `0 1px 4px rgba(75,29,143,0.05)`,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+                  aria-expanded={isOpen}
+                  aria-controls={`prefab-faq-answer-${i}`}
+                >
+                  <span
+                    className="font-semibold text-gray-900 leading-snug"
+                    style={{ fontSize: "18px" }}
+                  >
+                    {faq.q}
+                  </span>
+                  <span
+                    className="shrink-0 flex items-center justify-center h-7 w-7 rounded-full transition-colors"
+                    style={{
+                      backgroundColor: isOpen ? GOLD : `${PURPLE}12`,
+                    }}
+                    aria-hidden="true"
+                  >
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4 text-white" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" style={{ color: PURPLE }} />
+                    )}
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <div
+                    id={`prefab-faq-answer-${i}`}
+                    className="px-6 pb-6"
+                  >
+                    <p
+                      className="text-gray-700 leading-relaxed"
+                      style={{ fontSize: "16px", lineHeight: "1.7" }}
+                    >
+                      {faq.a}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="mt-12 text-center">
+          <p className="text-sm text-gray-500 mb-5">
+            Have a specific project in mind? We&apos;ll give you a tailored estimate.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all hover:opacity-90"
+              style={{ backgroundColor: "#25D366", color: "#fff" }}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Ask on WhatsApp
+            </a>
+            <Link
+              href="/contact?subject=Prefab Construction Inquiry"
+              className="inline-flex items-center gap-2 rounded-xl border-2 px-5 py-3 text-sm font-bold transition-all hover:opacity-80"
+              style={{ borderColor: PURPLE, color: PURPLE }}
+            >
+              Request a Free Estimate
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 /* ─── Trust / social proof strip ────────────────────────────────────────── */
 export function TrustStrip() {
   return (
@@ -414,5 +600,265 @@ export function TrustStrip() {
         </p>
       </div>
     </section>
+  );
+}
+
+/* ─── Project Estimate Form ──────────────────────────────────────────────── */
+type EstimateFormState = {
+  name: string;
+  email: string;
+  projectType: string;
+  projectSize: string;
+  location: string;
+  budget: string;
+  notes: string;
+};
+
+export function ProjectEstimateForm() {
+  const [form, setForm] = useState<EstimateFormState>({
+    name: "",
+    email: "",
+    projectType: "",
+    projectSize: "",
+    location: "",
+    budget: "",
+    notes: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function update(field: keyof EstimateFormState) {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setForm((f) => ({ ...f, [field]: e.target.value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const result = await submitProjectEstimate({
+      name: form.name,
+      email: form.email,
+      projectType: form.projectType,
+      projectSize: form.projectSize,
+      location: form.location,
+      budget: form.budget,
+      notes: form.notes || undefined,
+    });
+
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.error ?? "Something went wrong. Please try again.");
+      return;
+    }
+
+    setSubmitted(true);
+  }
+
+  if (submitted) {
+    return (
+      <div
+        className="rounded-2xl p-8 text-center"
+        style={{ border: `2px solid ${GOLD}`, background: `${GOLD}10` }}
+      >
+        <CheckCircle className="h-10 w-10 mx-auto mb-3" style={{ color: GOLD }} />
+        <p className="text-lg font-extrabold text-gray-900 mb-1">Estimate request received!</p>
+        <p className="text-sm text-gray-600 max-w-sm mx-auto">
+          Our team typically responds within one business day. You can also{" "}
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi CargoPlus! I submitted a project estimate request and would like to follow up.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold underline"
+            style={{ color: "#25D366" }}
+          >
+            message us on WhatsApp
+          </a>{" "}
+          for a faster reply.
+        </p>
+      </div>
+    );
+  }
+
+  const inputClass =
+    "w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white";
+  const labelClass = "block text-sm font-semibold text-gray-700 mb-1";
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl p-8"
+      style={{ border: `2px solid ${GOLD}55`, background: "#fff" }}
+      aria-label="Free project cost estimate form"
+    >
+      <h3 className="text-xl font-extrabold text-gray-900 mb-1">
+        Get a Free Project Cost Estimate
+      </h3>
+      <p className="text-sm text-gray-500 mb-6">
+        No phone call required. We&apos;ll review your project and follow up by email.
+      </p>
+
+      {error && (
+        <div
+          className="mb-5 flex items-start gap-2 rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: "#FEF2F2", border: "1.5px solid #FECACA", color: "#B91C1C" }}
+          role="alert"
+        >
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          {error}
+        </div>
+      )}
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="ce-name" className={labelClass}>
+            Your Name <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <input
+            id="ce-name"
+            type="text"
+            required
+            placeholder="e.g. Alex Chen"
+            value={form.name}
+            onChange={update("name")}
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="ce-email" className={labelClass}>
+            Email Address <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <input
+            id="ce-email"
+            type="email"
+            required
+            placeholder="you@company.com"
+            value={form.email}
+            onChange={update("email")}
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="ce-type" className={labelClass}>
+            Project Type <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <select
+            id="ce-type"
+            required
+            value={form.projectType}
+            onChange={update("projectType")}
+            className={inputClass}
+          >
+            <option value="">Select a type…</option>
+            <option>Prefab / Modular Building</option>
+            <option>Industrial Facility</option>
+            <option>Warehouse / Logistics Center</option>
+            <option>Residential Development</option>
+            <option>Government / Infrastructure</option>
+            <option>Steel Structure</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="ce-size" className={labelClass}>
+            Approximate Size <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <select
+            id="ce-size"
+            required
+            value={form.projectSize}
+            onChange={update("projectSize")}
+            className={inputClass}
+          >
+            <option value="">Select a size…</option>
+            <option>Under 500 sq ft</option>
+            <option>500 – 2,000 sq ft</option>
+            <option>2,000 – 10,000 sq ft</option>
+            <option>10,000 – 50,000 sq ft</option>
+            <option>50,000+ sq ft</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="ce-location" className={labelClass}>
+            Project Location <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <input
+            id="ce-location"
+            type="text"
+            required
+            placeholder="e.g. Vancouver, BC"
+            value={form.location}
+            onChange={update("location")}
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="ce-budget" className={labelClass}>
+            Budget Range <span aria-hidden="true" style={{ color: GOLD }}>*</span>
+          </label>
+          <select
+            id="ce-budget"
+            required
+            value={form.budget}
+            onChange={update("budget")}
+            className={inputClass}
+          >
+            <option value="">Select a range…</option>
+            <option>Under $100,000</option>
+            <option>$100,000 – $500,000</option>
+            <option>$500,000 – $2,000,000</option>
+            <option>$2,000,000 – $10,000,000</option>
+            <option>$10,000,000+</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="ce-notes" className={labelClass}>
+          Additional Notes <span className="font-normal text-gray-400">(optional)</span>
+        </label>
+        <textarea
+          id="ce-notes"
+          rows={3}
+          placeholder="Any specific requirements, timeline, or questions…"
+          value={form.notes}
+          onChange={update("notes")}
+          className={`${inputClass} resize-none`}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold transition-all hover:opacity-90 disabled:opacity-60"
+        style={{ backgroundColor: PURPLE, color: "#fff", border: `2px solid ${GOLD}` }}
+      >
+        {loading ? "Submitting…" : "Get My Free Estimate"}
+        {!loading && <ChevronRight className="h-4 w-4" />}
+      </button>
+
+      <p className="mt-3 text-center text-xs text-gray-400">
+        Or reach us on{" "}
+        <a
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold"
+          style={{ color: "#25D366" }}
+        >
+          WhatsApp
+        </a>
+      </p>
+    </form>
   );
 }

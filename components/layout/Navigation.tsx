@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Wrench } from "lucide-react";
+import { ChevronDown, Wrench, ShieldCheck } from "lucide-react";
 
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
@@ -19,6 +19,12 @@ const services = [
     label: "Construction Solutions",
     icon: Wrench,
     description: "Prefab buildings, steel structures & more",
+  },
+  {
+    href: "/services/csa-certification",
+    label: "CSA Certification Guide",
+    icon: ShieldCheck,
+    description: "Compliance for prefab buildings in Canada",
   },
 ];
 
