@@ -93,7 +93,8 @@ export default async function HomePage() {
     youtubeUrl: (product as any).youtube_url ?? null,
     documents: [],
   })) ?? [];
-  const products: ProductWithRelations[] = dbProducts;
+  const products: ProductWithRelations[] = dbProducts.length > 0 ? dbProducts : mockProducts;
+  console.log("Using products:", dbProducts.length > 0 ? "database" : "mock data", "Count:", products.length);
 
   return (
     <>

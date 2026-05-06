@@ -14,6 +14,17 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
   const [added, setAdded] = useState(false);
 
+  // Debug logging for Tiles & Flooring product
+  if (product.category?.name === 'Tiles & Flooring') {
+    console.log('Tiles & Flooring Product Debug:', {
+      productName: product.name,
+      images: product.images,
+      selectedImage: image,
+      imageUrl: image?.url,
+      hasImage: !!image?.url
+    });
+  }
+
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     // Lazy-import the store to avoid hydration mismatch
@@ -35,16 +46,46 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image */}
       <Link href={`/products/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-muted">
         {image?.url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image.url}
-            alt={image.altText ?? product.name}
-            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-          />
+          <>
+            {/* Debug info for Tiles & Flooring */}
+            {product.category?.name === 'Tiles & Flooring' && (
+              <div style={{position: 'absolute', top: '0', left: '0', background: 'red', color: 'white', fontSize: '10px', zIndex: 1000}}>
+                DEBUG: Has URL
+              </div>
+            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image.url}
+              alt={image.altText ?? product.name}
+              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              onLoad={() => {
+                if (product.category?.name === 'Tiles & Flooring') {
+                  console.log('Tiles & Flooring image loaded successfully');
+                }
+              }}
+              onError={(e) => {
+                if (product.category?.name === 'Tiles & Flooring') {
+                  console.error('Tiles & Flooring image failed to load:', {
+                    url: image.url,
+                    error: e
+                  });
+                }
+              }}
+              style={{border: product.category?.name === 'Tiles & Flooring' ? '2px solid blue' : 'none'}}
+            />
+          </>
         ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
-            No image
-          </div>
+          <>
+            {/* Debug info for Tiles & Flooring */}
+            {product.category?.name === 'Tiles & Flooring' && (
+              <div style={{position: 'absolute', top: '0', left: '0', background: 'red', color: 'white', fontSize: '10px', zIndex: 1000}}>
+                DEBUG: No URL
+              </div>
+            )}
+            <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
+              No image
+            </div>
+          </>
         )}
         {hasDiscount && (
           <span className="absolute top-2 left-2 rounded-md bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
