@@ -8,6 +8,7 @@ import { OrderRequestModal } from "@/components/product/OrderRequestModal";
 import { WhatsAppLink } from "@/components/layout/WhatsAppLink";
 import { RichTextRenderer } from "@/components/product/RichTextRenderer";
 import type { ProductWithRelations, ProductImageData } from "@/types";
+import { extractYouTubeId, getYouTubeEmbedUrl } from "@/lib/youtube";
 
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
@@ -177,6 +178,38 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
           </div>
 
         </div>
+
+        {/* YouTube video — shown below image gallery if present */}
+        {product.youtubeUrl && (() => {
+          const videoId = extractYouTubeId(product.youtubeUrl);
+          if (!videoId) return null;
+          return (
+            <div className="mt-1">
+              <div className="flex items-center gap-2 mb-2">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="#FF0000" aria-hidden="true">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                <span className="text-sm font-bold text-gray-700">Product Video</span>
+              </div>
+              <div
+                className="relative w-full overflow-hidden rounded-2xl"
+                style={{
+                  paddingBottom: "56.25%",
+                  boxShadow: `0 0 0 1.5px ${PURPLE}44`,
+                }}
+              >
+                <iframe
+                  src={getYouTubeEmbedUrl(videoId)}
+                  title="Product video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full rounded-2xl"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* RIGHT col */}

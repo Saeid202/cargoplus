@@ -90,6 +90,7 @@ export default async function HomePage() {
     } : { id: "", businessName: "Unknown Seller", businessEmail: "", logoUrl: null, status: "active" as const },
     requireOrderRequest: (product as any).require_order_request ?? false,
     showStock: (product as any).show_stock ?? true,
+    youtubeUrl: (product as any).youtube_url ?? null,
     documents: [],
   })) ?? [];
   const products: ProductWithRelations[] = dbProducts;

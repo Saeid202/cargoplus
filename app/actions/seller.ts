@@ -198,6 +198,7 @@ export async function createProduct(formData: FormData): Promise<{
         specifications,
         require_order_request: formData.get("requireOrderRequest") === "true",
         show_stock: formData.get("showStock") !== "false",
+        youtube_url: (formData.get("youtubeUrl") as string | null) || null,
         status: formData.get("publishStatus") === "draft" ? "pending" : "active",
       })
       .select()
@@ -290,6 +291,7 @@ export async function updateProduct(productId: string, formData: FormData): Prom
 
     const requireOrderRequest = formData.get("requireOrderRequest") === "true";
     const showStock = formData.get("showStock") !== "false"; // default true
+    const youtubeUrl = (formData.get("youtubeUrl") as string | null) || null;
 
     const { data: product, error: productError } = await supabase
       .from("products")
@@ -304,6 +306,7 @@ export async function updateProduct(productId: string, formData: FormData): Prom
         specifications,
         require_order_request: requireOrderRequest,
         show_stock: showStock,
+        youtube_url: youtubeUrl,
         updated_at: new Date().toISOString(),
       })
       .eq("id", productId)

@@ -13,6 +13,7 @@ import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
 import { RichTextEditor } from "@/components/seller/RichTextEditor";
 import { ProductDocumentsEditor, type DocSlot } from "@/components/seller/ProductDocumentsEditor";
 import { saveProductDocuments } from "@/app/actions/product-documents";
+import { extractYouTubeId, getYouTubeEmbedUrl, isValidYouTubeUrl } from "@/lib/youtube";
 
 interface EditProductFormProps {
   product: SellerProduct;
@@ -71,6 +72,7 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
   const [descriptionHtml, setDescriptionHtml] = useState<string>(product.description ?? "");
   const [docs, setDocs] = useState<DocSlot[]>([]);
   const [userId, setUserId] = useState<string>("");
+  const [youtubeUrl, setYoutubeUrl] = useState<string>((product as any).youtube_url ?? "");
 
   useEffect(() => {
     if (product.product_images.length > 0) {
@@ -154,6 +156,7 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
       formData.set("requireOrderRequest", requireOrderRequest ? "true" : "false");
       formData.set("showStock", showStock ? "true" : "false");
       formData.set("description", descriptionHtml);
+      formData.set("youtubeUrl", youtubeUrl.trim());
 
       setLoadingMsg("Saving changes...");
       const result = await updateProduct(product.id, formData);
@@ -292,6 +295,42 @@ export function EditProductForm({ product, categories }: EditProductFormProps) {
 
       <Section title="Product Documents" />
       <ProductDocumentsEditor userId={userId} docs={docs} onChange={setDocs} />
+
+      <Section title="Product Video" />
+      <Field label="YouTube Video URL" hint="Paste any YouTube link — watch, youtu.be, or Shorts. The video is hosted on YouTube, not uploaded here.">
+        <input
+          name="youtubeUrl"
+          type="url"
+          value={youtubeUrl}
+          onChange={(e) => setYoutubeUrl(e.target.value)}
+          className={inputClass}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
+        {youtubeUrl && !isValidYouTubeUrl(youtubeUrl) && (
+          <p className="text-xs text-red-500 pl-8 mt-1">That doesn&apos;t look like a valid YouTube URL.</p>
+        )}
+        {youtubeUrl && isValidYouTubeUrl(youtubeUrl) && (() => {
+          const id = extractYouTubeId(youtubeUrl)!;
+          return (
+            <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${GOLD}55` }}>
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  src={getYouTubeEmbedUrl(id)}
+                  title="Product video preview"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                  loading="lazy"
+                />
+              </div>
+              <div className="px-3 py-2" style={{ backgroundColor: "#fdfbf7" }}>
+                <p className="text-xs font-bold text-green-700">✓ Valid YouTube video — preview above</p>
+                <p className="text-[11px] text-gray-400 mt-0.5 break-all">{youtubeUrl.trim()}</p>
+              </div>
+            </div>
+          );
+        })()}
+      </Field>
 
       <div className="flex gap-3 pt-4 border-t" style={{ borderColor: `${GOLD}44` }}>
         <LuxuryButton type="button" variant="outline" size="md" onClick={() => router.back()}>Cancel</LuxuryButton>

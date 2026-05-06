@@ -28,6 +28,7 @@ function transformProduct(
     specifications: dbProduct.specifications as Record<string, string>,
     requireOrderRequest: (dbProduct as any).require_order_request ?? false,
     showStock: (dbProduct as any).show_stock ?? true,
+    youtubeUrl: (dbProduct as any).youtube_url ?? null,
     createdAt: dbProduct.created_at,
     updatedAt: dbProduct.updated_at,
     images: dbProduct.product_images.map((img: any) => ({

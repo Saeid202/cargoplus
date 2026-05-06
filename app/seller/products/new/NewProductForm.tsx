@@ -12,6 +12,7 @@ import { SpecificationsEditor } from "@/components/seller/SpecificationsEditor";
 import { DraggableVariantGrid, newSlot, type VariantSlot } from "@/components/seller/DraggableVariantGrid";
 import { RichTextEditor } from "@/components/seller/RichTextEditor";
 import { ProductDocumentsEditor, type DocSlot } from "@/components/seller/ProductDocumentsEditor";
+import { extractYouTubeId, getYouTubeEmbedUrl, isValidYouTubeUrl } from "@/lib/youtube";
 import { saveProductDocuments } from "@/app/actions/product-documents";
 
 const PURPLE = "#4B1D8F";
@@ -61,6 +62,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
   const [descriptionHtml, setDescriptionHtml] = useState("");
   const [docs, setDocs] = useState<DocSlot[]>([]);
   const [userId, setUserId] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
   // Get userId on mount for document uploads
   useEffect(() => {
@@ -107,6 +109,7 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
       formData.set("requireOrderRequest", requireOrderRequest ? "true" : "false");
       formData.set("showStock", showStock ? "true" : "false");
       formData.set("description", descriptionHtml);
+      formData.set("youtubeUrl", youtubeUrl.trim());
 
       const result = await createProduct(formData);
       if (result.error) throw new Error(result.error);
@@ -236,6 +239,42 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
 
       <Section title="Product Documents" />
       <ProductDocumentsEditor userId={userId} docs={docs} onChange={setDocs} />
+
+      <Section title="Product Video" />
+      <Field label="YouTube Video URL" hint="Paste any YouTube link — watch, youtu.be, or Shorts. The video is hosted on YouTube, not uploaded here.">
+        <input
+          name="youtubeUrl"
+          type="url"
+          value={youtubeUrl}
+          onChange={(e) => setYoutubeUrl(e.target.value)}
+          className={inputClass}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
+        {youtubeUrl && !isValidYouTubeUrl(youtubeUrl) && (
+          <p className="text-xs text-red-500 pl-8 mt-1">That doesn&apos;t look like a valid YouTube URL.</p>
+        )}
+        {youtubeUrl && isValidYouTubeUrl(youtubeUrl) && (() => {
+          const id = extractYouTubeId(youtubeUrl)!;
+          return (
+            <div className="mt-3 rounded-2xl overflow-hidden" style={{ border: `1.5px solid ${GOLD}55` }}>
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  src={getYouTubeEmbedUrl(id)}
+                  title="Product video preview"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                  loading="lazy"
+                />
+              </div>
+              <div className="px-3 py-2" style={{ backgroundColor: "#fdfbf7" }}>
+                <p className="text-xs font-bold text-green-700">✓ Valid YouTube video — preview above</p>
+                <p className="text-[11px] text-gray-400 mt-0.5 break-all">{youtubeUrl.trim()}</p>
+              </div>
+            </div>
+          );
+        })()}
+      </Field>
 
       {/* Publish status */}
       <div className="flex items-center justify-between rounded-xl border px-4 py-3" style={{ borderColor: `${GOLD}44`, background: "#fdfbf7" }}>

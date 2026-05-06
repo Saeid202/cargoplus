@@ -63,6 +63,7 @@ export interface ProductWithRelations {
   specifications: Record<string, string>
   requireOrderRequest: boolean
   showStock: boolean
+  youtubeUrl: string | null
   createdAt: string
   updatedAt: string
   images: ProductImageData[]
