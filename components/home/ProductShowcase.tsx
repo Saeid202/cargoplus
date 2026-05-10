@@ -36,7 +36,7 @@ export function ProductShowcase({ products, title = "Featured Products" }: Produ
         {/* Grid — 4 columns, fixed card height */}
         <div
           data-testid="product-grid"
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
         >
           {displayProducts.map((product) => (
             <div key={product.id} className="flex flex-col h-full">
