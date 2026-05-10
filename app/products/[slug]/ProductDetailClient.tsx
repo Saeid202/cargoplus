@@ -103,7 +103,7 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
 
           {/* Vertical thumbnail strip — only when there are multiple images */}
           {allImages.length > 1 && (
-            <div className="flex flex-col gap-2 overflow-y-auto pr-0.5" style={{ width: 104, scrollbarWidth: "thin" }}>
+            <div className="flex flex-col gap-2 overflow-y-auto pr-0.5" style={{ width: 144, scrollbarWidth: "thin" }}>
               {allImages.map((img, idx) => {
                 const isActive = img.id === activeId;
                 const label = img.variantCode ? img.variantCode : `#${idx + 1}`;
@@ -117,7 +117,7 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
                     aria-label={`Select image ${label}`}
                   >
                     <div
-                      className="h-24 w-24 overflow-hidden rounded-xl"
+                      className="h-32 w-32 overflow-hidden rounded-xl"
                       style={{
                         border: isActive ? `2.5px solid ${GOLD}` : `2px solid ${PURPLE}44`,
                         boxShadow: isActive ? `0 0 0 2px ${PURPLE}` : "none",
@@ -129,7 +129,7 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
                       <img src={img.url} alt={label} className="h-full w-full object-cover bg-white" />
                     </div>
                     <span
-                      className="max-w-[92px] truncate rounded-full px-2 py-0.5 text-[10px] font-bold text-center"
+                      className="max-w-[110px] truncate rounded-full px-2 py-0.5 text-[10px] font-bold text-center"
                       style={{
                         backgroundColor: isActive ? PURPLE : "#EDE9F6",
                         color: isActive ? "white" : PURPLE,
