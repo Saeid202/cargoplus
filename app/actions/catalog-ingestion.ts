@@ -85,7 +85,7 @@ export async function processCatalogFile(storagePath: string, fileName: string, 
               try { img = await (page.objs.has(name) ? page.objs.get(name) : page.commonObjs.get(name)); } catch(e) {}
               if (!img) continue;
               const { width, height } = img;
-              const channels = img.data.length / width / height;
+              const channels = (img.data.length / width / height) as 1 | 2 | 3 | 4;
               if ([1, 2, 3, 4].includes(channels)) {
                 const pngBuffer = await sharp(img.data, { raw: { width, height, channels } }).png().toBuffer();
                 const imagePath = `extracted/${sellerId}/${Date.now()}_p${p}.png`;
