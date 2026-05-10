@@ -84,7 +84,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col overflow-x-hidden">
         <ServiceWorkerRegistrar />
         <ConditionalShell cmsNav={<CmsNavigation />}>
           <main className="flex-1">{children}</main>

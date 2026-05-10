@@ -87,14 +87,14 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
 
   return (
     <>
-    <div className="grid md:grid-cols-2 gap-6 lg:gap-14">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-14 w-full max-w-full">
 
       {/* LEFT col */}
       <div className="flex flex-col gap-3">
 
         {/* Name + price — mobile only, one row */}
         <div className="md:hidden flex items-baseline justify-between gap-2 flex-wrap">
-          <h1 className="text-2xl font-extrabold text-gray-900">{product.name}</h1>
+          <h1 className="text-2xl font-extrabold text-gray-900 break-words">{product.name}</h1>
           <span className="text-xl font-bold shrink-0" style={{ color: PURPLE }}>${activePrice.toFixed(2)} CAD</span>
         </div>
 
@@ -298,9 +298,9 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
             <div className="grid grid-cols-1 sm:grid-cols-2 overflow-hidden rounded-xl border-2" style={{ borderColor: `${PURPLE}33` }}>
               {Object.entries(product.specifications as Record<string, string>).filter(([, v]) => v).map(([key, value], idx) => (
                 <div key={key} className="flex items-center border-b last:border-b-0 sm:border-b-0 sm:even:border-l" style={{ borderColor: `${PURPLE}15` }}>
-                  <div className="flex w-full items-center justify-between gap-3 px-4 py-3" style={{ backgroundColor: idx % 4 === 0 || idx % 4 === 3 ? "#F0EBF9" : "white" }}>
-                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: PURPLE }}>{key.replace(/_/g, " ")}</span>
-                    <span className="text-sm font-black" style={{ color: GOLD }}>{value}</span>
+                  <div className="flex w-full items-center justify-between gap-3 px-4 py-3 min-w-0" style={{ backgroundColor: idx % 4 === 0 || idx % 4 === 3 ? "#F0EBF9" : "white" }}>
+                    <span className="text-[10px] font-black uppercase tracking-widest shrink-0" style={{ color: PURPLE }}>{key.replace(/_/g, " ")}</span>
+                    <span className="text-sm font-black text-right break-words" style={{ color: GOLD }}>{value}</span>
                   </div>
                 </div>
               ))}
@@ -312,7 +312,7 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
         {hasVariants && (
           <div className="mb-5">
             <h2 className="mb-3 font-bold text-gray-900">Product Variants</h2>
-            <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: `${GOLD}55` }}>
+            <div className="overflow-x-auto rounded-2xl border max-w-full" style={{ borderColor: `${GOLD}55` }}>
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: `linear-gradient(135deg, ${PURPLE} 0%, #3a1570 100%)` }}>
