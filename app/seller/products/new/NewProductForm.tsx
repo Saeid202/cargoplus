@@ -15,7 +15,7 @@ import { ProductDocumentsEditor, type DocSlot } from "@/components/seller/Produc
 import { extractYouTubeId, getYouTubeEmbedUrl, isValidYouTubeUrl } from "@/lib/youtube";
 import { saveProductDocuments } from "@/app/actions/product-documents";
 import { enrichProductFromImage } from "@/app/actions/product-enrichment";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2, RefreshCcw } from "lucide-react";
 
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
