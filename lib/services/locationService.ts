@@ -47,7 +47,7 @@ export class LocationService implements LocationServiceType {
   private deduplicateResults(results: AddressSuggestion[]): AddressSuggestion[] {
     const seen = new Map<string, AddressSuggestion>();
     for (const result of results) {
-      const parts = result.text.split(', ');
+      const parts = (result.text || '').split(', ');
       const city = parts[1] || '';
       const province = parts[2] || '';
       const street = parts[0] || '';
@@ -135,7 +135,7 @@ export class LocationService implements LocationServiceType {
       const addr = data.address || {};
 
       return {
-        address: addr.house_number && addr.road ? `${addr.house_number} ${addr.road}` : addr.road || suggestion.text.split(',')[0].trim(),
+        address: addr.house_number && addr.road ? `${addr.house_number} ${addr.road}` : addr.road || (suggestion.text || '').split(',')[0].trim(),
         city: (addr.city || addr.town || addr.municipality || addr.village || '').trim(),
         state: normalizeProvince(addr.state || addr.province || ''),
         zipCode: addr.postcode ? formatPostalCode(addr.postcode) : '',
@@ -143,7 +143,7 @@ export class LocationService implements LocationServiceType {
         place_name: suggestion.place_name,
       };
     } catch {
-      const parts = suggestion.text.split(',');
+      const parts = (suggestion.text || '').split(',');
       return {
         address: parts[0]?.trim() || '',
         city: parts[1]?.trim() || '',
