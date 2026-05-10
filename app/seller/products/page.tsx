@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSellerProfile, getSellerProducts } from "@/app/actions/seller";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, Sparkles } from "lucide-react";
 import { ProductActions } from "./ProductActions";
 import { LuxuryLinkButton } from "@/components/seller/LuxuryButton";
 
@@ -28,14 +28,24 @@ export default async function SellerProductsPage() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-sm text-gray-500">
-          {products.length} product{products.length !== 1 ? "s" : ""} listed
-        </p>
-        <LuxuryLinkButton href="/seller/products/new" size="md">
-          <Plus className="h-4 w-4" />
-          Add Product
-        </LuxuryLinkButton>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-[1000] text-black tracking-tight">Product Catalog</h1>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            {products.length} product{products.length !== 1 ? "s" : ""} currently listed
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <LuxuryLinkButton href="/seller/import" size="md">
+            <Sparkles className="h-4 w-4" />
+            AI Bulk Import
+          </LuxuryLinkButton>
+          <LuxuryLinkButton href="/seller/products/new" size="md">
+            <Plus className="h-4 w-4" />
+            Add Product
+          </LuxuryLinkButton>
+        </div>
       </div>
 
       {products.length === 0 ? (

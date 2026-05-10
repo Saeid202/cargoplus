@@ -14,6 +14,8 @@ import { RichTextEditor } from "@/components/seller/RichTextEditor";
 import { ProductDocumentsEditor, type DocSlot } from "@/components/seller/ProductDocumentsEditor";
 import { extractYouTubeId, getYouTubeEmbedUrl, isValidYouTubeUrl } from "@/lib/youtube";
 import { saveProductDocuments } from "@/app/actions/product-documents";
+import { enrichProductFromImage } from "@/app/actions/product-enrichment";
+import { Sparkles, Wand2 } from "lucide-react";
 
 const PURPLE = "#4B1D8F";
 const GOLD = "#D4AF37";
@@ -63,6 +65,60 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
   const [docs, setDocs] = useState<DocSlot[]>([]);
   const [userId, setUserId] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleAiScan = async () => {
+    const mainImage = variants.find(v => v.file || v.existingUrl);
+    if (!mainImage) {
+      setError("Please upload an image first to scan for specifications.");
+      return;
+    }
+
+    setIsScanning(true);
+    setError(null);
+
+    try {
+      let imageInput: { url?: string, base64?: string } = {};
+      
+      if (mainImage.file) {
+        // Convert local file to base64
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1]); // Remove the data:image/jpeg;base64, part
+          };
+        });
+        reader.readAsDataURL(mainImage.file);
+        imageInput.base64 = await base64Promise;
+      } else if (mainImage.existingUrl) {
+        imageInput.url = mainImage.existingUrl;
+      }
+
+      const result = await enrichProductFromImage(imageInput);
+      
+      if (result.success && result.specs) {
+        // Merge AI specs with existing ones (avoiding duplicates)
+        setSpecs(prev => {
+          const newSpecs = [...prev];
+          result.specs.forEach((aiSpec: { key: string, value: string }) => {
+            if (!newSpecs.find(s => s.key.toLowerCase() === aiSpec.key.toLowerCase())) {
+              newSpecs.push(aiSpec);
+            }
+          });
+          return newSpecs;
+        });
+        setStatus("Specifications extracted successfully!");
+        setTimeout(() => setStatus(""), 3000);
+      } else {
+        throw new Error(result.error || "AI could not read specifications from this image.");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   // Get userId on mount for document uploads
   useEffect(() => {
@@ -235,6 +291,30 @@ export function NewProductForm({ categories }: { categories: Category[] }) {
       </div>
 
       <Section title="Specifications" />
+      <div className="bg-gray-50/50 p-4 rounded-2xl border border-dashed border-gray-200 mb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-sm font-bold text-gray-800">Smart AI Spec Entry</p>
+            <p className="text-xs text-gray-400">Save time! Let the AI read your product image to find sizes and materials.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAiScan}
+            disabled={isScanning}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
+            style={{ 
+              background: `linear-gradient(135deg, ${PURPLE}, #6B46C1)`,
+            }}
+          >
+            {isScanning ? (
+              <RefreshCcw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Wand2 className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+            )}
+            <span>{isScanning ? "Reading Image..." : "Scan Image with AI"}</span>
+          </button>
+        </div>
+      </div>
       <SpecificationsEditor specs={specs} onChange={setSpecs} />
 
       <Section title="Product Documents" />
