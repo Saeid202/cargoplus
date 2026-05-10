@@ -295,14 +295,13 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
         {Object.entries(product.specifications as Record<string, string>).filter(([, v]) => v).length > 0 && (
           <div className="mb-5">
             <h2 className="mb-3 font-bold text-gray-900">Specifications</h2>
-            <div className="flex w-full overflow-hidden rounded-xl border-2" style={{ borderColor: `${PURPLE}33` }}>
-              {Object.entries(product.specifications as Record<string, string>).filter(([, v]) => v).map(([key, value], idx, arr) => (
-                <div key={key} className="flex flex-1 items-center">
-                  <div className="flex w-full items-center gap-3 px-4 py-2" style={{ backgroundColor: idx % 2 === 0 ? "#F0EBF9" : "white" }}>
-                    <span className="whitespace-nowrap text-xs font-extrabold uppercase tracking-widest" style={{ color: PURPLE }}>{key.replace(/_/g, " ")}</span>
-                    <span className="whitespace-nowrap text-base font-extrabold" style={{ color: GOLD }}>{value}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 overflow-hidden rounded-xl border-2" style={{ borderColor: `${PURPLE}33` }}>
+              {Object.entries(product.specifications as Record<string, string>).filter(([, v]) => v).map(([key, value], idx) => (
+                <div key={key} className="flex items-center border-b last:border-b-0 sm:border-b-0 sm:even:border-l" style={{ borderColor: `${PURPLE}15` }}>
+                  <div className="flex w-full items-center justify-between gap-3 px-4 py-3" style={{ backgroundColor: idx % 4 === 0 || idx % 4 === 3 ? "#F0EBF9" : "white" }}>
+                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: PURPLE }}>{key.replace(/_/g, " ")}</span>
+                    <span className="text-sm font-black" style={{ color: GOLD }}>{value}</span>
                   </div>
-                  {idx < arr.length - 1 && <span className="w-0.5 flex-shrink-0 self-stretch" style={{ backgroundColor: `${PURPLE}33` }} />}
                 </div>
               ))}
             </div>
@@ -313,7 +312,7 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
         {hasVariants && (
           <div className="mb-5">
             <h2 className="mb-3 font-bold text-gray-900">Product Variants</h2>
-            <div className="overflow-hidden rounded-2xl border" style={{ borderColor: `${GOLD}55` }}>
+            <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: `${GOLD}55` }}>
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: `linear-gradient(135deg, ${PURPLE} 0%, #3a1570 100%)` }}>
