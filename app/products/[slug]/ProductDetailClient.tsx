@@ -95,7 +95,11 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
         {/* Name + price — mobile only, one row */}
         <div className="md:hidden flex items-baseline justify-between gap-2 flex-wrap">
           <h1 className="text-2xl font-extrabold text-gray-900 break-words">{product.name}</h1>
-          <span className="text-xl font-bold shrink-0" style={{ color: PURPLE }}>${activePrice.toFixed(2)} CAD</span>
+          {product.requireOrderRequest ? (
+            <span className="text-lg font-bold" style={{ color: GOLD }}>Request for a quote</span>
+          ) : (
+            <span className="text-xl font-bold shrink-0" style={{ color: PURPLE }}>${activePrice.toFixed(2)} CAD</span>
+          )}
         </div>
 
         {/* Image area: vertical thumbnail strip + main image side by side */}
@@ -219,9 +223,15 @@ export function ProductDetailClient({ product }: { product: ProductWithRelations
         <div className="hidden md:block mb-4">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-1">{product.name}</h1>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold" style={{ color: PURPLE }}>${activePrice.toFixed(2)} CAD</span>
-            {hasDiscount && activeImage?.variantPrice == null && (
-              <span className="text-base text-gray-400 line-through">${product.compareAtPrice!.toFixed(2)}</span>
+            {product.requireOrderRequest ? (
+              <span className="text-2xl font-bold" style={{ color: GOLD }}>Request for a quote</span>
+            ) : (
+              <>
+                <span className="text-2xl font-bold" style={{ color: PURPLE }}>${activePrice.toFixed(2)} CAD</span>
+                {hasDiscount && activeImage?.variantPrice == null && (
+                  <span className="text-base text-gray-400 line-through">${product.compareAtPrice!.toFixed(2)}</span>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -104,15 +104,22 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </Link>
 
+
         {/* Price */}
-        <div className="mt-auto flex items-center gap-2">
-          <span className="text-sm font-bold text-primary">
-            ${product.price.toFixed(2)} CAD
-          </span>
-          {hasDiscount && (
-            <span className="text-xs text-muted-foreground line-through">
-              ${product.compareAtPrice!.toFixed(2)}
-            </span>
+        <div className="mt-auto">
+          {product.requireOrderRequest ? (
+            <span className="text-sm font-bold text-secondary">Request for a quote</span>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-primary">
+                ${product.price.toFixed(2)} CAD
+              </span>
+              {hasDiscount && (
+                <span className="text-xs text-muted-foreground line-through">
+                  ${product.compareAtPrice!.toFixed(2)}
+                </span>
+              )}
+            </div>
           )}
         </div>
 
