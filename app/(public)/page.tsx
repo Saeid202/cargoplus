@@ -90,6 +90,7 @@ export default async function HomePage() {
     requireOrderRequest: (product as any).require_order_request ?? false,
     showStock: (product as any).show_stock ?? true,
     youtubeUrl: (product as any).youtube_url ?? null,
+    hasCustomization: (product as any).has_customization ?? false,
     documents: [],
   })) ?? [];
   const products: ProductWithRelations[] = dbProducts.length > 0 ? dbProducts : mockProducts;

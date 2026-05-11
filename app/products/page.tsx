@@ -54,6 +54,7 @@ function transformProduct(dbProduct: NonNullable<Awaited<ReturnType<typeof getPr
     requireOrderRequest: (dbProduct as any).require_order_request ?? false,
     showStock: (dbProduct as any).show_stock ?? true,
     youtubeUrl: (dbProduct as any).youtube_url ?? null,
+    hasCustomization: (dbProduct as any).has_customization ?? false,
     documents: [],
   };
 }

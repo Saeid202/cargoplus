@@ -3,7 +3,8 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
-import type { Product, ProductImage, Category, Seller, CustomizationGroup, CustomizationOption } from "@/types/database";
+import type { Product, ProductImage, Category, Seller } from "@/types/database";
+import type { CustomizationGroup, CustomizationOption } from "@/types";
 
 /** Generate a unique slug for a product, appending a random suffix on collision. */
 async function uniqueSlug(supabase: Awaited<ReturnType<typeof createServerClient>>, name: string, excludeId?: string): Promise<string> {

@@ -480,6 +480,8 @@ export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
 export type Inquiry = Database['public']['Tables']['inquiries']['Row']
 export type HeroSlide = Database['public']['Tables']['hero_slides']['Row']
+export type product_customization_groups = Database['public']['Tables']['product_customization_groups']['Row']
+export type product_customization_options = Database['public']['Tables']['product_customization_options']['Row']
 
 // Insert types
 export type InsertProfile = Database['public']['Tables']['profiles']['Insert']

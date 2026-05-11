@@ -6,6 +6,46 @@
  */
 
 // Re-export database types
+import type {
+  Database,
+  Json,
+  Profile,
+  Seller,
+  Category,
+  Product,
+  ProductImage,
+  CartItem,
+  Order,
+  OrderItem,
+  Inquiry,
+  HeroSlide,
+  InsertProfile,
+  InsertSeller,
+  InsertCategory,
+  InsertProduct,
+  InsertProductImage,
+  InsertCartItem,
+  InsertOrder,
+  InsertOrderItem,
+  InsertInquiry,
+  InsertHeroSlide,
+  UpdateProfile,
+  UpdateSeller,
+  UpdateCategory,
+  UpdateProduct,
+  UpdateProductImage,
+  UpdateCartItem,
+  UpdateOrder,
+  UpdateOrderItem,
+  UpdateInquiry,
+  UpdateHeroSlide,
+  Tables,
+  InsertTables,
+  UpdateTables,
+  product_customization_groups,
+  product_customization_options,
+} from './database'
+
 export type {
   Database,
   Json,
@@ -42,9 +82,12 @@ export type {
   Tables,
   InsertTables,
   UpdateTables,
-  product_customization_groups as CustomizationGroup,
-  product_customization_options as CustomizationOption,
-} from './database'
+  product_customization_groups,
+  product_customization_options,
+}
+
+export type CustomizationGroup = product_customization_groups;
+export type CustomizationOption = product_customization_options;
 
 // Application-specific types that extend database types
 
