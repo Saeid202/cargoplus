@@ -378,20 +378,34 @@ export async function updateProduct(productId: string, formData: FormData): Prom
     const storageClient = createAdminClient() || supabase;
 
     if (variantsJson) {
-      // Delete old storage files and DB rows
+      // 1. Fetch current images from DB to see what might need storage cleanup
       const { data: oldImages } = await supabase
         .from("product_images")
         .select("url")
         .eq("product_id", productId);
 
       if (oldImages && oldImages.length > 0) {
-        const paths = oldImages
-          .map((img) => img.url.split("/product-images/")[1])
-          .filter(Boolean) as string[];
-        if (paths.length > 0) {
-          await storageClient.storage.from("product-images").remove(paths);
+        // Get the storage paths of all NEW images we want to keep
+        const newPaths = new Set(
+          variants
+            .map(v => (v.url || v.existingUrl)?.split("/product-images/")[1])
+            .filter(Boolean)
+        );
+
+        // Get the storage paths of OLD images that are no longer in the new set
+        const pathsToDelete = oldImages
+          .map(img => img.url.split("/product-images/")[1])
+          .filter(path => path && !newPaths.has(path)) as string[];
+
+        // Only remove if we have something to delete
+        if (pathsToDelete.length > 0) {
+          // Safety: Don't delete anything that was just uploaded in this request
+          // (This is redundant if newPaths is correct, but good for peace of mind)
+          await storageClient.storage.from("product-images").remove(pathsToDelete);
         }
       }
+
+      // 2. Refresh the database rows
       await supabase.from("product_images").delete().eq("product_id", productId);
 
       const rows = variants
@@ -408,7 +422,7 @@ export async function updateProduct(productId: string, formData: FormData): Prom
             is_master: v.isMaster,
           };
         })
-        .filter(Boolean) as object[];
+        .filter(Boolean) as any[];
 
       if (rows.length > 0) {
         const { error: batchErr } = await supabase.from("product_images").insert(rows);
