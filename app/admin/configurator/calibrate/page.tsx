@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LayoutGrid, Plus, Home } from 'lucide-react';
 
 export default async function CalibrationListPage() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // Fetch products that are 'houses' or potential houses
   const { data: products } = await supabase

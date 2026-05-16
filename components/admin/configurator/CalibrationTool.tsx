@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { HouseAnchor, AnchorType } from '@/types/configurator';
 import { 
   Save, 
@@ -41,7 +41,7 @@ export default function CalibrationTool({ product, initialSettings, mainImage }:
   const [isSaving, setIsSaving] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
+  const supabase = createBrowserClient();
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;

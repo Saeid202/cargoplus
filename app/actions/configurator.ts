@@ -1,13 +1,13 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@/lib/supabase/server';
 import { HouseConfiguratorSettings, HouseAnchor, AllowedProduct } from '@/types/configurator';
 
 /**
  * Fetches the complete configurator mesh for a house product
  */
 export async function getHouseConfigurator(productId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // 1. Fetch settings
   const { data: settings, error: sError } = await supabase
@@ -72,7 +72,7 @@ export async function saveConfiguration(params: {
   selections: Record<string, string>;
   totalPrice: number;
 }) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   
   // Get current user
   const { data: { user }, error: userError } = await supabase.auth.getUser();

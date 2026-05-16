@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import CalibrationTool from '@/components/admin/configurator/CalibrationTool';
 
@@ -8,7 +8,7 @@ interface PageProps {
 
 export default async function CalibrateProductPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // Fetch product and its main image
   const { data: product } = await supabase
