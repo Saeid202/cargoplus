@@ -26,7 +26,7 @@ export default async function HomePage() {
       setTimeout(() => reject(new Error("Database timeout")), 3000)
     );
     
-    const productsData = await Promise.race([getProducts({ limit: 8 }), timeoutPromise]);
+    const productsData = await Promise.race([getProducts({ limit: 100 }), timeoutPromise]);
     productsResult = productsData as { data: any[] | null; error: string | null };
   } catch (error) {
     console.log("Home page: Using mock data due to database issues");

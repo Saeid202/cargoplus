@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { ProductCard } from "@/components/products/ProductCard";
 import type { ProductWithRelations } from "@/types";
 
@@ -8,17 +11,28 @@ interface ProductShowcaseProps {
 }
 
 export function ProductShowcase({ products, title = "Featured Products" }: ProductShowcaseProps) {
+  const [activeTab, setActiveTab] = useState<"Prefab" | "Robot">("Prefab");
+
   if (!products.length) return null;
 
-  // Cap at 8 products — 2 rows of 4
-  const displayProducts = products.slice(0, 8);
+  // Filter products based on tab
+  const filteredProducts = products.filter((product) => {
+    const categorySlug = product.category.slug.toLowerCase();
+    if (activeTab === "Robot") {
+      return categorySlug.includes("robot");
+    } else {
+      return categorySlug.includes("pre-fabricated") || categorySlug.includes("prefab") || categorySlug.includes("steel");
+    }
+  });
+
+  const displayProducts = filteredProducts;
 
   return (
     <section className="py-14 md:py-20 bg-white">
       <div className="container mx-auto px-4">
 
         {/* Heading */}
-        <div className="mb-10 flex items-end justify-between">
+        <div className="mb-6 flex items-end justify-between">
           <div>
             <span className="inline-block mb-2 rounded-full border border-purple-300 bg-purple-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-purple-700">
               Catalog
@@ -31,6 +45,32 @@ export function ProductShowcase({ products, title = "Featured Products" }: Produ
           >
             View all →
           </Link>
+        </div>
+
+        {/* Horizontal Tabs */}
+        <div className="mb-8">
+          <div className="flex gap-2 border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab("Prefab")}
+              className={`px-6 py-3 font-semibold transition-colors ${
+                activeTab === "Prefab"
+                  ? "text-[#4B1D8F] border-b-2 border-[#4B1D8F]"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Prefab
+            </button>
+            <button
+              onClick={() => setActiveTab("Robot")}
+              className={`px-6 py-3 font-semibold transition-colors ${
+                activeTab === "Robot"
+                  ? "text-[#4B1D8F] border-b-2 border-[#4B1D8F]"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Robot
+            </button>
+          </div>
         </div>
 
         {/* Grid — 4 columns, fixed card height */}

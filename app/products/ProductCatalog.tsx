@@ -31,7 +31,15 @@ export function ProductCatalog({ initialProducts, categories }: ProductCatalogPr
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Products</h1>
+      {/* Hero Section */}
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+          Browse Our Products
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Quality construction materials and industrial equipment from trusted Chinese suppliers, shipped directly to Canada.
+        </p>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters sidebar */}
