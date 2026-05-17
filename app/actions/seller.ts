@@ -202,7 +202,7 @@ export async function getEditProductData(productId: string): Promise<{
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { profile: null, product: null, categories: [], error: "Not authenticated" };
+      return { profile: null, product: null, categories: [], documents: [], error: "Not authenticated" };
     }
 
     const [profileResult, productResult, categoriesResult, documentsResult] = await Promise.all([
@@ -238,7 +238,7 @@ export async function getEditProductData(productId: string): Promise<{
     };
   } catch (err) {
     console.error("Error fetching edit product data:", err);
-    return { profile: null, product: null, categories: [], error: "Failed to fetch data" };
+    return { profile: null, product: null, categories: [], documents: [], error: "Failed to fetch data" };
   }
 }
 
