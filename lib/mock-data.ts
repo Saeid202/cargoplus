@@ -43,7 +43,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-1', name: 'Steel & Metal', slug: 'steel-metal', description: null, imageUrl: null },
     seller: { id: 'seller-1', businessName: 'SteelPro China', businessEmail: 'info@steelpro.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '2',
@@ -73,7 +73,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-2', name: 'Robots', slug: 'robots', description: null, imageUrl: null },
     seller: { id: 'seller-2', businessName: 'RoboTech Shanghai', businessEmail: 'sales@robotech.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '3',
@@ -103,7 +103,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-3', name: 'Cement & Concrete', slug: 'cement-concrete', description: null, imageUrl: null },
     seller: { id: 'seller-1', businessName: 'SteelPro China', businessEmail: 'info@steelpro.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '4',
@@ -133,7 +133,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-2', name: 'Robots', slug: 'robots', description: null, imageUrl: null },
     seller: { id: 'seller-2', businessName: 'RoboTech Shanghai', businessEmail: 'sales@robotech.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '5',
@@ -163,7 +163,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-4', name: 'Tiles & Flooring', slug: 'tiles-flooring', description: null, imageUrl: null },
     seller: { id: 'seller-3', businessName: 'TileWorld Guangzhou', businessEmail: 'export@tileworld.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '6',
@@ -193,7 +193,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-2', name: 'Robots', slug: 'robots', description: null, imageUrl: null },
     seller: { id: 'seller-2', businessName: 'RoboTech Shanghai', businessEmail: 'sales@robotech.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '7',
@@ -223,7 +223,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-1', name: 'Steel & Metal', slug: 'steel-metal', description: null, imageUrl: null },
     seller: { id: 'seller-1', businessName: 'SteelPro China', businessEmail: 'info@steelpro.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '8',
@@ -253,7 +253,7 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-2', name: 'Robots', slug: 'robots', description: null, imageUrl: null },
     seller: { id: 'seller-2', businessName: 'RoboTech Shanghai', businessEmail: 'sales@robotech.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
   {
     id: '9',
@@ -283,6 +283,6 @@ export const mockProducts: ProductWithRelations[] = [
     ],
     category: { id: 'cat-5', name: 'Pre-fabricated', slug: 'pre-fabricated', description: null, imageUrl: null },
     seller: { id: 'seller-1', businessName: 'SteelPro China', businessEmail: 'info@steelpro.cn', logoUrl: null, status: 'active' },
-    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false,
+    requireOrderRequest: false, showStock: true, youtubeUrl: null, documents: [], hasCustomization: false, priceType: 'unit', configurator_type: 'none',
   },
 ]

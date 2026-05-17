@@ -38,6 +38,7 @@ export function CustomizationSuiteSimpleWorking({ productId, userId, initialEnab
   const [isEnabled, setIsEnabled] = useState(initialEnabled);
   const [options, setOptions] = useState<OptionRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   // Load existing options when enabled
   useEffect(() => {
@@ -278,6 +279,17 @@ export function CustomizationSuiteSimpleWorking({ productId, userId, initialEnab
                   <div key={option.id} className="grid grid-cols-8 gap-2 p-3 items-center hover:bg-gray-50" style={{ 
                     backgroundColor: option.isNew ? `${GOLD}10` : 'transparent'
                   }}>
+                    <input
+                      key={`file-input-${index}`}
+                      ref={(el) => {
+                        fileInputRefs.current[`${index}-main`] = el;
+                      }}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => e.target.files && handleImageUpload(e.target.files, index)}
+                    />
                     <div className="text-sm">
                       <select
                         value={option.category}
