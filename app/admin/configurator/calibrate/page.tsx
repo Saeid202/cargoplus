@@ -28,11 +28,11 @@ export default async function CalibrationListPage() {
           <h1 className="text-3xl font-bold">Configurator Calibration</h1>
           <p className="text-muted-foreground">Select a house model to define anchors and masks.</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/products">
+        <Link href="/admin/products">
+          <Button>
             <Plus className="mr-2 h-4 w-4" /> Add New House
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -64,11 +64,11 @@ export default async function CalibrationListPage() {
                 <CardDescription>{product.slug}</CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-0">
-                <Button className="w-full" asChild variant={hasSettings ? "default" : "outline"}>
-                  <Link href={`/admin/configurator/calibrate/${product.id}`}>
+                <Link href={`/admin/configurator/calibrate/${product.id}`}>
+                  <Button className="w-full" variant={hasSettings ? "default" : "outline"}>
                     {hasSettings ? "Edit Calibration" : "Start Calibration"}
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           );
