@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getSellerProfile, getSellerProducts } from "@/app/actions/seller";
-import { Package, Plus } from "lucide-react";
+import { getSellerDashboardData } from "@/app/actions/seller";
+import { Package, Plus, Sparkles } from "lucide-react";
 import { ProductActions } from "./ProductActions";
 import { LuxuryLinkButton } from "@/components/seller/LuxuryButton";
 
@@ -10,32 +10,37 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "My Products",
-  description: "Manage your product listings on CargoPlus.",
+  description: "Manage your product listings on Apex Modular Construction.",
 };
 
 export default async function SellerProductsPage() {
-  const [profileResult, productsResult] = await Promise.all([
-    getSellerProfile(),
-    getSellerProducts(),
-  ]);
+  const { profile, products, error } = await getSellerDashboardData();
 
   // Only redirect if not authenticated, not on DB errors
-  if (!profileResult.data && profileResult.error === "Not authenticated") {
+  if (!profile && error === "Not authenticated") {
     redirect("/seller/login");
   }
 
-  const products = productsResult.data || [];
-
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-sm text-gray-500">
-          {products.length} product{products.length !== 1 ? "s" : ""} listed
-        </p>
-        <LuxuryLinkButton href="/seller/products/new" size="md">
-          <Plus className="h-4 w-4" />
-          Add Product
-        </LuxuryLinkButton>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-[1000] text-black tracking-tight">Product Catalog</h1>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            {products.length} product{products.length !== 1 ? "s" : ""} currently listed
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <LuxuryLinkButton href="/seller/import" size="md">
+            <Sparkles className="h-4 w-4" />
+            AI Bulk Import
+          </LuxuryLinkButton>
+          <LuxuryLinkButton href="/seller/products/new" size="md">
+            <Plus className="h-4 w-4" />
+            Add Product
+          </LuxuryLinkButton>
+        </div>
       </div>
 
       {products.length === 0 ? (
@@ -44,7 +49,7 @@ export default async function SellerProductsPage() {
             <Package className="h-7 w-7" style={{ color: "#4B1D8F" }} />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-1">No products yet</h2>
-          <p className="text-sm text-gray-500 mb-5">Start adding products to sell on CargoPlus.</p>
+          <p className="text-sm text-gray-500 mb-5">Start adding products to sell on Apex Modular Construction.</p>
           <LuxuryLinkButton href="/seller/products/new" size="md">
             <Plus className="h-4 w-4" />
             Add Your First Product

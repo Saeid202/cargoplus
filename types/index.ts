@@ -2,10 +2,52 @@
  * Application Types
  * 
  * These types extend the database types with application-specific shapes
- * and are used throughout the CargoPlus platform.
+ * and are used throughout the Apex Modular Construction platform.
  */
 
 // Re-export database types
+import type {
+  Database,
+  Json,
+  Profile,
+  Seller,
+  Category,
+  Product,
+  ProductImage,
+  CartItem,
+  Order,
+  OrderItem,
+  Inquiry,
+  HeroSlide,
+  InsertProfile,
+  InsertSeller,
+  InsertCategory,
+  InsertProduct,
+  InsertProductImage,
+  InsertCartItem,
+  InsertOrder,
+  InsertOrderItem,
+  InsertInquiry,
+  InsertHeroSlide,
+  UpdateProfile,
+  UpdateSeller,
+  UpdateCategory,
+  UpdateProduct,
+  UpdateProductImage,
+  UpdateCartItem,
+  UpdateOrder,
+  UpdateOrderItem,
+  UpdateInquiry,
+  UpdateHeroSlide,
+  Tables,
+  InsertTables,
+  UpdateTables,
+  product_customization_groups,
+  product_customization_options,
+} from './database'
+
+export * from './configurator'
+
 export type {
   Database,
   Json,
@@ -42,7 +84,12 @@ export type {
   Tables,
   InsertTables,
   UpdateTables,
-} from './database'
+  product_customization_groups,
+  product_customization_options,
+}
+
+export type CustomizationGroup = product_customization_groups;
+export type CustomizationOption = product_customization_options;
 
 // Application-specific types that extend database types
 
@@ -55,17 +102,37 @@ export interface ProductWithRelations {
   slug: string
   description: string | null
   price: number
+  priceType: 'unit' | 'sqm' | 'sqf'
   compareAtPrice: number | null
   stockQuantity: number
   categoryId: string
   sellerId: string
   status: 'pending' | 'active' | 'rejected' | 'archived'
+  configurator_type: 'house' | 'door' | 'window' | 'wall-material' | 'none'
   specifications: Record<string, string>
+  requireOrderRequest: boolean
+  showStock: boolean
+  youtubeUrl: string | null
   createdAt: string
   updatedAt: string
   images: ProductImageData[]
   category: CategoryData
   seller: SellerData
+  documents: ProductDocumentData[]
+  hasCustomization: boolean
+  customizationGroups?: CustomizationGroupWithRelations[]
+}
+
+export interface CustomizationGroupWithRelations extends CustomizationGroup {
+  options: CustomizationOption[]
+}
+
+export interface ProductDocumentData {
+  id: string
+  name: string
+  url: string
+  fileType: 'pdf' | 'excel' | 'word' | 'other'
+  position: number
 }
 
 export interface ProductImageData {
@@ -199,8 +266,18 @@ export interface HeroSlideData {
   title: string
   subtitle: string | null
   imageUrl: string
+  ctaEnabled: boolean
   ctaText: string | null
   ctaLink: string | null
   position: number
   isActive: boolean
+  // New fields for enhanced hero section
+  headline?: string | null
+  subtext?: string | null
+  benefits?: string[]
+  ctaSecondaryText?: string | null
+  ctaSecondaryLink?: string | null
+  layoutType?: 'split' | 'centered' | 'image-only'
+  backgroundOverlay?: boolean
+  trustLine?: string | null
 }

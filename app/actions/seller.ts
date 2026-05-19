@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import type { Product, ProductImage, Category, Seller } from "@/types/database";
+import type { CustomizationGroup, CustomizationOption } from "@/types";
 
 /** Generate a unique slug for a product, appending a random suffix on collision. */
 async function uniqueSlug(supabase: Awaited<ReturnType<typeof createServerClient>>, name: string, excludeId?: string): Promise<string> {
@@ -22,6 +23,9 @@ async function uniqueSlug(supabase: Awaited<ReturnType<typeof createServerClient
 export interface SellerProduct extends Product {
   product_images: ProductImage[];
   categories: Category | null;
+  product_customization_groups: (CustomizationGroup & {
+    options: CustomizationOption[];
+  })[];
 }
 
 // Combined function for dashboard - single auth call, parallel queries
@@ -46,7 +50,11 @@ export async function getSellerDashboardData(): Promise<{
         .select(`
           *,
           product_images (*),
-          categories (*)
+          categories (*),
+          product_customization_groups (
+            *,
+            options:product_customization_options (*)
+          )
         `)
         .eq("seller_id", user.id)
         .order("created_at", { ascending: false }),
@@ -120,7 +128,11 @@ export async function getSellerProducts(userId?: string): Promise<{
       .select(`
         *,
         product_images (*),
-        categories (*)
+        categories (*),
+        product_customization_groups (
+          *,
+          options:product_customization_options (*)
+        )
       `)
       .eq("seller_id", uid)
       .order("created_at", { ascending: false });
@@ -133,6 +145,100 @@ export async function getSellerProducts(userId?: string): Promise<{
   } catch (err) {
     console.error("Error fetching seller products:", err);
     return { data: null, error: "Failed to fetch products" };
+  }
+}
+
+// Get a single product by ID for editing
+export async function getSellerProductById(productId: string, userId?: string): Promise<{
+  data: SellerProduct | null;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createServerClient();
+    
+    let uid = userId;
+    if (!uid) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { data: null, error: "Not authenticated" };
+      uid = user.id;
+    }
+
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        *,
+        product_images (*),
+        categories (*),
+        product_customization_groups (
+          *,
+          options:product_customization_options (*)
+        )
+      `)
+      .eq("id", productId)
+      .eq("seller_id", uid)
+      .single();
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    return { data: data as SellerProduct, error: null };
+  } catch (err) {
+    console.error("Error fetching product by ID:", err);
+    return { data: null, error: "Failed to fetch product" };
+  }
+}
+
+// Get all data needed for the edit product page in one go
+export async function getEditProductData(productId: string): Promise<{
+  profile: Seller | null;
+  product: SellerProduct | null;
+  categories: Category[];
+  documents: any[];
+  error: string | null;
+}> {
+  try {
+    const supabase = await createServerClient();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { profile: null, product: null, categories: [], documents: [], error: "Not authenticated" };
+    }
+
+    const [profileResult, productResult, categoriesResult, documentsResult] = await Promise.all([
+      supabase.from("sellers").select("*").eq("id", user.id).single(),
+      supabase
+        .from("products")
+        .select(`
+          *,
+          product_images (*),
+          categories (*),
+          product_customization_groups (
+            *,
+            options:product_customization_options (*)
+          )
+        `)
+        .eq("id", productId)
+        .eq("seller_id", user.id)
+        .single(),
+      supabase.from("categories").select("*").order("name"),
+      supabase.from("product_documents").select("*").eq("product_id", productId).order("position"),
+    ]);
+
+    if (profileResult.error) {
+      return { profile: null, product: null, categories: [], documents: [], error: profileResult.error.message };
+    }
+
+    return {
+      profile: profileResult.data,
+      product: productResult.data as SellerProduct,
+      categories: categoriesResult.data || [],
+      documents: documentsResult.data || [],
+      error: null,
+    };
+  } catch (err) {
+    console.error("Error fetching edit product data:", err);
+    return { profile: null, product: null, categories: [], documents: [], error: "Failed to fetch data" };
   }
 }
 
@@ -158,6 +264,7 @@ export async function createProduct(formData: FormData): Promise<{
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
+    const priceType = (formData.get("priceType") as string) || "unit";
     const compareAtPrice = formData.get("compareAtPrice") ? parseFloat(formData.get("compareAtPrice") as string) : null;
     const stockQuantity = parseInt(formData.get("stockQuantity") as string);
     const categoryId = formData.get("categoryId") as string;
@@ -191,12 +298,17 @@ export async function createProduct(formData: FormData): Promise<{
         slug,
         description,
         price,
+        price_type: priceType,
         compare_at_price: compareAtPrice,
         stock_quantity: stockQuantity,
         category_id: categoryId,
         seller_id: user.id,
         specifications,
+        require_order_request: formData.get("requireOrderRequest") === "true",
+        show_stock: formData.get("showStock") !== "false",
+        youtube_url: (formData.get("youtubeUrl") as string | null) || null,
         status: formData.get("publishStatus") === "draft" ? "pending" : "active",
+        configurator_type: (formData.get("configuratorType") as string | null) || "none",
       })
       .select()
       .single();
@@ -225,6 +337,44 @@ export async function createProduct(formData: FormData): Promise<{
       }));
       const { error: batchErr } = await supabase.from("product_images").insert(rows);
       if (batchErr) console.error("Batch image insert error:", batchErr.message);
+    }
+
+    // 4. Handle Customizations
+    const customizationsJson = formData.get("customizationsJson") as string | null;
+    if (customizationsJson) {
+      try {
+        const groups = JSON.parse(customizationsJson);
+        if (groups.length > 0) {
+          // Mark product as having customizations
+          await supabase.from("products").update({ has_customization: true }).eq("id", product.id);
+
+          for (let i = 0; i < groups.length; i++) {
+            const group = groups[i];
+            const { data: g, error: gErr } = await supabase
+              .from("product_customization_groups")
+              .insert({
+                product_id: product.id,
+                name: group.name,
+                display_order: i,
+              })
+              .select()
+              .single();
+
+            if (g && group.options?.length > 0) {
+              const optRows = group.options.map((o: any, idx: number) => ({
+                group_id: g.id,
+                name: o.name,
+                price_modifier: parseFloat(o.priceModifier || "0"),
+                image_url: o.imageUrl,
+                display_order: idx,
+              }));
+              await supabase.from("product_customization_options").insert(optRows);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error saving customizations:", err);
+      }
     }
 
     revalidatePath("/seller/products");
@@ -262,6 +412,7 @@ export async function updateProduct(productId: string, formData: FormData): Prom
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
+    const priceType = (formData.get("priceType") as string) || "unit";
     const compareAtPrice = formData.get("compareAtPrice") ? parseFloat(formData.get("compareAtPrice") as string) : null;
     const stockQuantity = parseInt(formData.get("stockQuantity") as string);
     const categoryId = formData.get("categoryId") as string;
@@ -286,6 +437,11 @@ export async function updateProduct(productId: string, formData: FormData): Prom
       }
     }
 
+    const requireOrderRequest = formData.get("requireOrderRequest") === "true";
+    const showStock = formData.get("showStock") !== "false"; // default true
+    const youtubeUrl = (formData.get("youtubeUrl") as string | null) || null;
+    const hasCustomization = formData.get("hasCustomization") === "true";
+
     const { data: product, error: productError } = await supabase
       .from("products")
       .update({
@@ -293,10 +449,16 @@ export async function updateProduct(productId: string, formData: FormData): Prom
         slug,
         description,
         price,
+        price_type: priceType,
         compare_at_price: compareAtPrice,
         stock_quantity: stockQuantity,
         category_id: categoryId,
         specifications,
+        require_order_request: requireOrderRequest,
+        show_stock: showStock,
+        youtube_url: youtubeUrl,
+        has_customization: hasCustomization,
+        configurator_type: (formData.get("configuratorType") as string | null) || "none",
         updated_at: new Date().toISOString(),
       })
       .eq("id", productId)
@@ -318,20 +480,34 @@ export async function updateProduct(productId: string, formData: FormData): Prom
     const storageClient = createAdminClient() || supabase;
 
     if (variantsJson) {
-      // Delete old storage files and DB rows
+      // 1. Fetch current images from DB to see what might need storage cleanup
       const { data: oldImages } = await supabase
         .from("product_images")
         .select("url")
         .eq("product_id", productId);
 
       if (oldImages && oldImages.length > 0) {
-        const paths = oldImages
-          .map((img) => img.url.split("/product-images/")[1])
-          .filter(Boolean) as string[];
-        if (paths.length > 0) {
-          await storageClient.storage.from("product-images").remove(paths);
+        // Get the storage paths of all NEW images we want to keep
+        const newPaths = new Set(
+          variants
+            .map(v => (v.url || v.existingUrl)?.split("/product-images/")[1])
+            .filter(Boolean)
+        );
+
+        // Get the storage paths of OLD images that are no longer in the new set
+        const pathsToDelete = oldImages
+          .map(img => img.url.split("/product-images/")[1])
+          .filter(path => path && !newPaths.has(path)) as string[];
+
+        // Only remove if we have something to delete
+        if (pathsToDelete.length > 0) {
+          // Safety: Don't delete anything that was just uploaded in this request
+          // (This is redundant if newPaths is correct, but good for peace of mind)
+          await storageClient.storage.from("product-images").remove(pathsToDelete);
         }
       }
+
+      // 2. Refresh the database rows
       await supabase.from("product_images").delete().eq("product_id", productId);
 
       const rows = variants
@@ -348,11 +524,54 @@ export async function updateProduct(productId: string, formData: FormData): Prom
             is_master: v.isMaster,
           };
         })
-        .filter(Boolean) as object[];
+        .filter(Boolean) as any[];
 
       if (rows.length > 0) {
         const { error: batchErr } = await supabase.from("product_images").insert(rows);
         if (batchErr) console.error("Batch update image insert error:", batchErr.message);
+      }
+    }
+
+    // Handle Customizations Update
+    const customizationsJson = formData.get("customizationsJson") as string | null;
+    if (customizationsJson) {
+      try {
+        const groups = JSON.parse(customizationsJson);
+        
+        // Always clear old customizations first
+        await supabase.from("product_customization_groups").delete().eq("product_id", productId);
+        
+        if (groups.length > 0) {
+          await supabase.from("products").update({ has_customization: true }).eq("id", productId);
+
+          for (let i = 0; i < groups.length; i++) {
+            const group = groups[i];
+            const { data: g } = await supabase
+              .from("product_customization_groups")
+              .insert({
+                product_id: productId,
+                name: group.name,
+                display_order: i,
+              })
+              .select()
+              .single();
+
+            if (g && group.options?.length > 0) {
+              const optRows = group.options.map((o: any, idx: number) => ({
+                group_id: g.id,
+                name: o.name,
+                price_modifier: parseFloat(o.priceModifier || "0"),
+                image_url: o.imageUrl,
+                display_order: idx,
+              }));
+              await supabase.from("product_customization_options").insert(optRows);
+            }
+          }
+        } else {
+          await supabase.from("products").update({ has_customization: false }).eq("id", productId);
+        }
+      } catch (err) {
+        console.error("Error updating customizations:", err);
       }
     }
 

@@ -4,22 +4,24 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase/client";
-import { LayoutDashboard, Users, Package, MessageSquare, ShoppingBag, LogOut, ChevronRight, Store, Briefcase, Image, Menu, FileText } from "lucide-react";
+import { LayoutDashboard, Users, Package, MessageSquare, ShoppingBag, LogOut, ChevronRight, Store, Briefcase, Image, Menu, FileText, Truck, Settings } from "lucide-react";
 
 const navItems = [
-  { href: "/admin/dashboard",   label: "Dashboard",   icon: LayoutDashboard },
-  { href: "/admin/partners",    label: "Partners",    icon: Users },
-  { href: "/admin/agents",      label: "Agents",      icon: Briefcase },
-  { href: "/admin/engineering", label: "Engineering", icon: Package },
-  { href: "/admin/sellers",     label: "Sellers",     icon: Store },
-  { href: "/admin/orders",      label: "Orders",      icon: ShoppingBag },
-  { href: "/admin/inquiries",   label: "Inquiries",   icon: MessageSquare },
+  { href: "/admin/dashboard",        label: "Dashboard",        icon: LayoutDashboard },
+  { href: "/admin/partners",         label: "Partners",         icon: Users },
+  { href: "/admin/agents",           label: "Agents",           icon: Briefcase },
+  { href: "/admin/shipping-agents",  label: "Shipping Agents",  icon: Truck },
+  { href: "/admin/engineering",      label: "Engineering",      icon: Package },
+  { href: "/admin/sellers",          label: "Sellers",          icon: Store },
+  { href: "/admin/orders",           label: "Orders",           icon: ShoppingBag },
+  { href: "/admin/inquiries",        label: "Inquiries",        icon: MessageSquare },
 ];
 
 const contentNavItems = [
   { href: "/admin/cms/sliders",    label: "Sliders",    icon: Image },
   { href: "/admin/cms/navigation", label: "Navigation", icon: Menu },
   { href: "/admin/cms/pages",      label: "Pages",      icon: FileText },
+  { href: "/admin/cms/settings",   label: "Branding Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -40,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <aside className="w-64 shrink-0 bg-gray-900 flex flex-col">
         <div className="p-5 border-b border-gray-700">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Admin Panel</p>

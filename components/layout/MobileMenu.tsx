@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { X, ShoppingCart, User } from "lucide-react";
+import { X, ShoppingCart, User, ChevronDown, Wrench, ShieldCheck } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -18,7 +18,7 @@ const navLinks = [
   { href: "/products", label: "Products" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact Us" },
-  { href: "/seller/register", label: "Sell on CargoPlus" },
+  { href: "/seller/register", label: "Sell on Apex Modular Construction" },
 ];
 
 export function MobileMenu({
@@ -31,6 +31,7 @@ export function MobileMenu({
   onOpenSellerAuth,
 }: MobileMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [servicesOpen, setServicesOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,36 +87,101 @@ export function MobileMenu({
           {/* Navigation links */}
           <nav className="flex-1 overflow-y-auto p-4">
             <ul className="space-y-1">
-              {navLinks.map((link) => {
-                if (link.label === "Sell on CargoPlus") {
-                  return (
-                    <li key={link.href}>
-                      <button
-                        onClick={() => {
-                          if (onOpenSellerAuth) {
-                            onOpenSellerAuth("register");
-                          }
-                          onClose();
-                        }}
-                        className="flex min-h-[44px] w-full items-center rounded-lg px-4 text-base font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              {/* Products */}
+              <li>
+                <Link
+                  href="/products"
+                  onClick={onClose}
+                  className="flex min-h-[44px] items-center rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  Products
+                </Link>
+              </li>
+
+              {/* Blog */}
+              <li>
+                <Link
+                  href="/blog"
+                  onClick={onClose}
+                  className="flex min-h-[44px] items-center rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  Blog
+                </Link>
+              </li>
+
+              {/* Services — expandable */}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setServicesOpen((v) => !v)}
+                  className="flex min-h-[44px] w-full items-center justify-between rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  Services
+                  <ChevronDown
+                    className="h-4 w-4 transition-transform duration-200"
+                    style={{ transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  />
+                </button>
+                {servicesOpen && (
+                  <ul className="ml-4 mt-1 space-y-1 border-l-2 border-[#4B1D8F22] pl-3">
+                    <li>
+                      <Link
+                        href="/services/construction-solutions"
+                        onClick={onClose}
+                        className="flex min-h-[40px] items-center gap-2 rounded-lg px-3 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        {link.label}
-                      </button>
+                        <Wrench className="h-4 w-4 text-[#4B1D8F]" />
+                        Construction Solutions
+                      </Link>
                     </li>
-                  );
-                }
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={onClose}
-                      className="flex min-h-[44px] items-center rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
+                    <li>
+                      <Link
+                        href="/services/csa-certification"
+                        onClick={onClose}
+                        className="flex min-h-[40px] items-center gap-2 rounded-lg px-3 text-sm font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        <ShieldCheck className="h-4 w-4 text-[#4B1D8F]" />
+                        CSA Certification Guide
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+
+              {/* About Us */}
+              <li>
+                <Link
+                  href="/about"
+                  onClick={onClose}
+                  className="flex min-h-[44px] items-center rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  About Us
+                </Link>
+              </li>
+
+              {/* Contact Us */}
+              <li>
+                <Link
+                  href="/contact"
+                  onClick={onClose}
+                  className="flex min-h-[44px] items-center rounded-lg px-4 text-base font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  Contact Us
+                </Link>
+              </li>
+
+              {/* Sell on Apex Modular Construction */}
+              <li>
+                <button
+                  onClick={() => {
+                    if (onOpenSellerAuth) onOpenSellerAuth("register");
+                    onClose();
+                  }}
+                  className="flex min-h-[44px] w-full items-center rounded-lg px-4 text-base font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                >
+                  Sell on Apex Modular Construction
+                </button>
+              </li>
             </ul>
           </nav>
 

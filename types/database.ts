@@ -1,7 +1,7 @@
 /**
  * Supabase Database Types
  * 
- * Generated from Supabase schema for CargoPlus E-Commerce Platform
+ * Generated from Supabase schema for Apex Modular Construction E-Commerce Platform
  * Requirements: 1.1
  * 
  * To regenerate these types:
@@ -132,10 +132,12 @@ export interface Database {
           price: number
           compare_at_price: number | null
           stock_quantity: number
+          price_type: 'unit' | 'sqm' | 'sqf'
           category_id: string
           seller_id: string
           status: 'pending' | 'active' | 'rejected' | 'archived'
           specifications: Json
+          has_customization: boolean
           created_at: string
           updated_at: string
         }
@@ -147,10 +149,12 @@ export interface Database {
           price: number
           compare_at_price?: number | null
           stock_quantity?: number
+          price_type?: 'unit' | 'sqm' | 'sqf'
           category_id: string
           seller_id: string
           status?: 'pending' | 'active' | 'rejected' | 'archived'
           specifications?: Json
+          has_customization?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -162,10 +166,12 @@ export interface Database {
           price?: number
           compare_at_price?: number | null
           stock_quantity?: number
+          price_type?: 'unit' | 'sqm' | 'sqf'
           category_id?: string
           seller_id?: string
           status?: 'pending' | 'active' | 'rejected' | 'archived'
           specifications?: Json
+          has_customization?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -386,6 +392,82 @@ export interface Database {
           updated_at?: string
         }
       }
+      product_customization_groups: {
+        Row: {
+          id: string
+          product_id: string
+          name: string
+          description: string | null
+          is_required: boolean
+          display_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          name: string
+          description?: string | null
+          is_required?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          name?: string
+          description?: string | null
+          is_required?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      product_customization_options: {
+        Row: {
+          id: string
+          group_id: string
+          name: string
+          description: string | null
+          price_modifier: number
+          image_url: string | null
+          additional_images: string[] | null
+          stock_quantity: number | null
+          track_inventory: boolean
+          display_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          group_id: string
+          name: string
+          description?: string | null
+          price_modifier?: number
+          image_url?: string | null
+          additional_images?: string[] | null
+          stock_quantity?: number | null
+          track_inventory?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          group_id?: string
+          name?: string
+          description?: string | null
+          price_modifier?: number
+          image_url?: string | null
+          additional_images?: string[] | null
+          stock_quantity?: number | null
+          track_inventory?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -410,6 +492,8 @@ export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
 export type Inquiry = Database['public']['Tables']['inquiries']['Row']
 export type HeroSlide = Database['public']['Tables']['hero_slides']['Row']
+export type product_customization_groups = Database['public']['Tables']['product_customization_groups']['Row']
+export type product_customization_options = Database['public']['Tables']['product_customization_options']['Row']
 
 // Insert types
 export type InsertProfile = Database['public']['Tables']['profiles']['Insert']

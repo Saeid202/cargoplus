@@ -19,11 +19,13 @@ function transformProduct(dbProduct: NonNullable<Awaited<ReturnType<typeof getPr
     slug: dbProduct.slug,
     description: dbProduct.description,
     price: dbProduct.price,
+    priceType: (dbProduct as any).price_type || 'unit',
     compareAtPrice: dbProduct.compare_at_price,
     stockQuantity: dbProduct.stock_quantity,
     categoryId: dbProduct.category_id,
     sellerId: dbProduct.seller_id,
     status: dbProduct.status,
+    configurator_type: (dbProduct as any).configurator_type || 'none',
     specifications: dbProduct.specifications as Record<string, string>,
     createdAt: dbProduct.created_at,
     updatedAt: dbProduct.updated_at,
@@ -51,6 +53,11 @@ function transformProduct(dbProduct: NonNullable<Awaited<ReturnType<typeof getPr
       logoUrl: dbProduct.sellers.logo_url,
       status: dbProduct.sellers.status,
     } : { id: "", businessName: "Unknown Seller", businessEmail: "", logoUrl: null, status: "active" as const },
+    requireOrderRequest: (dbProduct as any).require_order_request ?? false,
+    showStock: (dbProduct as any).show_stock ?? true,
+    youtubeUrl: (dbProduct as any).youtube_url ?? null,
+    hasCustomization: (dbProduct as any).has_customization ?? false,
+    documents: [],
   };
 }
 

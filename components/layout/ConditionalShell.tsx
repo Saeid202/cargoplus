@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { WhatsAppButton } from "./WhatsAppButton";
+
+import { FloatingWidget } from "../adu/FloatingWidget";
 
 const DASHBOARD_PREFIXES = ["/partner", "/admin", "/seller", "/account"];
 
@@ -21,7 +22,7 @@ export function ConditionalShell({ children, cmsNav }: ConditionalShellProps) {
       {!isDashboard && <Header cmsNav={cmsNav} />}
       {children}
       {!isDashboard && <Footer />}
-      {!isDashboard && <WhatsAppButton />}
+      {!isDashboard && <FloatingWidget />}
     </>
   );
 }

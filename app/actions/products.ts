@@ -86,28 +86,49 @@ export async function getProductBySlug(slug: string): Promise<{
 }> {
   try {
     const supabase = await createServerClient();
+    if (!supabase) return { data: null, error: "Supabase not configured" };
 
-    const { data, error } = await supabase
+    const query = supabase
       .from("products")
       .select(`
         *,
         product_images (*),
         categories (*),
-        sellers (*)
+        sellers (*),
+        product_documents (*),
+        product_customization_groups (
+          *,
+          options:product_customization_options (*)
+        )
       `)
       .eq("slug", slug)
-      .eq("status", "active")
       .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
+    // Race against a 3s timeout
+    const result = await Promise.race([
+      query,
+      new Promise<{ data: null; error: { message: string } }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: { message: "timeout" } }), 3000)
+      ),
+    ]);
+
+    if (result.error) {
+      if ((result.error as any).code === "PGRST116") {
         return { data: null, error: "Product not found" };
       }
-      console.error("Error fetching product:", error);
-      return { data: null, error: error.message };
+      console.error("Error fetching product:", result.error);
+      return { data: null, error: result.error.message };
     }
 
-    return { data: data as ProductWithRelations, error: null };
+    const product = result.data as ProductWithRelations;
+    
+    // Check status
+    if (product.status !== "active") {
+      console.warn(`Product found but status is ${product.status}: ${slug}`);
+      return { data: null, error: `Product is ${product.status}` };
+    }
+
+    return { data: product, error: null };
   } catch (err) {
     console.error("Unexpected error fetching product:", err);
     return { data: null, error: "Failed to fetch product" };
@@ -120,6 +141,7 @@ export async function getCategories(): Promise<{
 }> {
   try {
     const supabase = await createServerClient();
+    if (!supabase) return { data: null, error: "Supabase not configured" };
 
     const result = await Promise.race([
       supabase.from("categories").select("*").order("name", { ascending: true }),
