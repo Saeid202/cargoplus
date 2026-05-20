@@ -4,16 +4,16 @@ import { PackageSearch, HardHat, Globe } from "lucide-react";
 const services = [
   {
     icon: PackageSearch,
-    title: "Multi-Seller Consolidation",
+    title: "Design and Manufacturing Container Houses",
     description:
-      "Purchasing from multiple suppliers in China? We consolidate all your orders into a single shipment — reducing freight costs, simplifying customs clearance, and ensuring everything arrives together on time.",
+      "Transform shipping containers into modern, sustainable living spaces. We design and manufacture custom container homes, offices, and commercial buildings — cost-effective, durable, and ready for rapid deployment.",
     steps: [
       "Register and log in to your account",
-      "Go to your dashboard and submit a consolidation request",
-      "Our team coordinates with your suppliers and manages the shipment",
+      "Submit your container house requirements and design preferences",
+      "Our team creates custom designs and manufactures your container structure",
     ],
-    cta: "Submit a Consolidation Request",
-    href: "/auth/register?redirect=/account/consolidation",
+    cta: "Start Your Project",
+    href: "/auth/register?redirect=/account/engineering",
     accent: "#4B1D8F",
   },
   {
@@ -32,15 +32,15 @@ const services = [
   },
   {
     icon: Globe,
-    title: "Sourcing Services",
+    title: "Building Permit and Installation",
     description:
-      "Can't find what you need in our catalog? Our sourcing team in China will identify qualified manufacturers, verify product quality, and negotiate competitive pricing on your behalf — so you get the right product at the right price.",
+      "Navigate the complex world of construction permits and installation with ease. We handle all regulatory approvals, permit applications, and professional installation services — ensuring your project meets all local building codes and standards.",
     steps: [
       "Register and log in to your account",
-      "Submit your sourcing request with product details",
-      "We find the supplier, you approve the deal",
+      "Submit your project details and location",
+      "Our team handles permits and coordinates professional installation",
     ],
-    cta: "Start Sourcing",
+    cta: "Get Started",
     href: "/auth/register?redirect=/contact",
     accent: "#4B1D8F",
   },

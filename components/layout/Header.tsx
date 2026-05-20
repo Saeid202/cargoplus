@@ -64,26 +64,44 @@ export function Header({ cmsNav }: HeaderProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0 hover:opacity-85 transition-opacity">
               {(!settings || settings.logo_style === "complete-banner") && (
-                <div className={`flex items-center bg-white px-4 py-1.5 rounded-xl shadow-md border border-purple-900/30 overflow-hidden transition-all ${
+                <div className={`flex items-center bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-lg border border-white/20 overflow-hidden transition-all ${
                   settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-16"
                 }`}>
-                  <img src="/logo.png" alt="Apex Modular Construction" className="h-full w-auto object-contain" />
+                  <img 
+                    src={settings?.logo_complete_banner_url || "/logo.png"} 
+                    alt="Apex Modular Construction" 
+                    className="h-full w-auto object-contain" 
+                  />
                 </div>
               )}
 
               {settings?.logo_style === "icon-and-text" && (
                 <div className="flex items-center gap-3">
-                  <div className={`flex items-center justify-center rounded-xl bg-white p-0.5 shadow-md border border-purple-900/30 overflow-hidden transition-all ${
+                  <div className={`flex items-center justify-center rounded-xl bg-white/95 backdrop-blur-sm p-0.5 shadow-lg border border-white/20 overflow-hidden transition-all ${
                     settings.logo_height === "h-12" ? "h-12 w-12" : settings.logo_height === "h-20" ? "h-20 w-20" : "h-16 w-16"
                   }`}>
-                    <img src="/logo.jpg" alt="Apex Logo" className="h-full w-full object-contain" />
+                    <img 
+                      src={settings.logo_icon_url || "/logo.jpg"} 
+                      alt="Apex Logo" 
+                      className="h-full w-full object-contain" 
+                    />
                   </div>
-                  <img src="/logo.svg" alt="Apex Modular Construction" className="h-10 w-auto hidden sm:block" />
+                  <img 
+                    src={settings.logo_text_url || "/logo.svg"} 
+                    alt="Apex Modular Construction" 
+                    className="h-10 w-auto hidden sm:block" 
+                  />
                 </div>
               )}
 
               {settings?.logo_style === "text-only" && (
-                <img src="/logo.svg" alt="Apex Modular Construction" className="h-12 w-auto animate-fade-in" />
+                <div className="bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-lg border border-white/20">
+                  <img 
+                    src={settings.logo_text_url || "/logo.svg"} 
+                    alt="Apex Modular Construction" 
+                    className="h-12 w-auto" 
+                  />
+                </div>
               )}
             </Link>
 

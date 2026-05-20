@@ -47,7 +47,7 @@ export const metadata: Metadata = {
       "Shop quality construction materials and robots from trusted Chinese sellers. Secure payment in CAD, Canadian tax compliance, and fast shipping.",
     images: [
       {
-        url: "https://apexmodularconstruction.com/opengraph-image",
+        url: "https://apexmodularconstruction.com/logo.png",
         width: 1200,
         height: 630,
         alt: "Apex Modular Construction - Your Trusted Partner for Construction Success",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "Apex Modular Construction - Construction Materials & Robots Marketplace",
     description:
       "Shop quality construction materials and robots from trusted Chinese sellers.",
-    images: ["https://apexmodularconstruction.com/opengraph-image"],
+    images: ["https://apexmodularconstruction.com/logo.png"],
   },
   robots: {
     index: true,

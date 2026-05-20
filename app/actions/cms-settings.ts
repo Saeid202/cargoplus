@@ -3,9 +3,46 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidateAllPublic } from "./cms-revalidate";
 
+export async function uploadLogo(file: File): Promise<{ success: boolean; url?: string; error?: string }> {
+  try {
+    const supabase = createAdminClient();
+    
+    // Generate unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `logo-${Date.now()}.${fileExt}`;
+    const filePath = `logos/${fileName}`;
+    
+    // Upload to Supabase storage (using hero-slides bucket for site assets)
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('hero-slides')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+    
+    // Get public URL
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('hero-slides')
+      .getPublicUrl(filePath);
+    
+    return { success: true, url: publicUrl };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to upload logo' };
+  }
+}
+
 export interface SiteSettings {
   logo_style: "complete-banner" | "icon-and-text" | "text-only";
   logo_height: "h-12" | "h-16" | "h-20";
+  logo_complete_banner_url?: string;
+  logo_icon_url?: string;
+  logo_text_url?: string;
 }
 
 const DEFAULT_SETTINGS: SiteSettings = {
