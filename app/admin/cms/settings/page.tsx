@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import type { ComponentType } from "react";
 import { getSiteSettings, updateSiteSettings, uploadLogo, type SiteSettings, type SocialLink } from "@/app/actions/cms-settings";
 import { Loader2, Save, Sparkles, Image, Menu, Type, Upload, X, Plus, Share2, Facebook, Instagram, Linkedin, Twitter, Youtube, Github, Globe } from "lucide-react";
 
@@ -20,7 +21,7 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-const PLATFORM_OPTIONS = [
+const PLATFORM_OPTIONS: { value: string; label: string; Icon: ComponentType<{ className?: string }> }[] = [
   { value: "facebook",  label: "Facebook",    Icon: Facebook },
   { value: "instagram", label: "Instagram",   Icon: Instagram },
   { value: "linkedin",  label: "LinkedIn",    Icon: Linkedin },

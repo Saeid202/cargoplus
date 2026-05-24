@@ -1,4 +1,4 @@
-import type { ElementType } from "react";
+import type { ComponentType } from "react";
 import Link from "next/link";
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube, Github, Globe } from "lucide-react";
 import type { SocialLink } from "@/app/actions/cms-settings";
@@ -37,7 +37,7 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-const PLATFORM_ICONS: Record<string, ElementType> = {
+const PLATFORM_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   facebook:  Facebook,
   instagram: Instagram,
   linkedin:  Linkedin,
