@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getProductBySlug } from "@/app/actions/products";
+import { getHouseConfigurator } from "@/app/actions/configurator";
 import { mockProducts } from "@/lib/mock-data";
 import type { ProductWithRelations } from "@/types";
 import { ProductDetailWrapper } from "./ProductDetailWrapper";
@@ -136,12 +137,14 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
+  const { data: configurator } = await getHouseConfigurator(product.id);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Link href="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
         <ArrowLeft className="h-4 w-4" /> Back to Products
       </Link>
-      <ProductDetailWrapper product={product} />
+      <ProductDetailWrapper product={product} configurator={configurator ?? null} />
     </div>
   );
 }
