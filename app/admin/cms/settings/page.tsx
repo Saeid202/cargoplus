@@ -117,7 +117,10 @@ export default function BrandingSettingsPage() {
       social_links: [...existing, { platform: newPlatform, url: newUrl.trim(), enabled: true }],
     });
     setNewUrl("");
-    setNewPlatform("facebook");
+    const nextPlatform = PLATFORM_OPTIONS.find(
+      (p) => p.value !== newPlatform && !existing.some((l) => l.platform === p.value)
+    );
+    setNewPlatform(nextPlatform?.value ?? "");
   }
 
   function removeSocialLink(platform: string) {
