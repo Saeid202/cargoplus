@@ -11,6 +11,7 @@ interface NavigationProps {
   className?: string;
   onLinkClick?: () => void;
   onOpenSellerAuth?: (mode: "login" | "register") => void;
+  scrolled?: boolean;
 }
 
 const services = [
@@ -28,11 +29,10 @@ const services = [
   },
 ];
 
-export function Navigation({ className, onLinkClick }: NavigationProps) {
+export function Navigation({ className, onLinkClick, scrolled = true }: NavigationProps) {
   const [servicesOpen, setServicesOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -43,8 +43,9 @@ export function Navigation({ className, onLinkClick }: NavigationProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const linkClass =
-    "relative text-sm font-semibold text-purple-100 transition-all hover:text-yellow-300 min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-white/10 group";
+  const linkClass = scrolled
+    ? "relative text-sm font-semibold text-foreground/70 transition-colors hover:text-primary min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-accent group"
+    : "relative text-sm font-semibold text-white/80 transition-colors hover:text-white min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-white/10 group";
 
   return (
     <nav className={className}>

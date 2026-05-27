@@ -132,7 +132,7 @@ export function PrefabHero({ slide }: PrefabHeroProps) {
 
         {/* H1 — three lines, middle line gold gradient */}
         <FadeUp delay={0.15}>
-          <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[1.05] tracking-tight text-white mb-6" itemProp="name">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-white mb-6" itemProp="name">
             <span className="block">{line1}</span>
             <span className="block text-gradient">{line2}</span>
             <span className="block">{line3}</span>

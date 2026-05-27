@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { User, ChevronDown, LogOut, LayoutDashboard, Store } from "lucide-react";
 
-export function HeaderAuth() {
+export function HeaderAuth({ scrolled = true }: { scrolled?: boolean }) {
   const supabase = createBrowserClient();
   const [user, setUser] = useState<{ id?: string; email?: string; user_metadata?: { full_name?: string } } | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -42,16 +42,19 @@ export function HeaderAuth() {
       <div className="flex items-center gap-2">
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("open-auth-modal", { detail: "login" }))}
-          className="inline-flex h-9 items-center justify-center rounded-xl border-2 border-white/30 px-4 text-sm font-semibold text-white transition-all hover:border-yellow-400 hover:text-yellow-300 hover:bg-white/10 cursor-pointer"
+          className={`inline-flex h-9 items-center justify-center rounded-xl border px-4 text-sm font-semibold transition-colors cursor-pointer ${
+            scrolled
+              ? "border-border text-foreground hover:bg-accent"
+              : "border-white/30 text-white hover:bg-white/10"
+          }`}
         >
           Login
         </button>
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("open-auth-modal", { detail: "register" }))}
-          className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-all cursor-pointer shadow-md"
-          style={{ background: 'linear-gradient(135deg, #d4af37, #f5e27a)', color: '#3b0764' }}
+          className="inline-flex h-9 items-center justify-center rounded-full px-5 text-sm font-bold transition-all cursor-pointer bg-gradient-primary text-white shadow-glow hover:shadow-glow hover:scale-105"
         >
-          Sign Up
+          Get Quote
         </button>
       </div>
     );
@@ -63,7 +66,11 @@ export function HeaderAuth() {
     <div className="relative">
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 rounded-xl border-2 border-white/20 px-3 h-9 text-sm font-semibold text-white hover:bg-white/10 hover:border-yellow-400 transition-all cursor-pointer"
+        className={`flex items-center gap-2 rounded-xl border px-3 h-9 text-sm font-semibold transition-all cursor-pointer ${
+          scrolled
+            ? "border-border text-foreground hover:bg-accent"
+            : "border-white/20 text-white hover:bg-white/10"
+        }`}
       >
         <User className="h-4 w-4 text-yellow-400" />
         <span className="max-w-[120px] truncate">{name}</span>

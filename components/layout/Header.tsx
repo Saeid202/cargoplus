@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Navigation } from "./Navigation";
@@ -17,21 +18,32 @@ interface HeaderProps {
 }
 
 export function Header({ cmsNav }: HeaderProps) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const [authModal, setAuthModal] = useState<{ open: boolean; mode: "login" | "register" }>({
     open: false,
     mode: "login",
   });
   const [sellerAuthModal, setSellerAuthModal] = useState<{ open: boolean; mode: "login" | "register" }>({
     open: false,
-    mode: "register", // Default to register for "Sell on Apex Modular Construction"
+    mode: "register",
   });
 
   useEffect(() => {
     getSiteSettings().then((data) => {
       setSettings(data);
     });
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 40);
+    handler();
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
   }, []);
 
   useEffect(() => {
@@ -43,9 +55,6 @@ export function Header({ cmsNav }: HeaderProps) {
     return () => window.removeEventListener("open-auth-modal", handler);
   }, []);
 
-  function closeAuth() { setAuthModal((prev) => ({ ...prev, open: false })); }
-  function closeSellerAuth() { setSellerAuthModal((prev) => ({ ...prev, open: false })); }
-
   useEffect(() => {
     const handler = (e: Event) => {
       const mode = (e as CustomEvent).detail as "login" | "register";
@@ -55,59 +64,69 @@ export function Header({ cmsNav }: HeaderProps) {
     return () => window.removeEventListener("open-seller-auth-modal", handler);
   }, []);
 
+  function closeAuth() { setAuthModal((prev) => ({ ...prev, open: false })); }
+  function closeSellerAuth() { setSellerAuthModal((prev) => ({ ...prev, open: false })); }
+
+  // On homepage: transparent until scrolled. On inner pages: always solid.
+  const transparent = isHome && !scrolled;
+
   return (
     <>
-      <header className="w-full sticky top-0 z-30 border-b border-purple-900/50" style={{ backgroundColor: '#4B1D8F' }}>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
+          transparent
+            ? "bg-transparent py-5"
+            : "bg-background/80 backdrop-blur-xl border-b border-border/60 py-3"
+        }`}
+      >
         <div className="container mx-auto px-4">
-          <div className="flex h-20 items-center gap-8">
+          <div className="flex items-center gap-8">
 
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0 hover:opacity-85 transition-opacity">
-              {(!settings || settings.logo_style === "complete-banner") && (
-                <div className={`flex items-center bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-lg border border-white/20 overflow-hidden transition-all ${
-                  settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-16"
-                }`}>
-                  <img 
-                    src={settings?.logo_complete_banner_url || "/logo.png"} 
-                    alt="Apex Modular Construction" 
-                    className="h-full w-auto object-contain" 
-                  />
+              {/* Logo mark — always visible, morphs colour */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-primary shadow-glow flex-shrink-0">
+                  <span className="text-white font-black text-lg leading-none">A</span>
                 </div>
-              )}
-
-              {settings?.logo_style === "icon-and-text" && (
-                <div className="flex items-center gap-3">
-                  <div className={`flex items-center justify-center rounded-xl bg-white/95 backdrop-blur-sm p-0.5 shadow-lg border border-white/20 overflow-hidden transition-all ${
-                    settings.logo_height === "h-12" ? "h-12 w-12" : settings.logo_height === "h-20" ? "h-20 w-20" : "h-16 w-16"
+                {(!settings || settings.logo_style === "complete-banner") && (
+                  <div className={`flex items-center overflow-hidden transition-all ${
+                    settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-10"
                   }`}>
-                    <img 
-                      src={settings.logo_icon_url || "/logo.jpg"} 
-                      alt="Apex Logo" 
-                      className="h-full w-full object-contain" 
+                    <img
+                      src={settings?.logo_complete_banner_url || "/logo.png"}
+                      alt="Apex Modular Construction"
+                      className="h-full w-auto object-contain"
                     />
                   </div>
-                  <img 
-                    src={settings.logo_text_url || "/logo.svg"} 
-                    alt="Apex Modular Construction" 
-                    className="h-10 w-auto hidden sm:block" 
+                )}
+                {settings?.logo_style === "icon-and-text" && (
+                  <img
+                    src={settings.logo_text_url || "/logo.svg"}
+                    alt="Apex Modular Construction"
+                    className={`w-auto hidden sm:block transition-colors ${transparent ? "brightness-0 invert" : ""} ${
+                      settings.logo_height === "h-12" ? "h-8" : settings.logo_height === "h-20" ? "h-12" : "h-8"
+                    }`}
                   />
-                </div>
-              )}
-
-              {settings?.logo_style === "text-only" && (
-                <div className="bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-xl shadow-lg border border-white/20">
-                  <img 
-                    src={settings.logo_text_url || "/logo.svg"} 
-                    alt="Apex Modular Construction" 
-                    className="h-12 w-auto" 
+                )}
+                {settings?.logo_style === "text-only" && (
+                  <img
+                    src={settings.logo_text_url || "/logo.svg"}
+                    alt="Apex Modular Construction"
+                    className={`w-auto transition-all ${transparent ? "brightness-0 invert" : ""} ${
+                      settings.logo_height === "h-12" ? "h-8" : settings.logo_height === "h-20" ? "h-12" : "h-8"
+                    }`}
                   />
-                </div>
-              )}
+                )}
+              </div>
             </Link>
 
-            {/* Desktop Navigation — LEFT side after logo */}
+            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center">
-              <Navigation onOpenSellerAuth={(mode) => setSellerAuthModal({ open: true, mode })} />
+              <Navigation
+                scrolled={!transparent}
+                onOpenSellerAuth={(mode) => setSellerAuthModal({ open: true, mode })}
+              />
               {cmsNav}
             </div>
 
@@ -116,19 +135,16 @@ export function Header({ cmsNav }: HeaderProps) {
 
             {/* Right side */}
             <div className="flex items-center gap-2 shrink-0">
-              {/* Cart */}
               <CartBadge />
-
-              {/* Auth — Desktop */}
               <div className="hidden lg:flex items-center gap-2">
                 <InstallButton />
-                <HeaderAuth />
+                <HeaderAuth scrolled={!transparent} />
               </div>
-
-              {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-purple-200 transition-all hover:bg-white/10 hover:text-white lg:hidden"
+                className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all hover:bg-white/10 lg:hidden ${
+                  transparent ? "text-white" : "text-foreground"
+                }`}
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -137,6 +153,9 @@ export function Header({ cmsNav }: HeaderProps) {
           </div>
         </div>
       </header>
+
+      {/* Spacer for non-home pages so content isn't hidden under the fixed header */}
+      {!isHome && <div className="h-[72px]" />}
 
       <MobileMenu
         isOpen={isMobileMenuOpen}
