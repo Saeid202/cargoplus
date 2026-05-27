@@ -43,9 +43,10 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Both states are dark backgrounds (purple or transparent over dark hero)
   const linkClass = scrolled
-    ? "relative text-sm font-semibold text-foreground/70 transition-colors hover:text-primary min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-accent group"
-    : "relative text-sm font-semibold text-white/80 transition-colors hover:text-white min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-white/10 group";
+    ? "relative text-sm font-semibold text-purple-100 transition-all hover:text-yellow-300 whitespace-nowrap flex items-center px-3 py-2 rounded-xl hover:bg-white/10 group"
+    : "relative text-sm font-semibold text-white/80 transition-all hover:text-white whitespace-nowrap flex items-center px-3 py-2 rounded-xl hover:bg-white/10 group";
 
   return (
     <nav className={className}>

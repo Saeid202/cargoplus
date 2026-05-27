@@ -76,7 +76,7 @@ export function Header({ cmsNav }: HeaderProps) {
         className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
           transparent
             ? "bg-transparent py-5"
-            : "bg-background/80 backdrop-blur-xl border-b border-border/60 py-3"
+            : "bg-[#4B1D8F] border-b border-purple-900/50 py-3"
         }`}
       >
         <div className="container mx-auto px-4">
@@ -84,41 +84,40 @@ export function Header({ cmsNav }: HeaderProps) {
 
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0 hover:opacity-85 transition-opacity">
-              {/* Logo mark — always visible, morphs colour */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-primary shadow-glow flex-shrink-0">
-                  <span className="text-white font-black text-lg leading-none">A</span>
+              {(!settings || settings.logo_style === "complete-banner") && (
+                <div className={`flex items-center overflow-hidden ${
+                  settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-12"
+                }`}>
+                  <img
+                    src={settings?.logo_complete_banner_url || "/logo.png"}
+                    alt="Apex Modular Construction"
+                    className="h-full w-auto object-contain"
+                  />
                 </div>
-                {(!settings || settings.logo_style === "complete-banner") && (
-                  <div className={`flex items-center overflow-hidden transition-all ${
-                    settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-10"
-                  }`}>
-                    <img
-                      src={settings?.logo_complete_banner_url || "/logo.png"}
-                      alt="Apex Modular Construction"
-                      className="h-full w-auto object-contain"
-                    />
-                  </div>
-                )}
-                {settings?.logo_style === "icon-and-text" && (
+              )}
+              {settings?.logo_style === "icon-and-text" && (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={settings.logo_icon_url || "/logo.jpg"}
+                    alt="Apex Logo"
+                    className={`w-auto rounded-lg ${
+                      settings.logo_height === "h-12" ? "h-12" : settings.logo_height === "h-20" ? "h-20" : "h-10"
+                    }`}
+                  />
                   <img
                     src={settings.logo_text_url || "/logo.svg"}
                     alt="Apex Modular Construction"
-                    className={`w-auto hidden sm:block transition-colors ${transparent ? "brightness-0 invert" : ""} ${
-                      settings.logo_height === "h-12" ? "h-8" : settings.logo_height === "h-20" ? "h-12" : "h-8"
-                    }`}
+                    className="h-8 w-auto hidden sm:block"
                   />
-                )}
-                {settings?.logo_style === "text-only" && (
-                  <img
-                    src={settings.logo_text_url || "/logo.svg"}
-                    alt="Apex Modular Construction"
-                    className={`w-auto transition-all ${transparent ? "brightness-0 invert" : ""} ${
-                      settings.logo_height === "h-12" ? "h-8" : settings.logo_height === "h-20" ? "h-12" : "h-8"
-                    }`}
-                  />
-                )}
-              </div>
+                </div>
+              )}
+              {settings?.logo_style === "text-only" && (
+                <img
+                  src={settings.logo_text_url || "/logo.svg"}
+                  alt="Apex Modular Construction"
+                  className="h-8 w-auto"
+                />
+              )}
             </Link>
 
             {/* Desktop Navigation */}
@@ -142,9 +141,7 @@ export function Header({ cmsNav }: HeaderProps) {
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all hover:bg-white/10 lg:hidden ${
-                  transparent ? "text-white" : "text-foreground"
-                }`}
+                className="flex h-9 w-9 items-center justify-center rounded-xl text-white transition-all hover:bg-white/10 lg:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -155,7 +152,7 @@ export function Header({ cmsNav }: HeaderProps) {
       </header>
 
       {/* Spacer for non-home pages so content isn't hidden under the fixed header */}
-      {!isHome && <div className="h-[72px]" />}
+      {!isHome && <div className="h-[68px]" />}
 
       <MobileMenu
         isOpen={isMobileMenuOpen}
