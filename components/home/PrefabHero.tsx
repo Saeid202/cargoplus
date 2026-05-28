@@ -116,7 +116,7 @@ export function PrefabHero({ slide }: PrefabHeroProps) {
 
       {/* Content */}
       <motion.div
-        className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-12 lg:px-24 xl:px-32 pt-24 pb-8"
+        className="relative z-10 h-full flex flex-col justify-start sm:justify-center px-6 sm:px-12 lg:px-24 xl:px-32 pt-28 sm:pt-32 pb-8"
         style={{ y: contentY, opacity: contentOpacity }}
       >
         {/* Eyebrow pill */}

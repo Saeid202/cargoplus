@@ -137,11 +137,11 @@ export function Footer({ socialLinks = [] }: FooterProps) {
           {/* Brand — wider column */}
           <div className="space-y-6 lg:col-span-5">
             <Link href="/" className="inline-flex items-center gap-3 hover:opacity-85 transition-opacity">
-              <div className="bg-white rounded-xl px-3 py-2">
-                <img src="/logo.png" alt="Apex Modular Construction" className="h-9 w-auto object-contain" />
+              <div className="bg-white rounded-full h-12 w-12 flex items-center justify-center shrink-0 overflow-hidden">
+                <img src="/logo.png" alt="Apex Modular Construction" className="h-10 w-10 object-contain" />
               </div>
-              <span className="text-white font-bold text-base leading-tight">
-                Apex Modular<br />Construction
+              <span className="text-white font-bold text-base whitespace-nowrap">
+                Apex Modular Construction
               </span>
             </Link>
             <p className="text-sm text-white/85 leading-relaxed max-w-sm">

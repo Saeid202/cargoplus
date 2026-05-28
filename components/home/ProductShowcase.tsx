@@ -33,7 +33,7 @@ export function ProductShowcase({ products, title = "Projects", limit }: Product
   const filtered = limit && limit > 0 ? all.slice(0, limit) : all;
 
   return (
-    <section id="products" className="relative py-16 bg-secondary/10">
+    <section id="products" className="relative pt-16 pb-28 bg-secondary/10">
       <div className="container mx-auto px-6">
 
         {/* Header row */}
