@@ -155,6 +155,14 @@
   box-shadow: 0 0 40px rgba(75,29,143,0.5), 0 8px 32px rgba(75,29,143,0.35);
 }
 
+.shadow-soft {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.shadow-elegant {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.12);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

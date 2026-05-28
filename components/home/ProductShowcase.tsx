@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ProductCard } from "@/components/products/ProductCard";
+import { motion } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
 import type { ProductWithRelations } from "@/types";
 
 interface ProductShowcaseProps {
@@ -10,79 +10,115 @@ interface ProductShowcaseProps {
   title?: string;
 }
 
-export function ProductShowcase({ products, title = "Projects" }: ProductShowcaseProps) {
-  const [activeTab, setActiveTab] = useState<"Prefab" | "Robot">("Prefab");
+type CardSize = "large" | "wide" | "default";
 
+// Bento layout: first card tall, last card wide, middle two normal
+const SIZES: CardSize[] = ["large", "default", "default", "wide"];
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+export function ProductShowcase({ products }: ProductShowcaseProps) {
   if (!products.length) return null;
 
-  // Filter products based on tab
-  const filteredProducts = products.filter((product) => {
-    const categorySlug = product.category.slug.toLowerCase();
-    if (activeTab === "Robot") {
-      return categorySlug.includes("robot");
-    } else {
-      return categorySlug.includes("pre-fabricated") || categorySlug.includes("prefab") || categorySlug.includes("steel");
-    }
-  });
-
-  const displayProducts = filteredProducts;
+  const featured = products.slice(0, 4);
 
   return (
-    <section className="py-14 md:py-20 bg-white">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="products" className="relative py-32 bg-secondary/10">
+      <div className="container mx-auto px-6">
 
-        {/* Heading */}
-        <div className="mb-6 flex items-end justify-between">
+        {/* Header row */}
+        <div className="flex items-end justify-between mb-16">
           <div>
-            <span className="inline-block mb-2 rounded-full border border-purple-300 bg-purple-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-purple-700">
-              Catalog
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#1a1a2e] md:text-4xl">{title}</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-primary font-medium mb-4">
+              Featured catalog
+            </p>
+            <h2 className="text-4xl md:text-5xl font-semibold max-w-2xl leading-tight">
+              Quality materials, built for{" "}
+              <span className="text-gradient">Canadian projects</span>
+            </h2>
           </div>
           <Link
             href="/products"
-            className="text-sm font-semibold text-[#4B1D8F] hover:underline whitespace-nowrap"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all duration-200"
           >
-            View all →
+            View all <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
 
-        {/* Horizontal Tabs */}
-        <div className="mb-8">
-          <div className="flex gap-2 border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab("Prefab")}
-              className={`px-6 py-3 font-semibold transition-colors ${
-                activeTab === "Prefab"
-                  ? "text-[#4B1D8F] border-b-2 border-[#4B1D8F]"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Prefab
-            </button>
-            <button
-              onClick={() => setActiveTab("Robot")}
-              className={`px-6 py-3 font-semibold transition-colors ${
-                activeTab === "Robot"
-                  ? "text-[#4B1D8F] border-b-2 border-[#4B1D8F]"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Robot
-            </button>
-          </div>
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 auto-rows-[280px]">
+          {featured.map((product, i) => {
+            const size = SIZES[i] ?? "default";
+            const image = product.images.find((img) => img.isMaster) ?? product.images[0];
+            const priceLabel = product.requireOrderRequest
+              ? "Request a quote"
+              : `From $${product.price.toLocaleString("en-CA", { minimumFractionDigits: 0 })} CAD`;
+
+            const spanClass =
+              size === "large" ? "md:row-span-2" :
+              size === "wide"  ? "md:col-span-2" : "";
+
+            return (
+              <motion.a
+                key={product.id}
+                href={`/products/${product.slug}`}
+                className={`group relative overflow-hidden rounded-3xl shadow-soft hover:shadow-elegant transition-all duration-500 block ${spanClass}`}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.7, delay: i * 0.1, ease: EASE }}
+              >
+                {/* Product image */}
+                {image?.url ? (
+                  <img
+                    src={image.url}
+                    alt={product.name}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-muted flex items-center justify-center text-muted-foreground text-sm">
+                    No image
+                  </div>
+                )}
+
+                {/* Dark gradient scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Category tag chip — top left */}
+                <div className="absolute top-5 left-5">
+                  <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/20 px-3 py-1 text-[10px] uppercase tracking-wider text-white font-medium">
+                    {product.category.name}
+                  </span>
+                </div>
+
+                {/* Bottom content row */}
+                <div className="absolute inset-x-0 bottom-0 p-6 flex items-end justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold text-white leading-snug line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-white/70 mt-1">{priceLabel}</p>
+                  </div>
+
+                  {/* Arrow button — appears on hover */}
+                  <div className="h-11 w-11 shrink-0 rounded-full bg-white/10 backdrop-blur-md border border-white/20 grid place-items-center text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
+                </div>
+              </motion.a>
+            );
+          })}
         </div>
 
-        {/* Grid — 4 columns, fixed card height */}
-        <div
-          data-testid="product-grid"
-          className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
-        >
-          {displayProducts.map((product) => (
-            <div key={product.id} className="flex flex-col h-full">
-              <ProductCard product={product} />
-            </div>
-          ))}
+        {/* Mobile "View all" link */}
+        <div className="mt-10 text-center md:hidden">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary"
+          >
+            View all products <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
