@@ -85,7 +85,7 @@ export function Header({ cmsNav }: HeaderProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0 hover:opacity-85 transition-opacity">
               {(!settings || settings.logo_style === "complete-banner") && (
-                <div className={`flex items-center overflow-hidden ${
+                <div className={`flex items-center bg-white rounded-xl px-3 py-1.5 overflow-hidden ${
                   settings?.logo_height === "h-12" ? "h-12" : settings?.logo_height === "h-20" ? "h-20" : "h-12"
                 }`}>
                   <img

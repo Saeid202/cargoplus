@@ -50,7 +50,7 @@ const services = [
 
 export function ServicesSection() {
   return (
-    <section className="relative py-24 bg-[#F5F4F7]">
+    <section className="relative py-16 bg-[#F5F4F7]">
       <div className="container mx-auto px-6">
 
         {/* Header row */}

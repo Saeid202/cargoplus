@@ -31,7 +31,7 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
   const filtered = filterProducts(products, activeTab);
 
   return (
-    <section id="products" className="relative py-32 bg-secondary/10">
+    <section id="products" className="relative py-16 bg-secondary/10">
       <div className="container mx-auto px-6">
 
         {/* Header row */}

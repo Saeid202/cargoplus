@@ -125,115 +125,110 @@ export function Footer({ socialLinks = [] }: FooterProps) {
   const activeSocialLinks = socialLinks.filter((l) => l.enabled && l.url);
 
   return (
-    <footer className="bg-[#4B1D8F] border-t border-white/10">
+    <footer style={{ background: 'linear-gradient(160deg, #1e0840 0%, #2d1060 40%, #1a0636 100%)' }}>
+
+      {/* Gold accent top line */}
+      <div className="h-[3px]" style={{ background: 'linear-gradient(90deg, transparent 0%, #D4AF37 25%, #D4AF37 75%, transparent 100%)' }} />
 
       {/* Main grid */}
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-6 py-14">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12">
 
-          {/* Brand */}
-          <div className="space-y-5 lg:col-span-1">
-            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Apex Modular Construction" className="h-10 w-auto object-contain" />
+          {/* Brand — wider column */}
+          <div className="space-y-6 lg:col-span-5">
+            <Link href="/" className="inline-flex items-center bg-white rounded-xl px-3 py-2 hover:opacity-85 transition-opacity">
+              <img src="/logo.png" alt="Apex Modular Construction" className="h-9 w-auto object-contain" />
             </Link>
-            <div className="flex items-start gap-3 max-w-xs">
-              <div className="mt-[0.45rem] h-0.5 w-5 shrink-0 rounded-full" style={{ background: '#D4AF37' }} />
-              <p className="text-sm text-white/85 leading-relaxed">
-                Your trusted marketplace for quality construction materials and prefabricated structures from China to Canada.
-              </p>
-            </div>
+            <p className="text-sm text-white/85 leading-relaxed max-w-sm">
+              Your trusted partner for quality prefabricated structures and construction solutions — direct from factory to your Canadian site.
+            </p>
             <div className="space-y-2.5 text-sm text-white/85">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#D4AF37' }} />
                 <span>9131 Keele Street, Vaughan, Ontario, L4K 0G7</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 text-[#D4AF37] shrink-0" />
+              <div className="flex items-center gap-3">
+                <Phone className="h-4 w-4 shrink-0" style={{ color: '#D4AF37' }} />
                 <a href="tel:+14168825015" className="hover:text-white transition-colors">+1 416 882 5015</a>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="h-4 w-4 text-[#D4AF37] shrink-0" />
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 shrink-0" style={{ color: '#D4AF37' }} />
                 <a href="mailto:info@cargoplus.site" className="hover:text-white transition-colors">info@cargoplus.site</a>
               </div>
             </div>
 
             {activeSocialLinks.length > 0 && (
-              <div className="pt-1">
-                <ColHeading>Follow Us</ColHeading>
-                <div className="flex flex-wrap gap-2">
-                  {activeSocialLinks.map((link) => (
-                    <a
-                      key={link.platform}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={link.platform.charAt(0).toUpperCase() + link.platform.slice(1)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 border border-white/20 text-white/70 hover:bg-[#D4AF37] hover:text-[#3b0764] hover:border-[#D4AF37] transition-all duration-200"
-                    >
-                      <SocialIcon platform={link.platform} />
-                    </a>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {activeSocialLinks.map((link) => (
+                  <a
+                    key={link.platform}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={link.platform.charAt(0).toUpperCase() + link.platform.slice(1)}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border text-white/70 transition-all duration-200 hover:text-[#3b0764] hover:border-[#D4AF37]"
+                    style={{ background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.15)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#D4AF37')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                  >
+                    <SocialIcon platform={link.platform} />
+                  </a>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <ColHeading>Quick Links</ColHeading>
-            <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Links columns */}
+          <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
 
-          {/* Customer Service */}
-          <div>
-            <ColHeading>Customer Service</ColHeading>
-            <ul className="space-y-3">
-              {customerServiceLinks.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Quick Links */}
+            <div>
+              <ColHeading>Quick Links</ColHeading>
+              <ul className="space-y-3">
+                {quickLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Legal */}
-          <div>
-            <ColHeading>Legal</ColHeading>
-            <ul className="space-y-3">
-              {legalLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Customer Service */}
+            <div>
+              <ColHeading>Customer Service</ColHeading>
+              <ul className="space-y-3">
+                {customerServiceLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <ColHeading>Legal</ColHeading>
+              <ul className="space-y-3">
+                {legalLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-white/85 hover:text-[#D4AF37] transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10">
-        <div className="container mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-white/60">
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-white/50">
           <p>© {currentYear} Apex Modular Construction. All rights reserved.</p>
           <p>Prices in CAD. HST/GST calculated at checkout.</p>
         </div>
