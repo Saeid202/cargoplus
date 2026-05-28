@@ -62,9 +62,12 @@ export function ServicesSection() {
             <h2 className="text-4xl md:text-5xl font-extrabold text-[#1a1a2e] max-w-2xl leading-tight">
               Our <span style={{ color: '#4B1D8F' }}>Services</span>
             </h2>
-            <p className="mt-3 text-sm text-gray-500 max-w-md">
-              From procurement to engineering, we connect Canadian businesses with trusted partners in China.
-            </p>
+            <div className="mt-4 flex items-start gap-3 max-w-md">
+              <div className="mt-[0.45rem] h-0.5 w-6 shrink-0 rounded-full" style={{ background: '#D4AF37' }} />
+              <p className="text-sm text-gray-500 leading-relaxed">
+                From procurement to engineering, we connect Canadian businesses with trusted partners in China.
+              </p>
+            </div>
           </div>
           <Link
             href="/services"
@@ -82,20 +85,24 @@ export function ServicesSection() {
             return (
               <motion.div
                 key={service.title}
-                className="group flex flex-col rounded-3xl bg-card border border-border shadow-soft hover:shadow-elegant transition-all duration-500 overflow-hidden"
+                className="group flex flex-col rounded-3xl bg-card border border-border shadow-soft hover:shadow-elegant hover:border-[#D4AF37]/30 transition-all duration-500 overflow-hidden"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.7, delay: i * 0.1, ease: EASE }}
               >
                 {/* Icon banner */}
-                <div className="bg-gradient-primary px-7 pt-8 pb-6">
+                <div className="bg-gradient-primary px-7 pt-8 pb-6 relative overflow-hidden">
+                  {/* Decorative gold circle */}
+                  <div className="absolute -top-6 -right-6 h-28 w-28 rounded-full opacity-10" style={{ background: '#D4AF37' }} />
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20">
                     <Icon className="h-6 w-6 text-white" />
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-white leading-snug">
                     {service.title}
                   </h3>
+                  {/* Gold accent line */}
+                  <div className="mt-4 h-0.5 w-10 rounded-full" style={{ background: '#D4AF37' }} />
                 </div>
 
                 {/* Body */}
@@ -106,13 +113,13 @@ export function ServicesSection() {
 
                   {/* How it works */}
                   <div className="mb-8">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: '#D4AF37' }}>
                       How it works
                     </p>
                     <ol className="space-y-3">
                       {service.steps.map((step, j) => (
                         <li key={j} className="flex items-start gap-3 text-sm text-foreground/80">
-                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold border" style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', borderColor: 'rgba(212,175,55,0.35)' }}>
                             {j + 1}
                           </span>
                           {step}
@@ -125,7 +132,8 @@ export function ServicesSection() {
                   <div className="mt-auto">
                     <Link
                       href={service.href}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition-all duration-300 hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-soft transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
+                      style={{ background: '#D4AF37', color: '#3b0764' }}
                     >
                       {service.cta}
                       <ArrowUpRight className="h-4 w-4" />

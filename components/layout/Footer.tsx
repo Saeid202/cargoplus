@@ -111,9 +111,12 @@ interface FooterProps {
 
 function ColHeading({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-5">
-      {children}
-    </p>
+    <div className="mb-5">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#D4AF37' }}>
+        {children}
+      </p>
+      <div className="h-px w-8 rounded-full" style={{ background: 'rgba(212,175,55,0.35)' }} />
+    </div>
   );
 }
 
@@ -124,28 +127,6 @@ export function Footer({ socialLinks = [] }: FooterProps) {
   return (
     <footer className="bg-[#4B1D8F] border-t border-white/10">
 
-      {/* CTA strip */}
-      <div className="border-b border-white/10">
-        <div className="container mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-medium mb-2">
-              Get In Touch
-            </p>
-            <h3 className="text-2xl md:text-3xl font-semibold text-white">
-              Ready to start your{" "}
-              <span className="text-gradient">next project?</span>
-            </h3>
-          </div>
-          <Link
-            href="/contact"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#3b0764] transition-all hover:brightness-110 hover:scale-105 active:scale-95"
-          >
-            Get a Free Quote
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-
       {/* Main grid */}
       <div className="container mx-auto px-6 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
@@ -155,9 +136,12 @@ export function Footer({ socialLinks = [] }: FooterProps) {
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
               <img src="/logo.png" alt="Apex Modular Construction" className="h-10 w-auto object-contain" />
             </Link>
-            <p className="text-sm text-white/60 leading-relaxed max-w-xs">
-              Your trusted marketplace for quality construction materials and prefabricated structures from China to Canada.
-            </p>
+            <div className="flex items-start gap-3 max-w-xs">
+              <div className="mt-[0.45rem] h-0.5 w-5 shrink-0 rounded-full" style={{ background: '#D4AF37' }} />
+              <p className="text-sm text-white/60 leading-relaxed">
+                Your trusted marketplace for quality construction materials and prefabricated structures from China to Canada.
+              </p>
+            </div>
             <div className="space-y-2.5 text-sm text-white/60">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
@@ -202,7 +186,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
+                    className="text-sm text-white/60 hover:text-[#D4AF37] transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -219,7 +203,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
+                    className="text-sm text-white/60 hover:text-[#D4AF37] transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -236,7 +220,7 @@ export function Footer({ socialLinks = [] }: FooterProps) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white transition-colors"
+                    className="text-sm text-white/60 hover:text-[#D4AF37] transition-colors"
                   >
                     {link.label}
                   </Link>

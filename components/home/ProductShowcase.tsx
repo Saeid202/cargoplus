@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import type { ProductWithRelations } from "@/types";
+import { ProductCard } from "@/components/products/ProductCard";
 
 interface ProductShowcaseProps {
   products: ProductWithRelations[];
@@ -43,9 +44,12 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
             <h2 className="text-4xl md:text-5xl font-extrabold text-[#1a1a2e] leading-tight">
               Our <span style={{ color: '#4B1D8F' }}>{title}</span>
             </h2>
-            <p className="mt-3 text-sm text-gray-500 max-w-md">
-              Browse our curated selection of prefabricated structures and industrial solutions.
-            </p>
+            <div className="mt-4 flex items-start gap-3 max-w-md">
+              <div className="mt-[0.45rem] h-0.5 w-6 shrink-0 rounded-full" style={{ background: '#D4AF37' }} />
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Browse our curated selection of prefabricated structures and industrial solutions.
+              </p>
+            </div>
           </div>
           <Link
             href="/products"
@@ -78,7 +82,7 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
           ))}
         </div>
 
-        {/* Uniform grid — all cards same size, all filtered products shown */}
+        {/* Product grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -93,61 +97,17 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
                 No products in this category yet.
               </div>
             ) : (
-              filtered.map((product, i) => {
-                const image = product.images.find((img) => img.isMaster) ?? product.images[0];
-                const priceLabel = product.requireOrderRequest
-                  ? "Request a quote"
-                  : `From $${product.price.toLocaleString("en-CA", { minimumFractionDigits: 0 })} CAD`;
-
-                return (
-                  <motion.a
-                    key={product.id}
-                    href={`/products/${product.slug}`}
-                    className="group relative aspect-[4/3] overflow-hidden rounded-2xl shadow-soft hover:shadow-elegant transition-all duration-500 block"
-                    initial={{ opacity: 0, y: 32 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.6, delay: i * 0.05, ease: EASE }}
-                  >
-                    {/* Product image */}
-                    {image?.url ? (
-                      <img
-                        src={image.url}
-                        alt={product.name}
-                        loading="lazy"
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-muted flex items-center justify-center text-muted-foreground text-sm">
-                        No image
-                      </div>
-                    )}
-
-                    {/* Purple brand gradient scrim */}
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #3a1570ee 0%, #4B1D8F55 50%, transparent 100%)' }} />
-
-                    {/* Gold category tag chip */}
-                    <div className="absolute top-4 left-4">
-                      <span className="rounded-full backdrop-blur-md border px-3 py-1 text-[10px] uppercase tracking-wider font-bold" style={{ background: 'rgba(212,175,55,0.2)', borderColor: 'rgba(212,175,55,0.5)', color: '#D4AF37' }}>
-                        {product.category.name}
-                      </span>
-                    </div>
-
-                    {/* Bottom content */}
-                    <div className="absolute inset-x-0 bottom-0 p-4 flex items-end justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-semibold text-white leading-snug line-clamp-2">
-                          {product.name}
-                        </h3>
-                        <p className="text-xs mt-0.5" style={{ color: '#D4AF37' }}>{priceLabel}</p>
-                      </div>
-                      <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" style={{ background: '#D4AF37', color: '#3a1570' }}>
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      </div>
-                    </div>
-                  </motion.a>
-                );
-              })
+              filtered.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.6, delay: i * 0.05, ease: EASE }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))
             )}
           </motion.div>
         </AnimatePresence>
