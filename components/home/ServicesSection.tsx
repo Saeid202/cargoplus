@@ -50,23 +50,26 @@ const services = [
 
 export function ServicesSection() {
   return (
-    <section className="relative py-32 bg-background">
+    <section className="relative py-24 bg-[#F5F4F7]">
       <div className="container mx-auto px-6">
 
         {/* Header row */}
         <div className="flex items-end justify-between mb-16">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary font-medium mb-4">
+            <p className="text-xs uppercase tracking-[0.3em] font-bold mb-3" style={{ color: '#D4AF37' }}>
               What We Offer
             </p>
-            <h2 className="text-4xl md:text-5xl font-semibold max-w-2xl leading-tight">
-              Services built for your{" "}
-              <span className="text-gradient">construction goals</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#1a1a2e] max-w-2xl leading-tight">
+              Our <span style={{ color: '#4B1D8F' }}>Services</span>
             </h2>
+            <p className="mt-3 text-sm text-gray-500 max-w-md">
+              From procurement to engineering, we connect Canadian businesses with trusted partners in China.
+            </p>
           </div>
           <Link
             href="/services"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all duration-200"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all duration-200"
+            style={{ color: '#4B1D8F' }}
           >
             All services <ArrowUpRight className="h-4 w-4" />
           </Link>

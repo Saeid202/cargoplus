@@ -23,7 +23,7 @@ function filterProducts(products: ProductWithRelations[], tab: Tab) {
   });
 }
 
-export function ProductShowcase({ products }: ProductShowcaseProps) {
+export function ProductShowcase({ products, title = "Projects" }: ProductShowcaseProps) {
   const [activeTab, setActiveTab] = useState<Tab>("Prefab");
 
   if (!products.length) return null;
@@ -31,23 +31,23 @@ export function ProductShowcase({ products }: ProductShowcaseProps) {
   const filtered = filterProducts(products, activeTab);
 
   return (
-    <section id="products" className="relative py-32 bg-secondary/10">
+    <section id="products" className="relative py-24 bg-white">
       <div className="container mx-auto px-6">
 
         {/* Header row */}
         <div className="flex items-end justify-between mb-10">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary font-medium mb-4">
-              Featured catalog
+            <p className="text-xs uppercase tracking-[0.3em] font-bold mb-3" style={{ color: '#D4AF37' }}>
+              Catalog
             </p>
-            <h2 className="text-4xl md:text-5xl font-semibold max-w-2xl leading-tight">
-              Quality materials, built for{" "}
-              <span className="text-gradient">Canadian projects</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#1a1a2e] leading-tight">
+              Our <span style={{ color: '#4B1D8F' }}>{title}</span>
             </h2>
           </div>
           <Link
             href="/products"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary hover:gap-3 transition-all duration-200"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all duration-200"
+            style={{ color: '#4B1D8F' }}
           >
             View all <ArrowUpRight className="h-4 w-4" />
           </Link>
