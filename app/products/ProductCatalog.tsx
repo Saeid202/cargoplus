@@ -29,11 +29,17 @@ export function ProductCatalog({ initialProducts, categories }: ProductCatalogPr
     });
   }, [selectedCategory, priceRange, initialProducts]);
 
+  const selectedCategoryData = useMemo(() =>
+    categoriesWithCount.find((c) => c.slug === selectedCategory) ?? null,
+  [categoriesWithCount, selectedCategory]);
+
+  const isPriceFiltered = priceRange[0] > 0 || priceRange[1] < 50000;
+
   return (
     <div>
       {/* Page header */}
       <div className="bg-white border-b border-border">
-        <div className="container mx-auto px-6 py-10">
+        <div className="container mx-auto px-6 pt-8 pb-10">
           <p className="text-xs uppercase tracking-[0.3em] font-bold mb-2" style={{ color: '#D4AF37' }}>
             Catalog
           </p>
@@ -68,20 +74,27 @@ export function ProductCatalog({ initialProducts, categories }: ProductCatalogPr
             {/* Product grid */}
             <div className="flex-1">
               {/* Count bar */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-extrabold" style={{ color: '#4B1D8F' }}>
-                    {filteredProducts.length}
-                  </span>
-                  <span className="text-sm text-gray-500 font-medium">
-                    {filteredProducts.length === 1 ? "product" : "products"} found
-                    {selectedCategory && (
-                      <span className="ml-1 text-gray-400">
-                        · filtered from {initialProducts.length}
-                      </span>
-                    )}
-                  </span>
-                </div>
+              <div className="flex items-center gap-3 mb-6">
+                {selectedCategoryData && (
+                  <>
+                    <span className="text-sm font-bold px-3 py-1 rounded-full text-white" style={{ background: 'linear-gradient(135deg, #4B1D8F 0%, #3a1570 100%)' }}>
+                      {selectedCategoryData.name}
+                    </span>
+                    <span className="text-gray-300">·</span>
+                  </>
+                )}
+                <span className="text-xl font-extrabold" style={{ color: '#4B1D8F' }}>
+                  {filteredProducts.length}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {filteredProducts.length === 1 ? "product" : "products"}
+                  {isPriceFiltered && selectedCategoryData && (
+                    <span className="text-gray-400"> of {selectedCategoryData.count}</span>
+                  )}
+                  {isPriceFiltered && !selectedCategoryData && (
+                    <span className="text-gray-400"> of {initialProducts.length}</span>
+                  )}
+                </span>
               </div>
 
               {filteredProducts.length > 0 ? (
