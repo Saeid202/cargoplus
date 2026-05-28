@@ -39,7 +39,7 @@ export function ProductCatalog({ initialProducts, categories }: ProductCatalogPr
     <div>
       {/* Page header */}
       <div className="bg-white border-b border-border">
-        <div className="container mx-auto px-6 pt-8 pb-10">
+        <div className="container mx-auto px-6 pt-12 pb-10">
           <p className="text-xs uppercase tracking-[0.3em] font-bold mb-2" style={{ color: '#D4AF37' }}>
             Catalog
           </p>
