@@ -35,7 +35,7 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
       <div className="container mx-auto px-6">
 
         {/* Header row */}
-        <div className="flex items-end justify-between mb-10">
+        <div className="flex items-end justify-between mb-16">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] font-bold mb-3" style={{ color: '#D4AF37' }}>
               Catalog
@@ -43,6 +43,9 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
             <h2 className="text-4xl md:text-5xl font-extrabold text-[#1a1a2e] leading-tight">
               Our <span style={{ color: '#4B1D8F' }}>{title}</span>
             </h2>
+            <p className="mt-3 text-sm text-gray-500 max-w-md">
+              Browse our curated selection of prefabricated structures and industrial solutions.
+            </p>
           </div>
           <Link
             href="/products"
@@ -120,12 +123,12 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
                       </div>
                     )}
 
-                    {/* Dark gradient scrim */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {/* Purple brand gradient scrim */}
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #3a1570ee 0%, #4B1D8F55 50%, transparent 100%)' }} />
 
-                    {/* Category tag chip */}
+                    {/* Gold category tag chip */}
                     <div className="absolute top-4 left-4">
-                      <span className="rounded-full bg-white/15 backdrop-blur-md border border-white/20 px-3 py-1 text-[10px] uppercase tracking-wider text-white font-medium">
+                      <span className="rounded-full backdrop-blur-md border px-3 py-1 text-[10px] uppercase tracking-wider font-bold" style={{ background: 'rgba(212,175,55,0.2)', borderColor: 'rgba(212,175,55,0.5)', color: '#D4AF37' }}>
                         {product.category.name}
                       </span>
                     </div>
@@ -136,9 +139,9 @@ export function ProductShowcase({ products, title = "Projects" }: ProductShowcas
                         <h3 className="text-sm font-semibold text-white leading-snug line-clamp-2">
                           {product.name}
                         </h3>
-                        <p className="text-xs text-white/70 mt-0.5">{priceLabel}</p>
+                        <p className="text-xs mt-0.5" style={{ color: '#D4AF37' }}>{priceLabel}</p>
                       </div>
-                      <div className="h-9 w-9 shrink-0 rounded-full bg-white/10 backdrop-blur-md border border-white/20 grid place-items-center text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      <div className="h-9 w-9 shrink-0 rounded-full grid place-items-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" style={{ background: '#D4AF37', color: '#3a1570' }}>
                         <ArrowUpRight className="h-3.5 w-3.5" />
                       </div>
                     </div>
