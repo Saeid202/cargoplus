@@ -64,16 +64,9 @@ export default async function ContactPage() {
       />
 
       {/* Main Workspace Layout */}
-      <section className="container mx-auto px-6 py-20 max-w-7xl relative z-10">
-        
-        {cmsContent && (
-          <div className="mb-16 p-8 rounded-3xl bg-white shadow-sm border border-gray-100 max-w-3xl">
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Executive Briefing</h2>
-            <div className="prose prose-lg prose-purple max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: cmsContent }} />
-          </div>
-        )}
+      <section className="container mx-auto px-6 py-10 max-w-7xl relative z-10">
 
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
           {/* Left Column: Premium Contact Form */}
           <div className="lg:col-span-7">

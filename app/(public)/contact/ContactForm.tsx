@@ -61,9 +61,9 @@ export function ContactForm() {
   }
 
   const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 pl-11 text-sm placeholder:text-gray-400 focus:border-[#4B1D8F] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4B1D8F]/20 transition-all duration-300 backdrop-blur-sm shadow-inner";
+    "w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-2.5 pl-10 text-sm placeholder:text-gray-400 focus:border-[#4B1D8F] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4B1D8F]/20 transition-all duration-300 backdrop-blur-sm";
 
-  const labelClass = "block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2 flex items-center gap-1.5";
+  const labelClass = "block text-xs font-bold text-gray-700 uppercase tracking-widest mb-1.5";
 
   if (isSubmitted) {
     return (
@@ -114,7 +114,7 @@ export function ContactForm() {
               Full Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <User className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 id="name"
@@ -132,7 +132,7 @@ export function ContactForm() {
               Corporate Email <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Mail className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="email"
                 id="email"
@@ -153,7 +153,7 @@ export function ContactForm() {
               Company / Firm Name
             </label>
             <div className="relative">
-              <Building2 className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 id="companyName"
@@ -170,7 +170,7 @@ export function ContactForm() {
               Direct Telephone
             </label>
             <div className="relative">
-              <Phone className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="tel"
                 id="phone"
@@ -190,7 +190,7 @@ export function ContactForm() {
               Primary Department / Inquiry <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <FileText className="absolute left-4 top-3.5 h-4 w-4 text-gray-400 pointer-events-none" />
+              <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <select
                 id="subject"
                 required
@@ -213,7 +213,7 @@ export function ContactForm() {
               Estimated Project Budget
             </label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-gray-400 pointer-events-none" />
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <select
                 id="projectBudget"
                 value={formData.projectBudget}
@@ -237,7 +237,7 @@ export function ContactForm() {
             Intended Construction Site Location
           </label>
           <div className="relative">
-            <MapPin className="absolute left-4 top-3.5 h-4 w-4 text-gray-400" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               id="projectLocation"
