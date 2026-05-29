@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import type { ProductWithRelations } from "@/types";
 
 interface ProductShowcaseProps {
@@ -24,13 +24,23 @@ function filterProducts(products: ProductWithRelations[], tab: Tab) {
   });
 }
 
+const LOAD_MORE_STEP = 6;
+
 export function ProductShowcase({ products, title = "Projects", limit }: ProductShowcaseProps) {
   const [activeTab, setActiveTab] = useState<Tab>("Prefab");
 
   if (!products.length) return null;
 
   const all = filterProducts(products, activeTab);
-  const filtered = limit && limit > 0 ? all.slice(0, limit) : all;
+  const initialCount = limit && limit > 0 ? limit : Math.min(LOAD_MORE_STEP, all.length);
+  const [visibleCount, setVisibleCount] = useState(initialCount);
+
+  useEffect(() => {
+    setVisibleCount(limit && limit > 0 ? limit : Math.min(LOAD_MORE_STEP, all.length));
+  }, [activeTab]);
+
+  const filtered = all.slice(0, visibleCount);
+  const hasMore = visibleCount < all.length;
 
   return (
     <section id="products" className="relative pt-16 pb-28 bg-secondary/10">
@@ -157,13 +167,28 @@ export function ProductShowcase({ products, title = "Projects", limit }: Product
           </motion.div>
         </AnimatePresence>
 
-        {/* Mobile "View all" link */}
-        <div className="mt-10 text-center md:hidden">
+        {/* Load more / View all */}
+        <div className="mt-12 flex flex-col items-center gap-4">
+          {hasMore && (
+            <motion.button
+              onClick={() => setVisibleCount((v) => v + LOAD_MORE_STEP)}
+              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full border-2 text-sm font-semibold transition-all duration-300 hover:text-white"
+              style={{ borderColor: '#4B1D8F', color: '#4B1D8F' }}
+              whileHover={{ scale: 1.03, backgroundColor: '#4B1D8F' }}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+              Load more projects ({all.length - visibleCount} remaining)
+            </motion.button>
+          )}
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
           >
-            View all products <ArrowUpRight className="h-4 w-4" />
+            View full catalogue <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { X, ShoppingCart, User, ChevronDown, Wrench, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -61,17 +62,28 @@ export function MobileMenu({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   return (
+    <AnimatePresence>
+      {isOpen && (
     <div className="fixed inset-0 z-50 lg:hidden">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+      <motion.div
+        className="absolute inset-0 bg-black/50"
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      />
 
       {/* Menu panel */}
-      <div
+      <motion.div
         ref={menuRef}
         className="absolute right-0 top-0 h-full w-80 max-w-[calc(100vw-4rem)] bg-background shadow-xl"
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 28, stiffness: 280 }}
       >
         <div className="flex h-full flex-col">
           {/* Header */}
@@ -254,7 +266,9 @@ export function MobileMenu({
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   );
 }
