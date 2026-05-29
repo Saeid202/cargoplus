@@ -20,6 +20,7 @@ import {
   Shield,
   CheckCircle2
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata: Metadata = {
   title: "Construction 3D Printing Systems - GAUDI Tech",
@@ -46,37 +47,11 @@ export default function Construction3DPrinterPage() {
         }}
       />
 
-      {/* Cinematic Hero Section */}
-      <section 
-        className="relative py-24 lg:py-32 text-white overflow-hidden"
-        style={{ background: `linear-gradient(135deg, #1D0A3A 0%, #3B1378 100%)` }}
-      >
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-cover bg-center" style={{ backgroundImage: "url('/logo.jpg')" }} />
-        
-        {/* Decorative Metallic Bottom Border */}
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, transparent 0%, ${GOLD} 50%, transparent 100%)` }} />
-
-        <div className="container mx-auto px-6 max-w-7xl relative z-10 text-center md:text-left">
-          <div className="max-w-3xl">
-            <span 
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-[#D4AF37]/30 bg-[#D4AF37]/10"
-              style={{ color: GOLD }}
-            >
-              <Cpu className="h-3 w-3 animate-pulse" />
-              Advanced Robotics Division
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none mb-6">
-              3D Printing <br />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #FFF 30%, ${GOLD} 100%)` }}>
-                Systems & Platforms
-              </span>
-            </h1>
-            <p className="text-purple-100 text-base sm:text-lg font-medium leading-relaxed max-w-xl">
-              Precision automated construction. GAUDI Tech systems support full remote operation, advanced pump automation, and on-site material formulation.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Advanced Robotics Division"
+        title={<>Construction <span style={{ color: PURPLE }}>3D Printing</span> Systems</>}
+        subtitle="GAUDI Tech systems support full remote operation, advanced pump automation, and on-site material formulation."
+      />
 
       {/* Intro Overview Section */}
       <section className="container mx-auto px-6 -mt-10 relative z-10 max-w-6xl">

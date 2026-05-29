@@ -2,16 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
-import { 
-  Calendar, 
-  User, 
-  ArrowRight, 
-  Tag, 
+import {
+  Calendar,
+  User,
+  ArrowRight,
+  Tag,
   Search,
   ChevronRight,
   Clock,
   BookOpen
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 // Design Tokens
 const PURPLE = "#4B1D8F";
@@ -71,30 +72,20 @@ export default function BlogHubPage() {
 
   return (
     <main className="bg-white min-h-screen">
-      {/* Header / Search */}
-      <section className="pt-24 pb-12 px-6 bg-[#F8F6FC]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.3em] mb-4" style={{ color: GOLD }}>
-                Knowledge Base & Insights
-              </p>
-              <h1 className="text-4xl md:text-6xl font-[1000] text-gray-900 tracking-tighter leading-tight">
-                The Apex Modular Construction <span style={{ color: PURPLE }}>Journal</span>
-              </h1>
-            </div>
-            
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search articles, guides, standards..." 
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
-              />
-            </div>
-          </div>
+      <PageHeader
+        eyebrow="Knowledge Base & Insights"
+        title={<>The Apex Modular <span style={{ color: PURPLE }}>Journal</span></>}
+        subtitle="Guides, standards, and industry insights for the Canadian modular construction market."
+      >
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search articles..."
+            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all"
+          />
         </div>
-      </section>
+      </PageHeader>
 
       {/* Featured Post */}
       <section className="py-12 px-6">

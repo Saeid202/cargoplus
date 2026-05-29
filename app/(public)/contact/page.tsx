@@ -2,15 +2,16 @@ import { Metadata } from "next";
 import { ContactForm } from "./ContactForm";
 import { createServerClient } from "@/lib/supabase/server";
 import { WhatsAppLink } from "@/components/layout/WhatsAppLink";
-import { 
-  Building2, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
-  ShieldCheck, 
-  Globe2, 
-  Award, 
+import { PageHeader } from "@/components/ui/PageHeader";
+import {
+  Building2,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  ShieldCheck,
+  Globe2,
+  Award,
   FileCheck2,
   Compass
 } from "lucide-react";
@@ -56,37 +57,11 @@ export default async function ContactPage() {
         }}
       />
 
-      {/* Hero Header Section */}
-      <section 
-        className="relative py-24 lg:py-32 overflow-hidden text-white flex items-center"
-        style={{ background: `linear-gradient(135deg, #1D0A3A 0%, #4B1D8F 100%)` }}
-      >
-        <div className="absolute inset-0 opacity-15 mix-blend-screen bg-cover bg-center pointer-events-none" style={{ backgroundImage: "url('/logo.jpg')" }} />
-        
-        {/* Decorative Metallic Ribbon */}
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, transparent 0%, ${GOLD} 50%, transparent 100%)` }} />
-
-        <div className="container mx-auto px-6 relative z-10 max-w-7xl">
-          <div className="max-w-3xl">
-            <span 
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-[#D4AF37]/30 bg-[#D4AF37]/10"
-              style={{ color: GOLD }}
-            >
-              <Compass className="h-3 w-3 animate-spin" style={{ animationDuration: '6s' }} />
-              Apex Global Sourcing & Engineering
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none mb-6">
-              Engineering the Future of <br className="hidden md:inline" />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #FFF 30%, ${GOLD} 100%)` }}>
-                Modular Infrastructure
-              </span>
-            </h1>
-            <p className="text-purple-100 text-lg sm:text-xl font-medium leading-relaxed max-w-2xl">
-              We partner with global real estate developers, construction management firms, and institutional investors to deliver ultra-high-efficiency modular buildings, custom structural steel framing, and rigorous CSA compliance certification services.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Get in Touch"
+        title={<>Contact <span style={{ color: '#4B1D8F' }}>Our Team</span></>}
+        subtitle="Partner with us to source prefabricated structures, request engineering consultations, or get a shipping quote."
+      />
 
       {/* Main Workspace Layout */}
       <section className="container mx-auto px-6 py-20 max-w-7xl relative z-10">

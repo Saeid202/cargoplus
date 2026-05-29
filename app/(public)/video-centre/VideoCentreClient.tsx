@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { VideoItem } from "@/app/actions/video-centre";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { 
   Play, 
   X, 
@@ -9,7 +10,6 @@ import {
   Compass, 
   Clock, 
   ArrowRight,
-  Sparkles
 } from "lucide-react";
 
 // Local inline YouTube SVG icon to prevent compile failures due to Lucide package discrepancies
@@ -91,38 +91,14 @@ export function VideoCentreClient({ initialVideos }: VideoCentreClientProps) {
         }}
       />
 
-      {/* Cinematic Theater Spotlight Hero Banner */}
-      <section 
-        className="relative py-20 lg:py-28 text-white overflow-hidden"
-        style={{ background: `linear-gradient(135deg, #1D0A3A 0%, #3B1378 100%)` }}
-      >
-        {/* Subtle grid elements */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-cover bg-center" style={{ backgroundImage: "url('/logo.jpg')" }} />
-        
-        {/* Decorative Metallic Border */}
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, transparent 0%, ${GOLD} 50%, transparent 100%)` }} />
+      <PageHeader
+        eyebrow="Dynamic Modular Portfolio"
+        title={<>Our Capabilities <span style={{ color: PURPLE }}>In Motion</span></>}
+        subtitle="Experience the speed, precision, and engineering capacity of Apex Modular — live timelapses and custom structural setups."
+      />
 
-        <div className="container mx-auto px-6 max-w-7xl relative z-10">
-          
-          <div className="text-center md:text-left max-w-3xl mb-12">
-            <span 
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-[#D4AF37]/30 bg-[#D4AF37]/10"
-              style={{ color: GOLD }}
-            >
-              <Sparkles className="h-3 w-3 animate-pulse" />
-              Dynamic Modular Portfolio
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none mb-6">
-              Our Capabilities <br className="hidden md:inline" />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #FFF 30%, ${GOLD} 100%)` }}>
-                In Motion
-              </span>
-            </h1>
-            <p className="text-purple-100 text-base sm:text-lg font-medium leading-relaxed max-w-xl">
-              Experience the speed, precision, and engineering capacity of Apex Modular. Watch live timelapses and custom structural setups.
-            </p>
-          </div>
-
+      {/* Theater Centerpiece Card */}
+      <section className="container mx-auto px-6 py-8 max-w-7xl">
           {/* Theater Centerpiece Card */}
           <div 
             className="rounded-3xl overflow-hidden bg-[#130728] border border-white/10 shadow-2xl relative max-w-5xl mx-auto group"
@@ -186,7 +162,6 @@ export function VideoCentreClient({ initialVideos }: VideoCentreClientProps) {
             </div>
           </div>
 
-        </div>
       </section>
 
       {/* Grid List of Other Construction Showcases */}
