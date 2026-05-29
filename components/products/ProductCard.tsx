@@ -51,7 +51,7 @@ export function ProductCard({ product }: ProductCardProps) {
             src={image.url}
             alt={image.altText ?? product.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 bg-muted" />
