@@ -100,14 +100,14 @@ export function VideoCentreClient({ initialVideos }: VideoCentreClientProps) {
       {/* Theater Centerpiece Card */}
       <section className="container mx-auto px-6 py-8 max-w-7xl">
           {/* Theater Centerpiece Card */}
-          <div 
-            className="rounded-3xl overflow-hidden bg-[#130728] border border-white/10 shadow-2xl relative max-w-5xl mx-auto group"
-            style={{ boxShadow: "0 30px 60px rgba(0, 0, 0, 0.4)" }}
+          <div
+            className="rounded-2xl overflow-hidden bg-[#130728] border border-white/10 shadow-xl relative max-w-3xl mx-auto group"
+            style={{ boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4)" }}
           >
             <div className="grid md:grid-cols-12 items-stretch">
-              
+
               {/* Widescreen Cover & Play trigger */}
-              <div 
+              <div
                 onClick={() => handleOpenLightbox(spotlightVideo.youtube_id)}
                 className="md:col-span-7 aspect-video relative overflow-hidden bg-black cursor-pointer group-hover:opacity-95 transition-all"
               >
@@ -116,46 +116,45 @@ export function VideoCentreClient({ initialVideos }: VideoCentreClientProps) {
                   alt={spotlightVideo.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => {
-                    // Fallback to high quality if maxres is missing
                     (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${spotlightVideo.youtube_id}/hqdefault.jpg`;
                   }}
                 />
-                
+
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                  <div 
-                    className="flex h-16 w-16 items-center justify-center rounded-full text-[#1D0A3A] transition-all duration-300 scale-95 group-hover:scale-110 shadow-lg"
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-full text-[#1D0A3A] transition-all duration-300 scale-95 group-hover:scale-110 shadow-lg"
                     style={{ backgroundColor: GOLD }}
                   >
-                    <Play className="h-7 w-7 fill-current ml-1" />
+                    <Play className="h-5 w-5 fill-current ml-0.5" />
                   </div>
                 </div>
 
-                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border border-white/15">
-                  <YoutubeIcon className="h-4 w-4 text-red-500" />
+                <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border border-white/15">
+                  <YoutubeIcon className="h-3.5 w-3.5 text-red-500" />
                   Spotlight Video
                 </div>
               </div>
 
               {/* Briefing sidebar info */}
-              <div className="md:col-span-5 p-8 flex flex-col justify-between border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A0A33] to-[#120524]">
+              <div className="md:col-span-5 p-5 flex flex-col justify-between border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A0A33] to-[#120524]">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mb-3 block">Featured Project Case</span>
-                  <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight mb-4">{spotlightVideo.title}</h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mb-2 block">Featured Project</span>
+                  <h3 className="text-base font-black tracking-tight leading-snug mb-2">{spotlightVideo.title}</h3>
                   {spotlightVideo.description && (
-                    <p className="text-purple-200 text-sm leading-relaxed">
+                    <p className="text-purple-200 text-xs leading-relaxed line-clamp-3">
                       {spotlightVideo.description}
                     </p>
                   )}
                 </div>
 
-                <button 
+                <button
                   onClick={() => handleOpenLightbox(spotlightVideo.youtube_id)}
-                  className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-xs font-black uppercase tracking-widest text-[#1D0A3A] hover:opacity-90 active:scale-98 transition-all cursor-pointer shadow-md"
+                  className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl text-xs font-black uppercase tracking-widest text-[#1D0A3A] hover:opacity-90 transition-all cursor-pointer shadow-md"
                   style={{ backgroundColor: GOLD }}
                 >
-                  Watch Project Video
-                  <ArrowRight className="h-4 w-4" />
+                  Watch Video
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
 
