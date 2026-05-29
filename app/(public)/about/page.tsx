@@ -28,6 +28,14 @@ export default async function AboutPage() {
     // Fall through to static content
   }
 
+  // Strip redundant top-level "About *" headings injected by the CMS editor
+  if (cmsContent) {
+    cmsContent = cmsContent
+      .replace(/<h[123][^>]*>\s*About\s+Us\s*<\/h[123]>/gi, "")
+      .replace(/<h[123][^>]*>\s*About\s+Shanghai\s+Cargo\s+Plus\s*<\/h[123]>/gi, "")
+      .replace(/<h[123][^>]*>\s*About\s+Apex\s+Modular\s+Construction\s*<\/h[123]>/gi, "");
+  }
+
   const content = cmsContent ?? `
     <div class="relative aspect-video rounded-xl overflow-hidden mb-8">
       <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=80" alt="Construction site" class="object-cover w-full h-full" />
