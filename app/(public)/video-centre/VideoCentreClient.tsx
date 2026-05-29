@@ -245,7 +245,7 @@ export function VideoCentreClient({ initialVideos }: VideoCentreClientProps) {
                   <div className="pt-6 mt-6 border-t border-gray-50 flex items-center justify-between">
                     <button 
                       onClick={() => handleOpenLightbox(video.youtube_id)}
-                      className="text-xs font-black uppercase tracking-widest text-[#4B1D8F] flex items-center gap-1 hover:text-yellow-600 transition-colors cursor-pointer"
+                      className="text-xs font-black uppercase tracking-widest text-[#4B1D8F] flex items-center gap-1 hover:text-[#b8960f] transition-colors cursor-pointer"
                     >
                       Launch Theater
                       <ArrowRight className="h-3 w-3" />

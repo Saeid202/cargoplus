@@ -704,7 +704,7 @@ export default function ConstructionSolutionsPage() {
                   <p className="text-5xl font-black text-white">$2,000+</p>
                   <p className="text-sm text-purple-200 mt-2 font-bold uppercase tracking-tighter">Average per SQM (CAD)</p>
                 </div>
-                <div className="p-8 rounded-2xl bg-yellow-400 flex flex-col justify-center transform md:scale-110 shadow-xl">
+                <div className="p-8 rounded-2xl bg-\[#D4AF37\] flex flex-col justify-center transform md:scale-110 shadow-xl">
                   <p className="text-xs font-black text-purple-900 uppercase mb-3 tracking-widest">Apex Modular Construction (China Sourced)</p>
                   <p className="text-6xl font-black text-purple-900">$700</p>
                   <p className="text-sm text-purple-900 mt-2 font-black uppercase tracking-tighter">Delivered to Canada (CAD)</p>

@@ -92,7 +92,7 @@ export default function BlogPostPage() {
   return (
     <main className="bg-white min-h-screen pb-24">
       {/* Progress Bar (Visual Only) */}
-      <div className="fixed top-0 left-0 h-1 bg-yellow-400 z-50 w-1/3" />
+      <div className="fixed top-0 left-0 h-1 bg-[#D4AF37] z-50 w-1/3" />
 
       {/* Article Header */}
       <header className="pt-24 pb-12 px-6 bg-[#F8F6FC]">
@@ -153,7 +153,7 @@ export default function BlogPostPage() {
         <div className="max-w-3xl mx-auto">
           {/* Content Render */}
           <div 
-            className="prose prose-lg max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-p:text-gray-600 prose-p:leading-relaxed prose-blockquote:border-l-4 prose-blockquote:border-yellow-400 prose-blockquote:bg-gray-50 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:font-bold prose-blockquote:text-gray-900 prose-blockquote:italic prose-li:text-gray-600"
+            className="prose prose-lg max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-p:text-gray-600 prose-p:leading-relaxed prose-blockquote:border-l-4 prose-blockquote:border-[#D4AF37] prose-blockquote:bg-gray-50 prose-blockquote:p-8 prose-blockquote:rounded-r-2xl prose-blockquote:font-bold prose-blockquote:text-gray-900 prose-blockquote:italic prose-li:text-gray-600"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
           
@@ -193,7 +193,7 @@ export default function BlogPostPage() {
             <div className="relative z-10">
                <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-4">Need a Structural Estimate?</h3>
                <p className="text-gray-400 mb-8 max-w-lg mx-auto">Get a detailed cost breakdown for your light steel or modular project in Canada.</p>
-               <Link href="/contact?subject=Structural Estimate Request" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-yellow-400 text-gray-900 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform">
+               <Link href="/contact?subject=Structural Estimate Request" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-[#D4AF37] text-gray-900 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform">
                   Request Free Estimate <ArrowRight className="w-4 h-4" />
                </Link>
             </div>

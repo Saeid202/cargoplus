@@ -135,8 +135,8 @@ export default function ServicesHubPage() {
                <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                   <div className="space-y-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20">
-                      <Globe className="w-3 h-3 text-yellow-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400">Logistics & Supply Chain</span>
+                      <Globe className="w-3 h-3 text-[#D4AF37]" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37]">Logistics & Supply Chain</span>
                     </div>
                     <h3 className="text-3xl font-black tracking-tight leading-tight">
                       Seamless Cross-Border <br /> Procurement
@@ -151,7 +151,7 @@ export default function ServicesHubPage() {
                         <span className="text-xs font-bold">Ocean & Inland Freight</span>
                       </div>
                       <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                        <Settings className="w-4 h-4 text-yellow-400" />
+                        <Settings className="w-4 h-4 text-[#D4AF37]" />
                         <span className="text-xs font-bold">Quality Control (QC)</span>
                       </div>
                     </div>
@@ -159,7 +159,7 @@ export default function ServicesHubPage() {
                   
                   <div className="grid grid-cols-2 gap-4">
                      <div className="aspect-square rounded-3xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between">
-                        <HardHat className="w-8 h-8 text-yellow-400" />
+                        <HardHat className="w-8 h-8 text-[#D4AF37]" />
                         <p className="text-sm font-bold leading-snug tracking-tight">On-Site <br />Support</p>
                      </div>
                      <div className="aspect-square rounded-3xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between">

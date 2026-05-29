@@ -122,7 +122,7 @@ export default function BlogHubPage() {
                   <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {featuredPost.readTime}</span>
                 </div>
                 
-                <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-6 group-hover:text-yellow-400 transition-colors">
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-6 group-hover:text-[#D4AF37] transition-colors">
                   {featuredPost.title}
                 </h2>
                 
@@ -138,7 +138,7 @@ export default function BlogHubPage() {
                       <p className="text-sm font-bold">{featuredPost.author}</p>
                       <p className="text-xs text-gray-500">{featuredPost.date}</p>
                    </div>
-                   <div className="ml-auto flex items-center gap-2 text-yellow-400 font-black uppercase tracking-widest text-[10px]">
+                   <div className="ml-auto flex items-center gap-2 text-[#D4AF37] font-black uppercase tracking-widest text-[10px]">
                       Read Post <ArrowRight className="w-4 h-4" />
                    </div>
                 </div>
@@ -230,7 +230,7 @@ export default function BlogHubPage() {
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-yellow-50 rounded-full blur-3xl opacity-50" />
         
         <div className="max-w-5xl mx-auto rounded-[64px] p-12 md:p-24 bg-gray-900 text-white relative z-10 text-center">
-          <p className="text-xs font-black uppercase tracking-[0.3em] mb-4 text-yellow-400">
+          <p className="text-xs font-black uppercase tracking-[0.3em] mb-4 text-[#D4AF37]">
             Expert Insights Delivered
           </p>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-8">
@@ -244,9 +244,9 @@ export default function BlogHubPage() {
             <input 
               type="email" 
               placeholder="Enter your professional email" 
-              className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all"
+              className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all"
             />
-            <button className="px-8 py-4 rounded-2xl bg-yellow-400 text-gray-900 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform shadow-xl">
+            <button className="px-8 py-4 rounded-2xl bg-[#D4AF37] text-gray-900 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform shadow-xl">
               Subscribe
             </button>
           </form>

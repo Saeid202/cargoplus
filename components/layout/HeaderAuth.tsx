@@ -62,9 +62,9 @@ export function HeaderAuth({ scrolled = true }: { scrolled?: boolean }) {
     <div className="relative">
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-3 h-9 text-sm font-semibold text-white hover:bg-white/20 hover:border-yellow-400 transition-all cursor-pointer"
+        className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-3 h-9 text-sm font-semibold text-white hover:bg-white/20 hover:border-[#D4AF37] transition-all cursor-pointer"
       >
-        <User className="h-4 w-4 text-yellow-400" />
+        <User className="h-4 w-4 text-[#D4AF37]" />
         <span className="max-w-[120px] truncate">{name}</span>
         <ChevronDown className="h-3 w-3 text-white/50" />
       </button>

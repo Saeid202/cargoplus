@@ -85,7 +85,7 @@ export async function CmsNavigation() {
               className="relative text-sm font-semibold text-purple-100 transition-all hover:text-yellow-300 min-h-[44px] flex items-center px-4 py-2 rounded-xl hover:bg-white/10"
             >
               {item.label}
-              <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+              <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
             </Link>
 
             {/* Dropdown for child pages */}

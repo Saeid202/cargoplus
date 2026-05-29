@@ -55,7 +55,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/about" onClick={() => onLinkClick?.()} className={linkClass}>
             About Us
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
 
@@ -63,7 +63,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/products" onClick={() => onLinkClick?.()} className={linkClass}>
             Products
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
 
@@ -71,7 +71,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/blog" onClick={() => onLinkClick?.()} className={linkClass}>
             Blog
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
 
@@ -89,7 +89,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
               className="h-3.5 w-3.5 transition-transform duration-200"
               style={{ transform: servicesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
             />
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </button>
 
           {/* Dropdown panel */}
@@ -147,7 +147,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/3d-printer" onClick={() => onLinkClick?.()} className={linkClass}>
             Construction 3D Printer
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
 
@@ -155,7 +155,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/video-centre" onClick={() => onLinkClick?.()} className={linkClass}>
             Video Centre
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
 
@@ -163,7 +163,7 @@ export function Navigation({ className, onLinkClick, scrolled = true }: Navigati
         <li>
           <Link href="/contact" onClick={() => onLinkClick?.()} className={linkClass}>
             Contact Us
-            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+            <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
           </Link>
         </li>
       </ul>
