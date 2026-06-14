@@ -16,11 +16,13 @@ import {
   FileSpreadsheet,
   File,
   Settings,
+  Wrench,
 } from 'lucide-react'
 import { useCartStore } from '@/lib/stores/cartStore'
 import { OrderRequestModal } from '@/components/product/OrderRequestModal'
 import { WhatsAppLink } from '@/components/layout/WhatsAppLink'
 import { RichTextRenderer } from '@/components/product/RichTextRenderer'
+import { ProductInclusionsPanel } from '@/components/ProductInclusionsPanel'
 import type { ProductWithRelations, CustomizationOption, HouseAnchor } from '@/types'
 import { extractYouTubeId, getYouTubeEmbedUrl } from '@/lib/youtube'
 import { ProductCustomizer } from '@/components/product/ProductCustomizer'
@@ -496,6 +498,12 @@ export function ProductDetailClient({
                 </div>
               )
             })()}
+
+          {/* Inclusions Panel - Sticky below image */}
+          <ProductInclusionsPanel
+            whatIsIncluded={product.whatIsIncluded}
+            certificatesStandards={product.certificatesStandards}
+          />
         </div>
 
         {/* RIGHT col */}
@@ -856,6 +864,18 @@ export function ProductDetailClient({
                     Request Quote for <span style={{ color: GOLD }}>{activeCode}</span>
                   </a>
                 )}
+
+                <a
+                  href="/hire-installers"
+                  className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-base font-bold text-white transition-all hover:opacity-90"
+                  style={{
+                    backgroundColor: PURPLE,
+                    border: `2px solid ${GOLD}`,
+                  }}
+                >
+                  <Wrench className="h-5 w-5" />
+                  Hire Installer
+                </a>
               </>
             )}
           </div>

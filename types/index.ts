@@ -96,6 +96,13 @@ export type CustomizationOption = product_customization_options
 /**
  * Product with related data (images, category, seller)
  */
+export interface CertificateStandard {
+  id: string
+  title: string
+  description: string
+  file_url?: string
+}
+
 export interface ProductWithRelations {
   id: string
   name: string
@@ -113,6 +120,8 @@ export interface ProductWithRelations {
   requireOrderRequest: boolean
   showStock: boolean
   youtubeUrl: string | null
+  whatIsIncluded?: string[] | null
+  certificatesStandards?: CertificateStandard[] | null
   createdAt: string
   updatedAt: string
   images: ProductImageData[]

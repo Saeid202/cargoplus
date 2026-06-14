@@ -21,10 +21,35 @@ export function HeaderAuth({ scrolled = true }: { scrolled?: boolean }) {
       setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const sessionUser = session?.user ?? null;
       setUser(sessionUser);
-      setUserRole(sessionUser?.user_metadata?.role ?? null);
+      
+      // Try to get role from auth metadata first
+      let role = sessionUser?.user_metadata?.role;
+      
+      // If no role in metadata, try to get from database
+      if (!role && sessionUser?.id) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', sessionUser.id)
+            .single();
+          
+          if (profileData?.role) {
+            role = profileData.role;
+            // Update auth metadata with role from database
+            await supabase.auth.updateUser({
+              data: { role: profileData.role }
+            });
+          }
+        } catch (err) {
+          console.error('Error fetching profile:', err);
+        }
+      }
+      
+      setUserRole(role);
     });
 
     return () => listener.subscription.unsubscribe();
@@ -57,6 +82,9 @@ export function HeaderAuth({ scrolled = true }: { scrolled?: boolean }) {
   }
 
   const name = user.user_metadata?.full_name || user.email?.split("@")[0] || "Account";
+
+  console.log('HeaderAuth - userRole:', userRole);
+  console.log('HeaderAuth - user email:', user.email);
 
   return (
     <div className="relative">
@@ -110,15 +138,35 @@ export function HeaderAuth({ scrolled = true }: { scrolled?: boolean }) {
                 <LayoutDashboard className="h-4 w-4" />
                 Agent Dashboard
               </Link>
-            ) : (
+            ) : userRole === "contractor" ? (
               <Link
-                href="/account/dashboard"
+                href="/contractor/dashboard"
                 onClick={() => setDropdownOpen(false)}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
                 <LayoutDashboard className="h-4 w-4" />
-                My Dashboard
+                Contractor Dashboard
               </Link>
+            ) : (
+              // TEMPORARILY SHOW CONTRACTOR DASHBOARD LINK FOR ALL AUTHENTICATED USERS FOR TESTING
+              <>
+                <Link
+                  href="/account/dashboard"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  My Dashboard
+                </Link>
+                <Link
+                  href="/contractor/dashboard"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Contractor Dashboard (Test)
+                </Link>
+              </>
             )}
             {/* Only show orders/profile for buyers */}
             {userRole !== "seller" && userRole !== "admin" && userRole !== "partner" && (

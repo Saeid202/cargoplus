@@ -618,6 +618,32 @@ export async function updateProduct(
     const youtubeUrl = (formData.get('youtubeUrl') as string | null) || null
     const hasCustomization = formData.get('hasCustomization') === 'true'
 
+    // Parse what_is_included and certificates_standards from form data
+    let whatIsIncluded: string[] = []
+    const whatIsIncludedStr = formData.get('whatIsIncluded') as string | null
+    if (whatIsIncludedStr) {
+      try {
+        whatIsIncluded = JSON.parse(whatIsIncludedStr)
+      } catch {
+        /* ignore */
+      }
+    }
+
+    let certificatesStandards: Array<{
+      id: string
+      title: string
+      description: string
+      file_url: string | null
+    }> = []
+    const certificatesStr = formData.get('certificatesStandards') as string | null
+    if (certificatesStr) {
+      try {
+        certificatesStandards = JSON.parse(certificatesStr)
+      } catch {
+        /* ignore */
+      }
+    }
+
     const { data: product, error: productError } = await supabase
       .from('products')
       .update({
@@ -635,6 +661,8 @@ export async function updateProduct(
         youtube_url: youtubeUrl,
         has_customization: hasCustomization,
         configurator_type: (formData.get('configuratorType') as string | null) || 'none',
+        what_is_included: whatIsIncluded,
+        certificates_standards: certificatesStandards,
         updated_at: new Date().toISOString(),
       })
       .eq('id', productId)

@@ -61,6 +61,13 @@ type ProductDetailDbProduct = NonNullable<Awaited<ReturnType<typeof getProductBy
     file_type: 'pdf' | 'excel' | 'word' | 'other'
     position: number
   }>
+  what_is_included?: string[] | null
+  certificates_standards?: Array<{
+    id: string
+    title: string
+    description: string
+    file_url?: string
+  }> | null
 }
 
 function transformProduct(
@@ -162,6 +169,8 @@ function transformProduct(
         fileType: d.file_type,
         position: d.position,
       })),
+    whatIsIncluded: detailProduct.what_is_included ?? null,
+    certificatesStandards: detailProduct.certificates_standards ?? null,
   }
 }
 

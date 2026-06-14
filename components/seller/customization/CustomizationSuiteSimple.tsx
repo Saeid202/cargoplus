@@ -609,8 +609,9 @@ export function CustomizationSuiteSimple({
         await deleteCustomizationOption(option.id)
       }
 
-      setOptions((prev) => prev.filter((_, idx) => idx !== rowIndex))
-      syncCustomGroups()
+      const updatedOptions = options.filter((_, idx) => idx !== rowIndex)
+      setOptions(updatedOptions)
+      syncCustomGroups(updatedOptions)
     } catch (error) {
       console.error('Error deleting option:', error)
       alert('Error deleting option. Please try again.')
@@ -618,12 +619,14 @@ export function CustomizationSuiteSimple({
   }
 
   // Transform internal options to customGroups format for parent
-  const syncCustomGroups = () => {
+  const syncCustomGroups = (optionsToSync?: OptionRow[]) => {
     if (!onCustomGroupsChange) return
+
+    const optsToProcess = optionsToSync || options
 
     // Group options by category
     const grouped: Record<string, OptionRow[]> = {}
-    options.forEach((opt) => {
+    optsToProcess.forEach((opt) => {
       if (!grouped[opt.category]) {
         grouped[opt.category] = []
       }
@@ -631,71 +634,73 @@ export function CustomizationSuiteSimple({
     })
 
     // Transform to customGroups format
-    const transformedGroups = Object.entries(grouped).map(([category, opts]) => {
-      const existingGroup = customGroups?.find((group) => group.name === category)
-      // For color categories, expand grouped rows into individual color option entries
-      if (category.toLowerCase().includes('color')) {
-        const expandedOptions = opts.flatMap((opt) => {
-          const colors =
-            opt.selectedColorHexes && opt.selectedColorHexes.length > 0
-              ? opt.selectedColorHexes
-              : opt.colorHex
-                ? [opt.colorHex]
-                : []
+    const transformedGroups = Object.entries(grouped)
+      .filter(([_, opts]) => opts.length > 0) // Filter out empty categories
+      .map(([category, opts]) => {
+        const existingGroup = customGroups?.find((group) => group.name === category)
+        // For color categories, expand grouped rows into individual color option entries
+        if (category.toLowerCase().includes('color')) {
+          const expandedOptions = opts.flatMap((opt) => {
+            const colors =
+              opt.selectedColorHexes && opt.selectedColorHexes.length > 0
+                ? opt.selectedColorHexes
+                : opt.colorHex
+                  ? [opt.colorHex]
+                  : []
 
-          if (colors.length === 0) {
-            // Fallback to single entry using the base name
-            return [
-              {
-                id: opt.id === 'new' ? `new-${opt.name}` : opt.id,
-                name: opt.name,
-                priceModifier: parseFloat(opt.price) || 0,
-                imageUrl: opt.images[0] || '',
-                description: null as string | null,
-                colorHex: opt.colorHex ?? null,
-              },
-            ]
+            if (colors.length === 0) {
+              // Fallback to single entry using the base name
+              return [
+                {
+                  id: opt.id === 'new' ? `new-${opt.name}` : opt.id,
+                  name: opt.name,
+                  priceModifier: parseFloat(opt.price) || 0,
+                  imageUrl: opt.images[0] || '',
+                  description: null as string | null,
+                  colorHex: opt.colorHex ?? null,
+                },
+              ]
+            }
+
+            return colors.map((color, idx) => ({
+              id:
+                opt.relatedOptionIds && opt.relatedOptionIds[idx]
+                  ? opt.relatedOptionIds[idx]
+                  : opt.id === 'new'
+                    ? `new-${opt.name}-${idx}`
+                    : opt.id,
+              name: `${opt.name} (${color})`,
+              priceModifier: parseFloat(opt.price) || 0,
+              imageUrl: opt.images[0] || '',
+              description: color as string | null,
+              colorHex: color,
+            }))
+          })
+
+          return {
+            id: existingGroup?.id ?? (opts[0].id === 'new' ? `new-${category}` : opts[0].id),
+            name: category,
+            visualType: existingGroup?.visualType ?? 'generic',
+            targetAnchorId: existingGroup?.targetAnchorId ?? null,
+            options: expandedOptions,
           }
-
-          return colors.map((color, idx) => ({
-            id:
-              opt.relatedOptionIds && opt.relatedOptionIds[idx]
-                ? opt.relatedOptionIds[idx]
-                : opt.id === 'new'
-                  ? `new-${opt.name}-${idx}`
-                  : opt.id,
-            name: `${opt.name} (${color})`,
-            priceModifier: parseFloat(opt.price) || 0,
-            imageUrl: opt.images[0] || '',
-            description: color as string | null,
-            colorHex: color,
-          }))
-        })
+        }
 
         return {
           id: existingGroup?.id ?? (opts[0].id === 'new' ? `new-${category}` : opts[0].id),
           name: category,
           visualType: existingGroup?.visualType ?? 'generic',
           targetAnchorId: existingGroup?.targetAnchorId ?? null,
-          options: expandedOptions,
+          options: opts.map((opt) => ({
+            id: opt.id === 'new' ? `new-${opt.name}` : opt.id,
+            name: opt.name,
+            priceModifier: parseFloat(opt.price) || 0,
+            imageUrl: opt.images[0] || '',
+            description: opt.description ?? null,
+            colorHex: opt.colorHex ?? null,
+          })),
         }
-      }
-
-      return {
-        id: existingGroup?.id ?? (opts[0].id === 'new' ? `new-${category}` : opts[0].id),
-        name: category,
-        visualType: existingGroup?.visualType ?? 'generic',
-        targetAnchorId: existingGroup?.targetAnchorId ?? null,
-        options: opts.map((opt) => ({
-          id: opt.id === 'new' ? `new-${opt.name}` : opt.id,
-          name: opt.name,
-          priceModifier: parseFloat(opt.price) || 0,
-          imageUrl: opt.images[0] || '',
-          description: opt.description ?? null,
-          colorHex: opt.colorHex ?? null,
-        })),
-      }
-    })
+      })
 
     try {
       const payload = JSON.stringify(transformedGroups, null, 2)

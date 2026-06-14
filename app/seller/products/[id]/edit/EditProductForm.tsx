@@ -15,8 +15,10 @@ import {
   Hash,
   FileText,
   ChevronDown,
-  ToggleLeft,
   Settings,
+  Plus,
+  File,
+  Upload,
 } from 'lucide-react'
 import Link from 'next/link'
 import { LuxuryButton } from '@/components/seller/LuxuryButton'
@@ -127,6 +129,13 @@ export function EditProductForm({
   const [configuratorType, setConfiguratorType] = useState<'none' | 'house'>(
     ((product as any).configurator_type as string) === 'house' ? 'house' : 'none'
   )
+  const [whatIsIncluded, setWhatIsIncluded] = useState<string[]>([])
+  const [certificatesStandards, setCertificatesStandards] = useState<
+    Array<{ id: string; title: string; description: string; file_url: string | null; file?: File }>
+  >([])
+  const [certificateFileInputs, setCertificateFileInputs] = useState<Map<string, File | null>>(
+    new Map()
+  )
 
   useEffect(() => {
     if (product.product_images.length > 0) {
@@ -183,6 +192,14 @@ export function EditProductForm({
           position: d.position,
         }))
       )
+    }
+
+    // Load existing what's included and certificates
+    if ((product as any).what_is_included) {
+      setWhatIsIncluded((product as any).what_is_included)
+    }
+    if ((product as any).certificates_standards) {
+      setCertificatesStandards((product as any).certificates_standards)
     }
   }, [])
 
@@ -274,6 +291,43 @@ export function EditProductForm({
         formData.set('customizationsJson', '[]')
       }
 
+      // Filter out empty what's included items
+      const filteredWhatIsIncluded = whatIsIncluded.filter((item) => item.trim())
+      formData.set('whatIsIncluded', JSON.stringify(filteredWhatIsIncluded))
+
+      // Upload certificates and prepare certificate data
+      if (certificatesStandards.length > 0) {
+        setLoadingMsg('Uploading certificates…')
+        const uploadedCertificates = await Promise.all(
+          certificatesStandards.map(async (cert) => {
+            let file_url = cert.file_url
+            // Upload new certificate file if provided
+            if (cert.file) {
+              const fileExt = cert.file.name.split('.').pop()
+              const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+              const { error: uploadError } = await supabase.storage
+                .from('certificates')
+                .upload(`${user.id}/${product.id}/${fileName}`, cert.file)
+              if (!uploadError) {
+                const { data: publicData } = supabase.storage
+                  .from('certificates')
+                  .getPublicUrl(`${user.id}/${product.id}/${fileName}`)
+                file_url = publicData.publicUrl
+              }
+            }
+            return {
+              id: cert.id,
+              title: cert.title,
+              description: cert.description,
+              file_url,
+            }
+          })
+        )
+        formData.set('certificatesStandards', JSON.stringify(uploadedCertificates))
+      } else {
+        formData.set('certificatesStandards', JSON.stringify([]))
+      }
+
       formData.set('variantsJson', JSON.stringify(uploadedVariants))
       formData.set('configuratorType', configuratorType)
       console.log('💾 Calling updateProduct with variants:', uploadedVariants.length)
@@ -295,13 +349,8 @@ export function EditProductForm({
       console.log('Documents saved')
 
       console.log('Save process completed')
-      // If interactive house is enabled, take the seller to the visual configurator builder
-      if (configuratorType === 'house') {
-        router.push(`/seller/products/${product.id}/visual-configurator`)
-      } else {
-        setLoading(false)
-        router.refresh()
-      }
+      setLoading(false)
+      router.refresh()
     } catch (error) {
       console.error('Error during save:', error)
       setError('An error occurred while saving. Please try again.')
@@ -563,6 +612,188 @@ export function EditProductForm({
               </div>
             )
           })()}
+      </Field>
+
+      <Section title="What's Included" />
+      <Field label="Bullet Points" hint="List what's included with your product.">
+        <div className="space-y-2">
+          {whatIsIncluded.map((item, idx) => (
+            <div key={idx} className="flex gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => {
+                  const updated = [...whatIsIncluded]
+                  updated[idx] = e.target.value
+                  setWhatIsIncluded(updated)
+                }}
+                placeholder={`Item ${idx + 1}`}
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={() => setWhatIsIncluded(whatIsIncluded.filter((_, i) => i !== idx))}
+                className="flex items-center justify-center h-10.5 w-10.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors shrink-0"
+                style={{ color: '#DC2626' }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => setWhatIsIncluded([...whatIsIncluded, ''])}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all hover:bg-gray-50"
+            style={{
+              borderColor: GOLD,
+              color: PURPLE,
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Add Item
+          </button>
+        </div>
+      </Field>
+
+      <Section title="Certificates & Standards" />
+      <Field label="Certificates" hint="Add certifications and standards your product meets.">
+        <div className="space-y-4">
+          {certificatesStandards.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: `1.5px solid ${GOLD}55`,
+                    }}
+                  >
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">Title</th>
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">Description</th>
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">File</th>
+                    <th className="text-center py-2 px-3 font-semibold text-gray-700 w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {certificatesStandards.map((cert) => (
+                    <tr
+                      key={cert.id}
+                      style={{
+                        borderBottom: `1px solid ${GOLD}22`,
+                      }}
+                    >
+                      <td className="py-3 px-3">
+                        <input
+                          type="text"
+                          value={cert.title}
+                          onChange={(e) => {
+                            const updated = certificatesStandards.map((c) =>
+                              c.id === cert.id ? { ...c, title: e.target.value } : c
+                            )
+                            setCertificatesStandards(updated)
+                          }}
+                          placeholder="e.g., ISO 9001"
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-xs"
+                        />
+                      </td>
+                      <td className="py-3 px-3">
+                        <textarea
+                          value={cert.description}
+                          onChange={(e) => {
+                            const updated = certificatesStandards.map((c) =>
+                              c.id === cert.id ? { ...c, description: e.target.value } : c
+                            )
+                            setCertificatesStandards(updated)
+                          }}
+                          placeholder="Certificate description"
+                          rows={1}
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-xs resize-none"
+                        />
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="flex flex-col gap-1">
+                          {cert.file_url && !certificateFileInputs.get(cert.id) && (
+                            <a
+                              href={cert.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-medium text-blue-600 hover:underline flex items-center gap-1"
+                            >
+                              <File className="h-3 w-3" />
+                              View File
+                            </a>
+                          )}
+                          {certificateFileInputs.get(cert.id) && (
+                            <span className="text-xs text-green-600 flex items-center gap-1">
+                              ✓ {certificateFileInputs.get(cert.id)!.name}
+                            </span>
+                          )}
+                          <label className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-700 cursor-pointer">
+                            <Upload className="h-3 w-3" />
+                            {certificateFileInputs.get(cert.id) ? 'Change' : 'Upload'}
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              onChange={(e) => {
+                                if (e.target.files?.[0]) {
+                                  const newInputs = new Map(certificateFileInputs)
+                                  newInputs.set(cert.id, e.target.files[0])
+                                  setCertificateFileInputs(newInputs)
+                                  // Update the certificate with the file
+                                  const updated = certificatesStandards.map((c) =>
+                                    c.id === cert.id ? { ...c, file: e.target.files![0] } : c
+                                  )
+                                  setCertificatesStandards(updated)
+                                }
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCertificatesStandards(
+                              certificatesStandards.filter((c) => c.id !== cert.id)
+                            )
+                            const newInputs = new Map(certificateFileInputs)
+                            newInputs.delete(cert.id)
+                            setCertificateFileInputs(newInputs)
+                          }}
+                          className="flex items-center justify-center h-8 w-8 rounded hover:bg-red-50 transition-colors"
+                          style={{ color: '#DC2626' }}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              const newCert = {
+                id: `cert-${Date.now()}`,
+                title: '',
+                description: '',
+                file_url: null,
+              }
+              setCertificatesStandards([...certificatesStandards, newCert])
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all hover:bg-gray-50"
+            style={{
+              borderColor: GOLD,
+              color: PURPLE,
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Add Certificate
+          </button>
+        </div>
       </Field>
 
       <Section title="Customization Options" />
